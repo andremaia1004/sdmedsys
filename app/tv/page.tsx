@@ -1,7 +1,9 @@
 import TVBoard from '@/features/queue/components/TVBoard';
+import { fetchTVQueueAction } from '@/app/actions/queue';
 
-export default function TVPage() {
+export default async function TVPage() {
+    const items = await fetchTVQueueAction();
     return (
-        <TVBoard />
+        <TVBoard items={items || []} />
     );
 }

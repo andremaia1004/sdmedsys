@@ -26,33 +26,33 @@ export default function ConsultationWorkspace({ consultation, patientName }: { c
                 <h1 className={styles.patientName}>{patientName}</h1>
                 <div className={styles.meta}>
                     <div className={styles.metaItem}>
-                        <span>📅</span> {new Date(consultation.startedAt).toLocaleDateString()}
+                        <span>📅</span> {new Date(consultation.startedAt).toLocaleDateString('pt-BR')}
                     </div>
                     <div className={styles.metaItem}>
-                        <span>🕒</span> Started at {new Date(consultation.startedAt).toLocaleTimeString()}
+                        <span>🕒</span> Iniciado às {new Date(consultation.startedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 </div>
             </header>
 
             <div className={styles.notesArea}>
                 <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.875rem' }}>
-                    CLINICAL OBSERVATIONS & NOTES
+                    OBSERVAÇÕES CLÍNICAS & EVOLUÇÃO
                 </label>
                 <textarea
                     className={styles.textarea}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     onBlur={handleSave}
-                    placeholder="Start typing clinical notes..."
+                    placeholder="Comece a digitar as notas clínicas aqui..."
                 />
                 <div className={styles.statusInfo}>
-                    {saving ? 'Saving changes...' : '✓ All changes saved'}
+                    {saving ? 'Salvando alterações...' : '✓ Todas as alterações foram salvas'}
                 </div>
             </div>
 
             <footer className={styles.footer}>
                 <form action={async () => {
-                    if (confirm('Are you sure you want to finish this consultation?')) {
+                    if (confirm('Tem certeza que deseja finalizar este atendimento?')) {
                         await handleSave();
                         await finishConsultationAction(consultation.id);
                     }
@@ -62,7 +62,7 @@ export default function ConsultationWorkspace({ consultation, patientName }: { c
                         variant="accent"
                         size="lg"
                     >
-                        Finish Consultation
+                        Finalizar Atendimento
                     </Button>
                 </form>
             </footer>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useActionState } from 'react';
 import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
@@ -34,8 +34,8 @@ export default function AppointmentModal({
             <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
                 <Card padding="lg" style={{ width: '350px', textAlign: 'center' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
-                    <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>Appointment Scheduled!</h3>
-                    <p style={{ color: 'var(--text-muted)' }}>Updating calendar...</p>
+                    <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>Agendamento Confirmado!</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>Atualizando calendário...</p>
                 </Card>
             </div>
         )
@@ -53,26 +53,28 @@ export default function AppointmentModal({
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
             <Card
                 className={styles.modalCard}
-                header="New Appointment"
+                header="Novo Agendamento"
                 style={{ width: '450px', animation: 'slideUp 0.3s ease-out' }}
                 footer={
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                        <Button variant="secondary" onClick={onClose} fullWidth>Cancel</Button>
+                        <Button variant="secondary" onClick={onClose} fullWidth>Cancelar</Button>
                         <Button
                             variant="primary"
                             disabled={!selectedPatient || isPending}
                             onClick={() => (document.getElementById('appointment-form') as HTMLFormElement)?.requestSubmit()}
                             fullWidth
                         >
-                            {isPending ? 'Scheduling...' : 'Confirm'}
+                            {isPending ? 'Agendando...' : 'Confirmar'}
                         </Button>
                     </div>
                 }
             >
                 <div style={{ padding: '1.5rem' }}>
                     <div style={{ marginBottom: '1.5rem', padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: '8px', borderLeft: '4px solid var(--accent)' }}>
-                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Scheduled Slot</div>
-                        <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{date} at {time}</div>
+                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Horário Selecionado</div>
+                        <div style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                            {new Date(date).toLocaleDateString('pt-BR')} às {time}
+                        </div>
                     </div>
 
                     <form id="appointment-form" action={formAction}>
@@ -83,10 +85,10 @@ export default function AppointmentModal({
                         {!selectedPatient ? (
                             <div>
                                 <Input
-                                    label="Search Patient"
+                                    label="Buscar Paciente"
                                     value={searchQuery}
                                     onChange={(e) => handleSearch(e.target.value)}
-                                    placeholder="Type patient name or document..."
+                                    placeholder="Nome ou CPF do paciente..."
                                     autoFocus
                                 />
                                 {searchQuery.length > 2 && (
@@ -120,7 +122,7 @@ export default function AppointmentModal({
                                         ))}
                                         {searchResults.length === 0 && searchQuery.length > 2 && (
                                             <li style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                                                No patients found
+                                                Nenhum paciente encontrado
                                             </li>
                                         )}
                                     </ul>
@@ -137,10 +139,10 @@ export default function AppointmentModal({
                                 border: '1px solid rgba(59, 130, 246, 0.2)'
                             }}>
                                 <div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Selected Patient</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Paciente Selecionado</div>
                                     <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{selectedPatient.name}</div>
                                 </div>
-                                <Button variant="ghost" size="sm" onClick={() => setSelectedPatient(null)} style={{ color: 'var(--danger)' }}>Change</Button>
+                                <Button variant="ghost" size="sm" onClick={() => setSelectedPatient(null)} style={{ color: 'var(--danger)' }}>Alterar</Button>
                                 <input type="hidden" name="patientId" value={selectedPatient.id} />
                                 <input type="hidden" name="patientName" value={selectedPatient.name} />
                             </div>

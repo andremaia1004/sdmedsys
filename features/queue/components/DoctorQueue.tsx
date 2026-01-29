@@ -17,25 +17,25 @@ export default function DoctorQueue({ items }: { items: QueueItemWithPatient[] }
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {currentPatient && (
                 <Card
-                    header="Current Service"
+                    header="Atendimento em Curso"
                     style={{ borderLeft: '8px solid var(--primary)', backgroundColor: 'rgba(0, 45, 94, 0.02)' }}
                     footer={
                         <div style={{ display: 'flex', gap: '1rem' }}>
                             <Link href={`/doctor/consultation/${currentPatient.id}`} style={{ flex: 1 }}>
-                                <Button fullWidth variant="primary" size="lg">Open Consultation Workspace</Button>
+                                <Button fullWidth variant="primary" size="lg">Abrir Prontuário</Button>
                             </Link>
                             <Button onClick={() => changeQueueStatusAction(currentPatient.id, 'DONE')} variant="secondary" size="lg">
-                                Mark as Done
+                                Concluir Atendimento
                             </Button>
                         </div>
                     }
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Patient in Room</div>
+                            <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Paciente em Sala</div>
                             <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)' }}>{currentPatient.patientName}</div>
                             <div style={{ marginTop: '0.5rem' }}>
-                                <Badge variant="in_service">TICKET: {currentPatient.ticketCode}</Badge>
+                                <Badge variant="in_service">SENHA: {currentPatient.ticketCode}</Badge>
                             </div>
                         </div>
                     </div>
@@ -44,38 +44,38 @@ export default function DoctorQueue({ items }: { items: QueueItemWithPatient[] }
 
             {calledPatient && !currentPatient && (
                 <Card
-                    header="Awaiting Arrival"
+                    header="Aguardando Chegada"
                     style={{ borderLeft: '8px solid var(--warning)' }}
                     footer={
                         <Button onClick={() => changeQueueStatusAction(calledPatient.id, 'IN_SERVICE')} variant="primary" size="lg" fullWidth>
-                            Start Service
+                            Iniciar Atendimento
                         </Button>
                     }
                 >
                     <div style={{ textAlign: 'center', padding: '1rem' }}>
-                        <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>Patient Called</div>
+                        <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>Paciente Chamado</div>
                         <div style={{ fontSize: '2rem', fontWeight: 700 }}>{calledPatient.patientName}</div>
                         <div style={{ marginTop: '1rem' }}>
-                            <Badge variant="called">TICKET: {calledPatient.ticketCode}</Badge>
+                            <Badge variant="called">SENHA: {calledPatient.ticketCode}</Badge>
                         </div>
                     </div>
                 </Card>
             )}
 
-            <Card header={`Patients in Queue (${waitingList.length})`} padding="none">
-                <Table headers={['Ticket', 'Patient', 'Status', 'Actions']}>
+            <Card header={`Pacientes na Fila (${waitingList.length})`} padding="none">
+                <Table headers={['Senha', 'Paciente', 'Status', 'Ações']}>
                     {waitingList.map(item => (
                         <tr key={item.id}>
                             <td><strong>{item.ticketCode}</strong></td>
                             <td>{item.patientName}</td>
-                            <td><Badge variant="waiting">{item.status}</Badge></td>
+                            <td><Badge variant="waiting">AGUARDANDO</Badge></td>
                             <td>
                                 {!calledPatient && !currentPatient && (
                                     <form action={async () => {
                                         await changeQueueStatusAction(item.id, 'CALLED');
                                     }}>
                                         <Button type="submit" size="sm">
-                                            Call Next
+                                            Chamar Próximo
                                         </Button>
                                     </form>
                                 )}
@@ -85,7 +85,7 @@ export default function DoctorQueue({ items }: { items: QueueItemWithPatient[] }
                     {waitingList.length === 0 && (
                         <tr>
                             <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                No patients waiting.
+                                Nenhum paciente aguardando.
                             </td>
                         </tr>
                     )}

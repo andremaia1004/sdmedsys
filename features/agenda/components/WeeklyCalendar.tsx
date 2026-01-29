@@ -1,93 +1,87 @@
 'use client';
 
 import { useState } from 'react';
-import { Appointment } from '@/features/agenda/types';
+import { Appointment } from '../types';
 import AppointmentModal from './AppointmentModal';
 import styles from '../styles/Agenda.module.css';
 
-const HOURS = Array.from({ length: 11 }, (_, i) => i + 8); // 08:00 to 18:00
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-
 export default function WeeklyCalendar({
-    appointments = [],
-    role,
+    appointments,
     doctorId
 }: {
     appointments: Appointment[],
-    role: string,
     doctorId: string
 }) {
-    const [modalData, setModalData] = useState<{ date: string, time: string } | null>(null);
+    const [selectedSlot, setSelectedSlot] = useState<{ date: string, time: string } | null>(null);
 
-    const getEvent = (dayIndex: number, hour: number) => {
-        // Mock Date Mapping: Assume current week starts Mon Jan 29 2026
-        const mockDate = `2026-01-${29 + dayIndex}`;
+    const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+    const times = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
 
+    // Get current week dates
+    const today = new Date();
+    const currentWeekDates = days.map((_, i) => {
+        const d = new Date(today);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1) + i;
+        const dateObj = new Date(d.setDate(diff));
+        return dateObj.toISOString().split('T')[0];
+    });
+
+    const getAppointment = (date: string, time: string) => {
         return appointments.find(a => {
-            const d = new Date(a.startTime);
-            return d.getDate() === (29 + dayIndex) && d.getHours() === hour;
+            const apptDate = new Date(a.startTime).toISOString().split('T')[0];
+            const apptTime = new Date(a.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            return apptDate === date && apptTime === time;
         });
     };
 
-    const handleCellClick = (dayIndex: number, hour: number) => {
-        if (role === 'DOCTOR') return; // Read only
-
-        const timeStr = `${hour.toString().padStart(2, '0')}:00`;
-        const dateStr = `2026-01-${29 + dayIndex}`;
-        setModalData({ date: dateStr, time: timeStr });
-    };
-
     return (
-        <div className={styles.agendaContainer}>
-            <div className={styles.calendarGrid}>
-                {/* Header Row */}
-                <div className={styles.timeHeaderPlaceholder}></div>
-                {DAYS.map(d => (
-                    <div key={d} className={styles.dayHeader}>
-                        {d}
+        <div className={styles.calendarContainer}>
+            <div className={styles.grid}>
+                <div className={styles.timeLabel}></div>
+                {days.map((day, i) => (
+                    <div key={day} className={styles.dayHeader}>
+                        <div className={styles.dayName}>{day}</div>
+                        <div className={styles.dayDate}>
+                            {new Date(currentWeekDates[i]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                        </div>
                     </div>
                 ))}
 
-                {/* Hour Rows */}
-                {HOURS.map(hour => (
-                    <React.Fragment key={`row-${hour}`}>
-                        <div className={styles.timeCell}>
-                            {hour}:00
-                        </div>
-                        {DAYS.map((_, dayIndex) => {
-                            const event = getEvent(dayIndex, hour);
-                            const isClickable = !event && role !== 'DOCTOR';
-
+                {times.map(time => (
+                    <div key={time} className={styles.row}>
+                        <div className={styles.timeLabel}>{time}</div>
+                        {currentWeekDates.map(date => {
+                            const appt = getAppointment(date, time);
                             return (
                                 <div
-                                    key={`${dayIndex}-${hour}`}
-                                    onClick={() => isClickable && handleCellClick(dayIndex, hour)}
-                                    className={`${styles.calendarCell} ${isClickable ? styles.clickableCell : ''}`}
+                                    key={`${date}-${time}`}
+                                    className={`${styles.cell} ${appt ? styles.occupied : styles.empty}`}
+                                    onClick={() => !appt && setSelectedSlot({ date, time })}
                                 >
-                                    {event ? (
+                                    {appt ? (
                                         <div className={styles.appointment}>
-                                            <span className={styles.patientName}>{event.patientName}</span>
-                                            <span className={styles.statusText}>{event.status}</span>
+                                            <div className={styles.patientName}>{appt.patientName}</div>
+                                            <div className={styles.apptStatus}>{appt.status}</div>
                                         </div>
-                                    ) : null}
+                                    ) : (
+                                        <span className={styles.plusIcon}>+</span>
+                                    )}
                                 </div>
                             );
                         })}
-                    </React.Fragment>
+                    </div>
                 ))}
             </div>
 
-            {modalData && (
+            {selectedSlot && (
                 <AppointmentModal
                     doctorId={doctorId}
-                    date={modalData.date}
-                    time={modalData.time}
-                    onClose={() => setModalData(null)}
+                    date={selectedSlot.date}
+                    time={selectedSlot.time}
+                    onClose={() => setSelectedSlot(null)}
                 />
             )}
         </div>
     );
 }
-
-// React import for Fragment if not available globally in common patterns, but usually standard in TSX
-import React from 'react';

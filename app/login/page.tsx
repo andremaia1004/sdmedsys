@@ -23,12 +23,12 @@ export default function LoginPage() {
                     <h1 className={styles.title}>
                         SDMED<span className={styles.titleAccent}>SYS</span>
                     </h1>
-                    <p className={styles.subtitle}>Medical Management System</p>
+                    <p className={styles.subtitle}>Sistema de Gestão Médica</p>
                 </div>
 
                 <form action={formAction} className={styles.form}>
                     <Input
-                        label="Email or Username"
+                        label="E-mail ou Usuário"
                         name="username"
                         type="text"
                         placeholder="admin@sdmed.com"
@@ -36,7 +36,7 @@ export default function LoginPage() {
                     />
 
                     <Input
-                        label="Password"
+                        label="Senha"
                         name="password"
                         type="password"
                         placeholder="••••••••"
@@ -49,7 +49,7 @@ export default function LoginPage() {
                         fullWidth
                         size="lg"
                     >
-                        {isPending ? 'Signing in...' : 'Sign In'}
+                        {isPending ? 'Entrando...' : 'Entrar'}
                     </Button>
 
                     {state?.error && (
@@ -62,18 +62,18 @@ export default function LoginPage() {
                             textAlign: 'center',
                             border: '1px solid #fecaca'
                         }}>
-                            {state.error}
+                            {state.error === 'Invalid login credentials' ? 'Credenciais de acesso inválidas' : state.error}
                         </div>
                     )}
                 </form>
             </Card>
 
             <div className={styles.hints}>
-                <p><strong>Demo Mode (AUTH_MODE=stub)</strong></p>
+                <p><strong>Modo de Teste (AUTH_MODE=stub)</strong></p>
                 <ul className={styles.hintList}>
-                    <li><code>admin</code></li>
-                    <li><code>sec</code></li>
-                    <li><code>doc</code></li>
+                    <li><code>admin</code> (Admin)</li>
+                    <li><code>sec</code> (Secretaria)</li>
+                    <li><code>doc</code> (Médico)</li>
                 </ul>
             </div>
         </div>

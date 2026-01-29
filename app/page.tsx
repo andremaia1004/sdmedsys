@@ -10,7 +10,7 @@ export default function Home() {
       justifyContent: 'center',
       height: '100vh',
       backgroundColor: 'var(--primary)',
-      backgroundLinearGradient: 'linear-gradient(135deg, var(--primary) 0%, #001f41 100%)',
+      backgroundImage: 'linear-gradient(135deg, var(--primary) 0%, #001f41 100%)',
       color: 'white',
       textAlign: 'center',
       padding: '2rem'
@@ -34,17 +34,17 @@ export default function Home() {
         SDMED<span style={{ color: 'var(--accent)' }}>SYS</span>
       </h1>
       <p style={{ fontSize: '1.25rem', marginBottom: '3rem', opacity: 0.8, maxWidth: '500px' }}>
-        The next generation of medical management. Efficient, secure, and modern.
+        A próxima geração em gestão médica. Eficiente, seguro e moderno.
       </p>
 
       <Link href="/login">
         <Button size="lg" variant="accent" style={{ padding: '1.5rem 3rem', fontSize: '1.25rem', borderRadius: '50px' }}>
-          Access System
+          Acessar Sistema
         </Button>
       </Link>
 
       <div style={{ marginTop: 'auto', opacity: 0.5, fontSize: '0.875rem' }}>
-        © 2026 SDMED SYS. All rights reserved.
+        © 2026 SDMED SYS. Todos os direitos reservados.
       </div>
     </div>
   );

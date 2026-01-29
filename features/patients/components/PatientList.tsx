@@ -1,74 +1,56 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Patient } from '@/features/patients/types';
-import { searchPatientsAction } from '../actions';
+import { useState } from 'react';
+import { Patient } from '../types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Table } from '@/components/ui/Table';
+import { Badge } from '@/components/ui/Badge';
 import styles from '../styles/Patients.module.css';
 
-export default function PatientList({ initialPatients = [], role }: { initialPatients?: Patient[], role: string }) {
-    const [query, setQuery] = useState('');
-    const [patients, setPatients] = useState<Patient[]>(initialPatients);
-    const [loading, setLoading] = useState(false);
+export default function PatientList({ patients, canEdit = false }: { patients: Patient[], canEdit?: boolean }) {
+    const [search, setSearch] = useState('');
 
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            setLoading(true);
-            const results = await searchPatientsAction(query);
-            setPatients(results);
-            setLoading(false);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [query]);
+    const filtered = patients.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.document.includes(search)
+    );
 
     return (
-        <div className={styles.tableContainer}>
+        <div className={styles.container}>
             <div className={styles.searchBar}>
                 <Input
-                    type="text"
-                    placeholder="Search by name, document or phone..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Pesquisar por nome ou CPF..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    fullWidth
                 />
-                {loading && <span className={styles.searchLoading}>Searching...</span>}
             </div>
 
-            <table className={styles.table}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Document</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
+            <Table headers={['Nome do Paciente', 'Documento/CPF', 'Data Nasc.', 'Ações']}>
+                {filtered.map(p => (
+                    <tr key={p.id}>
+                        <td style={{ fontWeight: 600 }}>{p.name}</td>
+                        <td>{p.document}</td>
+                        <td style={{ color: 'var(--text-muted)' }}>
+                            {p.birthDate ? new Date(p.birthDate).toLocaleDateString('pt-BR') : 'N/A'}
+                        </td>
+                        <td>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <Button size="sm" variant="secondary">Ver</Button>
+                                {canEdit && <Button size="sm" variant="ghost">Editar</Button>}
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {patients.map(p => (
-                        <tr key={p.id}>
-                            <td><strong>{p.name}</strong></td>
-                            <td>{p.document}</td>
-                            <td>{p.phone}</td>
-                            <td>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    {(role === 'ADMIN' || role === 'SECRETARY') && (
-                                        <Button variant="ghost" size="sm">Edit</Button>
-                                    )}
-                                    <Button variant="secondary" size="sm">View</Button>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                    {patients.length === 0 && (
-                        <tr>
-                            <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                No patients found.
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                ))}
+                {filtered.length === 0 && (
+                    <tr>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                            Nenhum paciente encontrado.
+                        </td>
+                    </tr>
+                )}
+            </Table>
         </div>
     );
 }

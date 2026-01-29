@@ -42,3 +42,7 @@ export async function updatePatientAction(id: string, input: PatientInput): Prom
 export async function searchPatientsAction(query: string): Promise<Patient[]> {
     return PatientService.list(query);
 }
+
+export async function fetchPatientsAction(): Promise<Patient[]> {
+    return PatientService.list();
+}

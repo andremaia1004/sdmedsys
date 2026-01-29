@@ -4,16 +4,18 @@ import styles from './Input.module.css';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
+    fullWidth?: boolean;
 }
 
 export const Input: React.FC<InputProps> = ({
     label,
     error,
+    fullWidth,
     className = '',
     ...props
 }) => {
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${fullWidth ? styles.fullWidth : ''}`}>
             {label && <label className={styles.label}>{label}</label>}
             <input
                 className={`${styles.input} ${error ? styles.errorInput : ''} ${className}`}

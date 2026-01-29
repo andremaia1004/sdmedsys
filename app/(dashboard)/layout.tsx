@@ -11,6 +11,13 @@ export default async function DashboardLayout({
 }) {
     const user = await getCurrentUser();
 
+    // Map roles to Portuguese
+    const roleMap: Record<string, string> = {
+        'ADMIN': 'Administrador',
+        'SECRETARY': 'Secretaria',
+        'DOCTOR': 'Médico'
+    };
+
     return (
         <div className={styles.layout}>
             <aside className={styles.sidebar}>
@@ -19,25 +26,25 @@ export default async function DashboardLayout({
                 </div>
 
                 <nav className={styles.navSection}>
-                    <h3 className={styles.navTitle}>Modules</h3>
+                    <h3 className={styles.navTitle}>Módulos</h3>
                     <Link href="/secretary/agenda" className={styles.navLink}>
                         Agenda
                     </Link>
                     <Link href="/secretary/queue" className={styles.navLink}>
-                        Queue Control
+                        Controle de Fila
                     </Link>
                     <Link href="/admin/patients" className={styles.navLink}>
-                        Patients
+                        Pacientes
                     </Link>
-                    <Link href="/tv" target="_blank" className={styles.navLink} style={{ color: '#fff', backgroundColor: 'rgba(59, 130, 246, 0.2)', marginTop: '1rem' }}>
-                        Live TV Board
+                    <Link href="/tv" target="_blank" className={styles.navLink} style={{ color: '#fff', backgroundColor: 'rgba(211, 47, 47, 0.4)', marginTop: '1rem' }}>
+                        Painel de TV (Live)
                     </Link>
                 </nav>
 
                 <div className={styles.logoutContainer}>
                     <form action={logoutAction}>
                         <Button variant="accent" fullWidth type="submit">
-                            Logout
+                            Sair do Sistema
                         </Button>
                     </form>
                 </div>
@@ -47,8 +54,8 @@ export default async function DashboardLayout({
                 <header className={styles.topbar}>
                     <div className={styles.userInfo}>
                         <div style={{ textAlign: 'right' }}>
-                            <div className={styles.userName}>{user?.name || 'User'}</div>
-                            <div className={styles.userRole}>{user?.role || 'Role'}</div>
+                            <div className={styles.userName}>{user?.name || 'Usuário'}</div>
+                            <div className={styles.userRole}>{roleMap[user?.role || ''] || user?.role || 'Acesso'}</div>
                         </div>
                         <div style={{
                             width: '40px',

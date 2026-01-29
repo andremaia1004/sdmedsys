@@ -1,22 +1,22 @@
+import { fetchPatientsAction } from '@/features/patients/actions';
 import PatientList from '@/features/patients/components/PatientList';
 import PatientForm from '@/features/patients/components/PatientForm';
 import { Card } from '@/components/ui/Card';
 import styles from '@/features/patients/styles/Patients.module.css';
 
-export default function SecretaryPatientsPage() {
+export default async function SecretaryPatientsPage() {
+    const patients = await fetchPatientsAction();
+
     return (
-        <div className={styles.pageContainer}>
-            <header className={styles.header}>
-                <h1 className={styles.title}>Patients</h1>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Secretary Management</div>
-            </header>
-
-            <div className={styles.grid}>
-                <Card header="Patient Directory" padding="none">
-                    <PatientList role="SECRETARY" />
+        <div className={styles.pageLayout}>
+            <div className={styles.mainCol}>
+                <Card header="Diretório de Pacientes" padding="none">
+                    <PatientList patients={patients} canEdit={true} />
                 </Card>
+            </div>
 
-                <Card header="Quick Register">
+            <div className={styles.sideCol}>
+                <Card header="Novo Cadastro">
                     <PatientForm />
                 </Card>
             </div>
