@@ -6,8 +6,8 @@ import { SupabasePatientsRepository } from './repository.supabase';
 // Helper to select repository
 // In a real app, this might be a Dependency Injection container
 const getRepository = (): IPatientsRepository => {
-    // Check feature flag - default to false (Mock) for safety during migration
-    const useSupabase = process.env.NEXT_PUBLIC_USE_SUPABASE === 'true';
+    // Check feature flag - controlled server-side
+    const useSupabase = process.env.USE_SUPABASE === 'true';
 
     // Fallback if Supabase credentials are missing even if flag is true (prevent runtime crash)
     if (useSupabase) {

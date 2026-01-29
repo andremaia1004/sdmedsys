@@ -5,7 +5,7 @@ import { MockConsultationRepository } from './repository.mock';
 import { SupabaseConsultationRepository } from './repository.supabase';
 
 const getRepository = (): IConsultationRepository => {
-    const useSupabase = process.env.NEXT_PUBLIC_USE_SUPABASE === 'true';
+    const useSupabase = process.env.USE_SUPABASE === 'true';
 
     if (useSupabase) {
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
