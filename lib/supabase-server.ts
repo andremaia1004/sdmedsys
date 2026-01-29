@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 // This file should ONLY be imported in server-side files (Actions, Repositories running on server).
 // Do NOT import this in Client Components.
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
