@@ -7,7 +7,7 @@ describe('QueueService', () => {
 
     it('should add item to queue and generate ticket code', async () => {
         item = await QueueService.add({
-            patientName: 'Test Patient',
+            patientId: 'test-patient-id',
             status: 'WAITING'
         }, 'SECRETARY');
 
@@ -38,7 +38,7 @@ describe('QueueService', () => {
 
     it('should mask data for TV list', async () => {
         // Create a new waiting item
-        await QueueService.add({ patientName: 'Secret Name', status: 'WAITING' }, 'SECRETARY');
+        await QueueService.add({ patientId: 'secret-patient-id', status: 'WAITING' }, 'SECRETARY');
 
         const tvList = await QueueService.getTVList();
         const found = tvList.find(i => i.status === 'WAITING' && !i.patientName);
