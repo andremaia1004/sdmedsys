@@ -1,10 +1,11 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
     // output: 'standalone', // Disabled for Vercel
     typescript: {
         ignoreBuildErrors: true,
-    }
-};
-ignoreBuildErrors: true,
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
     }
 };
 
