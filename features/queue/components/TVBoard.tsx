@@ -6,9 +6,14 @@ import styles from '../styles/Queue.module.css';
 
 export default function TVBoard({ items = [] }: { items?: Partial<QueueItemWithPatient>[] }) {
     const [calling, setCalling] = useState<Partial<QueueItemWithPatient> | null>(null);
+    const [mounted, setMounted] = useState(false);
 
     // Identify CALLED item to ring/blink
     const currentCalled = items.find(i => i.status === 'CALLED');
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (currentCalled && currentCalled.id !== calling?.id) {
@@ -52,7 +57,9 @@ export default function TVBoard({ items = [] }: { items?: Partial<QueueItemWithP
 
             <footer className={styles.tvFooter}>
                 <div className={styles.clinicName}>SDMED <span style={{ color: 'var(--accent)' }}>SYS</span></div>
-                <div className={styles.clock}>{new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+                <div className={styles.clock}>
+                    {mounted && new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </div>
             </footer>
         </div>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useActionState } from 'react';
 import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
@@ -28,8 +28,14 @@ export default function AppointmentModal({
     // @ts-ignore
     const [state, formAction, isPending] = useActionState(createAppointmentAction, { error: '', success: false });
 
+    useEffect(() => {
+        if (state?.success) {
+            const timer = setTimeout(() => onClose(), 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [state?.success, onClose]);
+
     if (state?.success) {
-        setTimeout(() => onClose(), 1500);
         return (
             <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
                 <Card padding="lg" style={{ width: '350px', textAlign: 'center' }}>
@@ -73,7 +79,7 @@ export default function AppointmentModal({
                     <div style={{ marginBottom: '1.5rem', padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: '8px', borderLeft: '4px solid var(--accent)' }}>
                         <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Horário Selecionado</div>
                         <div style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                            {new Date(date).toLocaleDateString('pt-BR')} às {time}
+                            {date && new Date(date).toLocaleDateString('pt-BR')} às {time}
                         </div>
                     </div>
 
