@@ -8,6 +8,11 @@ export function middleware(request: NextRequest) {
     // 1. Redirect to login if accessing protected routes without token
     const isProtectedRoute = path.startsWith('/admin') || path.startsWith('/secretary') || path.startsWith('/doctor');
 
+    // 0. Redirect Root to Login
+    if (path === '/') {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
     if (isProtectedRoute && !token) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
