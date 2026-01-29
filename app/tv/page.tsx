@@ -11,6 +11,10 @@ export default async function TVPage() {
     ]);
 
     return (
-        <TVBoard items={items || []} clinicName={settings?.clinicName} />
+        <TVBoard
+            items={items || []}
+            clinicName={settings?.clinicName}
+            refreshSeconds={settings?.tvRefreshSeconds || 30}
+        />
     );
 }

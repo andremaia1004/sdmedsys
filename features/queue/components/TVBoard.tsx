@@ -1,16 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { QueueItemWithPatient } from '../types';
 import styles from '../styles/Queue.module.css';
 
 export default function TVBoard({
     items = [],
-    clinicName = 'SDMED SYS'
+    clinicName = 'SDMED SYS',
+    refreshSeconds = 30
 }: {
     items?: Partial<QueueItemWithPatient>[],
-    clinicName?: string
+    clinicName?: string,
+    refreshSeconds?: number
 }) {
+    const router = useRouter();
     const [calling, setCalling] = useState<Partial<QueueItemWithPatient> | null>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -19,7 +23,14 @@ export default function TVBoard({
 
     useEffect(() => {
         setMounted(true);
-    }, []);
+
+        // Auto-refresh data
+        const interval = setInterval(() => {
+            router.refresh();
+        }, refreshSeconds * 1000);
+
+        return () => clearInterval(interval);
+    }, [router, refreshSeconds]);
 
     useEffect(() => {
         if (currentCalled && currentCalled.id !== calling?.id) {

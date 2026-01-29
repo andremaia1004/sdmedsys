@@ -50,7 +50,7 @@ export class SupabaseQueueRepository implements IQueueRepository {
         }));
     }
 
-    async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string): Promise<QueueItem> {
+    async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string, prefix: string = 'A'): Promise<QueueItem> {
         const today = new Date().toISOString().split('T')[0];
         const startOfDay = `${today}T00:00:00.000Z`;
         const endOfDay = `${today}T23:59:59.999Z`;
@@ -68,7 +68,7 @@ export class SupabaseQueueRepository implements IQueueRepository {
         }
 
         const nextNum = (count || 0) + 1;
-        const code = `A${nextNum.toString().padStart(3, '0')}`;
+        const code = `${prefix}${nextNum.toString().padStart(3, '0')}`;
 
         const { data, error } = await this.supabase
             .from('queue_items')

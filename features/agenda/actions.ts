@@ -17,6 +17,16 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         // Enforce RBAC
         await requireRole(['ADMIN', 'SECRETARY']);
 
+        // Fetch duration from settings
+        let duration = 30;
+        try {
+            const { fetchSettingsAction } = await import('@/app/actions/admin');
+            const settings = await fetchSettingsAction();
+            duration = settings.appointmentDurationMinutes;
+        } catch (e) {
+            console.warn('createAppointmentAction: Using default duration 30 due to settings error');
+        }
+
         const date = formData.get('date') as string;
         const time = formData.get('time') as string;
         const doctorId = formData.get('doctorId') as string;
@@ -29,9 +39,8 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         }
 
         const startTime = `${date}T${time}:00`;
-        // Default 30 min duration for MVP
-        const endDate = new Date(new Date(startTime).getTime() + 30 * 60000);
-        const endTime = endDate.toISOString().slice(0, 19); // Simple ISO without ms causing issues
+        const endDate = new Date(new Date(startTime).getTime() + duration * 60000);
+        const endTime = endDate.toISOString().slice(0, 19);
 
         const input: AppointmentInput = {
             patientId,

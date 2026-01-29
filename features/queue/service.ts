@@ -57,7 +57,17 @@ export class QueueService {
 
     static async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string): Promise<QueueItem> {
         const repo = await getRepository();
-        return repo.add(item, actorRole);
+
+        let prefix = 'A';
+        try {
+            const { SettingsService } = await import('../admin/settings/service');
+            const settings = await SettingsService.get();
+            prefix = settings.queuePrefix;
+        } catch (e) {
+            console.warn('QueueService: Using default prefix A due to settings error');
+        }
+
+        return repo.add(item, actorRole, prefix);
     }
 
     static async changeStatus(id: string, newStatus: QueueStatus, actorRole: string): Promise<QueueItem> {
