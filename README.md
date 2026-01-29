@@ -59,3 +59,11 @@ The current services use in-memory Mock Repositories. To migrate:
 ## Architecture
 - **Tech Stack**: Next.js 15, TypeScript, Vanilla CSS (Modules).
 - **Structure**: Feature-based (`src/features/module`).
+### TV Security
+The `/tv` route is protected. In production, you must set the environment variable:
+```env
+TV_PIN=1234  # Replace with a secret PIN
+```
+To access the TV, append `?pin=YOUR_PIN` to the URL (e.g., `/tv?pin=1234`).
+- Success: Redirects to `/tv` (clean URL) and sets a secure cookie (valid for 12h).
+- Failure: Redirects to `/unauthorized`.
