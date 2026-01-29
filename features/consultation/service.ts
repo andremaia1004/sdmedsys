@@ -1,75 +1,62 @@
 import { Consultation, ConsultationInput } from './types';
 import { QueueService } from '@/features/queue/service';
+import { IConsultationRepository } from './repository.types';
+import { MockConsultationRepository } from './repository.mock';
+import { SupabaseConsultationRepository } from './repository.supabase';
 
-let MOCK_CONSULTATIONS: Consultation[] = [];
+const getRepository = (): IConsultationRepository => {
+    const useSupabase = process.env.NEXT_PUBLIC_USE_SUPABASE === 'true';
 
-export class ConsultationService {
-    // Audit Hook
-    private static logAudit(action: string, doctorId: string, consultationId: string) {
-        console.log(`[AUDIT] CONSULTATION | ${action} | Doc: ${doctorId} | ID: ${consultationId} | ${new Date().toISOString()}`);
+    if (useSupabase) {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            console.warn('Fallback to Mock (Consultation).');
+            return new MockConsultationRepository();
+        }
+        return new SupabaseConsultationRepository();
     }
 
+    return new MockConsultationRepository();
+};
+
+export class ConsultationService {
     static async start(input: ConsultationInput): Promise<Consultation> {
-        // Validate Queue Item
-        const queueItems = await QueueService.list();
-        // Note: list() returns enriched items. We just need to check if item exists and is IN_SERVICE ideally, 
-        // or we are moving it to IN_SERVICE.
-        // The Prompt says "start(queueItemId) ... creates consultation ... mark startedAt". 
-        // Logic: The QueueItem should probably be IN_SERVICE before or as part of this.
-        // Let's assume DoctorQueue component sets it to IN_SERVICE, then calls this.
-
-        const newConsultation: Consultation = {
-            id: Math.random().toString(36).substring(7),
-            ...input,
-            clinicalNotes: '',
-            startedAt: new Date().toISOString(),
-            finishedAt: null,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
-
-        MOCK_CONSULTATIONS.push(newConsultation);
-        this.logAudit('START', input.doctorId, newConsultation.id);
-        return newConsultation;
+        // Validation could go here (e.g. check if doc already has active)
+        return getRepository().start(input);
     }
 
     static async getActiveByDoctor(doctorId: string): Promise<Consultation | undefined> {
-        return MOCK_CONSULTATIONS.find(c => c.doctorId === doctorId && !c.finishedAt);
+        return getRepository().getActiveByDoctor(doctorId);
     }
 
     static async getById(id: string): Promise<Consultation | undefined> {
-        return MOCK_CONSULTATIONS.find(c => c.id === id);
+        return getRepository().findById(id);
     }
 
     static async updateNotes(id: string, notes: string, doctorId: string): Promise<void> {
-        const index = MOCK_CONSULTATIONS.findIndex(c => c.id === id);
-        if (index === -1) throw new Error('Consultation not found');
+        const consultation = await this.getById(id);
+        if (!consultation) throw new Error('Consultation not found');
+        if (consultation.doctorId !== doctorId) throw new Error('Unauthorized');
 
-        // Ownership check
-        if (MOCK_CONSULTATIONS[index].doctorId !== doctorId) throw new Error('Unauthorized');
-
-        MOCK_CONSULTATIONS[index].clinicalNotes = notes;
-        MOCK_CONSULTATIONS[index].updatedAt = new Date().toISOString();
-        // this.logAudit('UPDATE_NOTES', doctorId, id); // Auto-save might remain silent to avoid log spam, or log sparingly
+        await getRepository().updateNotes(id, notes);
     }
 
     static async finish(id: string, doctorId: string): Promise<void> {
-        const index = MOCK_CONSULTATIONS.findIndex(c => c.id === id);
-        if (index === -1) throw new Error('Consultation not found');
+        const consultation = await this.getById(id);
+        if (!consultation) throw new Error('Consultation not found');
+        if (consultation.doctorId !== doctorId) throw new Error('Unauthorized');
 
-        if (MOCK_CONSULTATIONS[index].doctorId !== doctorId) throw new Error('Unauthorized');
-
-        MOCK_CONSULTATIONS[index].finishedAt = new Date().toISOString();
-        MOCK_CONSULTATIONS[index].updatedAt = new Date().toISOString();
+        await getRepository().finish(id);
 
         // Update Queue status to DONE
-        // In real app, transactional. Here, sequential.
+        // In a real microservice architecture, this might be an event. 
+        // Here we explicitly call the other service.
         try {
-            await QueueService.changeStatus(MOCK_CONSULTATIONS[index].queueItemId, 'DONE', 'DOCTOR');
+            if (consultation.queueItemId) {
+                await QueueService.changeStatus(consultation.queueItemId, 'DONE', 'DOCTOR');
+            }
         } catch (e) {
-            console.error("Failed to update queue status", e);
+            console.error("Failed to update queue status during finish", e);
+            // We don't rollback finish here for MVP, but ideally we should transactionalize.
         }
-
-        this.logAudit('FINISH', doctorId, id);
     }
 }

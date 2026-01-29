@@ -1,13 +1,22 @@
 'use client';
 
+import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
 import { QueueItemWithPatient } from '@/features/queue/types';
 import { changeQueueStatusAction } from '@/app/actions/queue';
-import { startConsultationAction } from '@/app/actions/consultation';
+import { startConsultationAction } from '../actions';
 
 export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[] }) {
     const currentPatient = items.find(i => i.status === 'IN_SERVICE');
     const calledPatient = items.find(i => i.status === 'CALLED');
     const waitingList = items.filter(i => i.status === 'WAITING');
+
+    const [state, formAction] = useActionState(startConsultationAction, { success: false });
+    const router = useRouter();
+
+    if (state?.success && state.consultation) {
+        router.push(`/doctor/consultation/${state.consultation.id}`);
+    }
 
     return (
         <div>
@@ -17,11 +26,14 @@ export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[
                     <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{currentPatient.patientName}</p>
                     <p>Ticket: {currentPatient.ticketCode}</p>
 
-                    <form action={() => startConsultationAction(currentPatient.id, currentPatient.patientId)}>
+                    <form action={formAction}>
+                        <input type="hidden" name="queueItemId" value={currentPatient.id} />
+                        <input type="hidden" name="patientId" value={currentPatient.patientId} />
                         <button type="submit" style={{ marginTop: '1rem', padding: '0.8rem', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}>
                             Open Consultation Workspace
                         </button>
                     </form>
+                    {state?.error && <p style={{ color: 'red' }}>{state.error}</p>}
                 </div>
             )}
 

@@ -1,5 +1,5 @@
 import ConsultationWorkspace from '@/features/consultation/components/ConsultationWorkspace';
-import { getConsultationAction } from '@/app/actions/consultation';
+import { getConsultationAction } from '@/features/consultation/actions';
 import { PatientService } from '@/features/patients/service';
 import { redirect } from 'next/navigation';
 

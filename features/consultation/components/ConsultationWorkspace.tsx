@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Consultation } from '@/features/consultation/types';
-import { updateNotesAction, finishConsultationAction } from '@/app/actions/consultation';
+import { updateClinicalNotesAction, finishConsultationAction } from '../actions';
 
 export default function ConsultationWorkspace({ consultation, patientName }: { consultation: Consultation, patientName: string }) {
     const [notes, setNotes] = useState(consultation.clinicalNotes);
@@ -10,7 +10,7 @@ export default function ConsultationWorkspace({ consultation, patientName }: { c
 
     const handleSave = async () => {
         setSaving(true);
-        await updateNotesAction(consultation.id, notes);
+        await updateClinicalNotesAction(consultation.id, notes);
         setSaving(false);
     };
 
