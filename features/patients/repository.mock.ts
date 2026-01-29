@@ -30,10 +30,12 @@ export class MockPatientsRepository implements IPatientsRepository {
         if (!query) return MOCK_PATIENTS;
 
         const lowerQuery = query.toLowerCase();
+        const phoneQuery = query.replace(/\D/g, '');
+
         return MOCK_PATIENTS.filter(p =>
             p.name.toLowerCase().includes(lowerQuery) ||
             p.document.includes(lowerQuery) ||
-            p.phone.includes(lowerQuery)
+            (phoneQuery.length > 0 && p.phone.includes(phoneQuery))
         );
     }
 
@@ -47,6 +49,8 @@ export class MockPatientsRepository implements IPatientsRepository {
 
         const newPatient: Patient = {
             ...input,
+            phone: input.phone.replace(/\D/g, ''),
+            document: input.document.replace(/\D/g, ''),
             id: Math.random().toString(36).substring(7),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -65,6 +69,8 @@ export class MockPatientsRepository implements IPatientsRepository {
         MOCK_PATIENTS[index] = {
             ...MOCK_PATIENTS[index],
             ...input,
+            phone: input.phone.replace(/\D/g, ''),
+            document: input.document.replace(/\D/g, ''),
             updatedAt: new Date().toISOString(),
         };
 

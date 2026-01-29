@@ -10,7 +10,7 @@ export default defineConfig({
     setupFiles: [],
     include: ['**/*.test.{ts,tsx}'],
     alias: {
-      '@': resolve(__dirname, './src')
+      '@': resolve(__dirname, './')
     }
   },
 })

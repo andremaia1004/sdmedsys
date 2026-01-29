@@ -10,11 +10,21 @@ export class SupabasePatientsRepository implements IPatientsRepository {
             .order('name', { ascending: true });
 
         if (query) {
-            // Simple search: check name (ilike) OR document/phone (exact/like)
-            // Supabase 'or' syntax: "name.ilike.%query%,document.eq.query,phone.eq.query"
-            // For MVP, stick to name ilike for simplicity or a broad "or" filter
             const q = query.trim();
-            builder = builder.or(`name.ilike.%${q}%,document.ilike.%${q}%,phone.ilike.%${q}%`);
+            // Normalize query for phone search (remove non-digits)
+            const phoneQuery = q.replace(/\D/g, '');
+
+            // Build OR clause: 
+            // 1. Name matches (case-insensitive)
+            // 2. Document matches (case-insensitive)
+            // 3. Phone matches (if query contains digits)
+            let orClause = `name.ilike.%${q}%,document.ilike.%${q}%`;
+
+            if (phoneQuery.length > 0) {
+                orClause += `,phone.ilike.%${phoneQuery}%`;
+            }
+
+            builder = builder.or(orClause);
         }
 
         const { data, error } = await builder;
@@ -35,8 +45,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
             .single();
 
         if (error) {
-            // PGRST116 is "JSON object requested, multiple (or no) rows returned"
-            if (error.code === 'PGRST116') return undefined;
+            if (error.code === 'PGRST116') return undefined; // No rows
             console.error('Supabase Error (findById):', error);
             throw new Error('Failed to find patient');
         }
@@ -45,13 +54,16 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async create(input: PatientInput): Promise<Patient> {
+        // Normalize phone: maintain only digits
+        const normalizedPhone = input.phone.replace(/\D/g, '');
+
         const { data, error } = await supabase
             .from('patients')
             .insert([{
                 name: input.name,
-                document: input.document,
-                phone: input.phone,
-                birth_date: input.birthDate, // Map birthDate (TS) to birth_date (SQL)
+                document: input.document.replace(/\D/g, ''), // Normalize document too
+                phone: normalizedPhone,
+                birth_date: input.birthDate,
             }])
             .select()
             .single();
@@ -65,12 +77,14 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async update(id: string, input: PatientInput): Promise<Patient | null> {
+        const normalizedPhone = input.phone.replace(/\D/g, '');
+
         const { data, error } = await supabase
             .from('patients')
             .update({
                 name: input.name,
-                document: input.document,
-                phone: input.phone,
+                document: input.document.replace(/\D/g, ''),
+                phone: normalizedPhone,
                 birth_date: input.birthDate,
                 updated_at: new Date().toISOString(),
             })
