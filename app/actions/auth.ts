@@ -1,35 +1,74 @@
-'use server'
+'use server';
 
 import { cookies } from 'next/headers';
-import { AuthService } from '@/features/auth/service';
 import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase-auth';
 
 export async function loginAction(prevState: any, formData: FormData) {
-    const userStr = formData.get('username') as string;
+    const authMode = process.env.AUTH_MODE || 'stub';
+    const emailOrUsername = formData.get('username') as string;
+    const password = formData.get('password') as string;
 
-    const result = await AuthService.login(userStr);
+    // 1. Stub Mode
+    if (authMode !== 'supabase') {
+        const cookieStore = await cookies();
 
-    if (!result) {
-        return { error: 'Invalid credentials. Try "admin", "sec", or "doc".' };
+        let role = 'SECRETARY';
+        // Simple mapping for Stub
+        if (emailOrUsername.includes('admin')) role = 'ADMIN';
+        if (emailOrUsername.includes('doc')) role = 'DOCTOR';
+
+        // Use 'sec' or anything else -> SECRETARY
+
+        cookieStore.set('mock_role', role);
+
+        if (role === 'ADMIN') redirect('/admin');
+        if (role === 'DOCTOR') redirect('/doctor');
+        redirect('/secretary');
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set('auth_token', result.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24, // 1 day
-        path: '/',
+    // 2. Supabase Mode
+    const supabase = await createClient();
+
+    // We assume input is email for Supabase
+    const { error } = await supabase.auth.signInWithPassword({
+        email: emailOrUsername,
+        password: password
     });
 
-    // Redirect based on role
-    if (result.user.role === 'ADMIN') redirect('/admin');
-    if (result.user.role === 'SECRETARY') redirect('/secretary');
-    if (result.user.role === 'DOCTOR') redirect('/doctor');
+    if (error) {
+        return { error: error.message };
+    }
+
+    // Login successful - Redirect based on Profile Role
+    // (We need to fetch profile to know where to redirect)
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // We can fetch profile here OR let the middleware/layout handle it.
+    // For specific redirect, let's fetch profile.
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user?.id)
+        .single();
+
+    const userRole = profile?.role || 'SECRETARY'; // Default fallback
+
+    if (userRole === 'ADMIN') redirect('/admin');
+    if (userRole === 'DOCTOR') redirect('/doctor');
+    redirect('/secretary');
 }
 
 export async function logoutAction() {
-    await AuthService.logout();
-    const cookieStore = await cookies();
-    cookieStore.delete('auth_token');
+    const authMode = process.env.AUTH_MODE || 'stub';
+
+    if (authMode !== 'supabase') {
+        const cookieStore = await cookies();
+        cookieStore.delete('mock_role');
+        redirect('/login');
+    }
+
+    const supabase = await createClient();
+    await supabase.auth.signOut();
     redirect('/login');
 }

@@ -49,7 +49,9 @@ Create a `.env.local` file (not needed for mock MVP, but for Supabase):
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=... # Client-Server RLS Bypass
+TV_PIN=... # Optional for TV Protection
 USE_SUPABASE=true
+AUTH_MODE=stub # 'stub' (Default) or 'supabase' (Real Auth)
 ```
 
 ### Database Migration
