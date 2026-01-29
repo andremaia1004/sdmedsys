@@ -3,8 +3,8 @@
 import { AppointmentService } from './service';
 import { AppointmentInput, Appointment, AppointmentStatus } from './types';
 import { revalidatePath } from 'next/cache';
-
 import { requireRole } from '@/lib/session';
+import { logAudit } from '@/lib/audit';
 
 export type ActionState = {
     error?: string;
@@ -44,6 +44,13 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         };
 
         const appointment = await AppointmentService.create(input);
+
+        await logAudit('CREATE', 'APPOINTMENT', appointment.id, {
+            patientName: appointment.patientName,
+            doctorId: appointment.doctorId,
+            startTime: appointment.startTime
+        });
+
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
         return { success: true, appointment };
@@ -56,6 +63,11 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
 export async function updateAppointmentStatusAction(id: string, status: AppointmentStatus): Promise<Appointment | null> {
     try {
         const appointment = await AppointmentService.updateStatus(id, status);
+
+        if (appointment) {
+            await logAudit('STATUS_CHANGE', 'APPOINTMENT', id, { status });
+        }
+
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
         return appointment;

@@ -4,6 +4,7 @@ import { QueueService } from '@/features/queue/service';
 import { QueueStatus } from '@/features/queue/types';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
+import { logAudit } from '@/lib/audit';
 
 // Mock extracting role from session/cookie
 // In real app, we would parse the cookie here
@@ -38,11 +39,13 @@ export async function addToQueueAction(formData: FormData) {
             patientId = newP.id;
         }
 
-        await QueueService.add({
+        const item = await QueueService.add({
             patientId,
             doctorId,
             status: 'WAITING'
-        }, user.role); // Changed from 'SECRETARY'
+        }, user.role);
+
+        await logAudit('CREATE', 'QUEUE', item.id, { patientId, doctorId });
 
         revalidatePath('/secretary/queue');
         revalidatePath('/doctor/queue');
@@ -62,7 +65,10 @@ export async function changeQueueStatusAction(id: string, newStatus: QueueStatus
         // Doctor only should touch their own queue? 
         // For MVP, we pass the Actor Role to service to log audit.
 
-        await QueueService.changeStatus(id, newStatus, user.role); // Changed from 'SECRETARY'
+        await QueueService.changeStatus(id, newStatus, user.role);
+
+        await logAudit('STATUS_CHANGE', 'QUEUE', id, { newStatus });
+
         revalidatePath('/secretary/queue');
         revalidatePath('/doctor/queue');
         revalidatePath('/tv');

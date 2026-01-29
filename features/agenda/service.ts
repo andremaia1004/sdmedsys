@@ -45,4 +45,9 @@ export class AppointmentService {
         const repo = await getRepository();
         return repo.updateStatus(id, status);
     }
+
+    static async checkConflict(doctorId: string, startTime: string, endTime: string): Promise<boolean> {
+        const repo = await getRepository();
+        return repo.checkConflict(doctorId, startTime, endTime);
+    }
 }

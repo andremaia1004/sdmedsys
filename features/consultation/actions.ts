@@ -4,6 +4,7 @@ import { ConsultationService } from './service';
 import { ConsultationInput, Consultation } from './types';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
+import { logAudit } from '@/lib/audit';
 
 export type ActionState = {
     error?: string;
@@ -29,6 +30,12 @@ export async function startConsultationAction(prevState: ActionState, formData: 
         };
 
         const consultation = await ConsultationService.start(input);
+
+        await logAudit('CREATE', 'CONSULTATION', consultation.id, {
+            patientId,
+            queueItemId
+        });
+
         revalidatePath('/doctor/consultation');
         revalidatePath('/doctor/queue');
         return { success: true, consultation };
@@ -53,6 +60,9 @@ export async function finishConsultationAction(id: string): Promise<{ success: b
     try {
         const user = await requireRole(['DOCTOR']);
         await ConsultationService.finish(id, user.id);
+
+        await logAudit('STATUS_CHANGE', 'CONSULTATION', id, { status: 'FINISHED' });
+
         revalidatePath('/doctor/queue');
         revalidatePath('/doctor/consultation');
         return { success: true };
@@ -63,6 +73,6 @@ export async function finishConsultationAction(id: string): Promise<{ success: b
 
 // For retrieval, not mutation
 export async function getConsultationAction(id: string): Promise<Consultation | undefined> {
-    const consultation = await ConsultationService.getById(id);
+    const consultation = await ConsultationService.findById(id);
     return consultation;
 }

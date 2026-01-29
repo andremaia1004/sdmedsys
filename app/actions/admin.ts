@@ -28,3 +28,28 @@ export async function createProfile(userId: string, email: string, role: 'ADMIN'
 
     return data;
 }
+
+export async function fetchAuditLogsAction(page: number = 1, limit: number = 20) {
+    const user = await requireRole(['ADMIN']);
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    const { data, error, count } = await supabaseServer
+        .from('audit_logs')
+        .select('*', { count: 'exact' })
+        .eq('clinic_id', user.clinicId) // Only current clinic
+        .order('created_at', { ascending: false })
+        .range(start, end);
+
+    if (error) {
+        console.error('Error fetching audit logs:', error);
+        throw new Error('Failed to fetch audit logs');
+    }
+
+    return {
+        logs: data,
+        totalCount: count || 0,
+        page,
+        totalPages: Math.ceil((count || 0) / limit)
+    };
+}
