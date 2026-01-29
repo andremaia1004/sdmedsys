@@ -1,0 +1,88 @@
+import { SupabaseClient } from '@supabase/supabase-js';
+import { Doctor, DoctorInput } from './types';
+import { IDoctorsRepository } from './repository.types';
+
+export class SupabaseDoctorsRepository implements IDoctorsRepository {
+    constructor(
+        private supabase: SupabaseClient,
+        private clinicId: string
+    ) { }
+
+    async list(activeOnly?: boolean): Promise<Doctor[]> {
+        let query = this.supabase
+            .from('doctors')
+            .select('*')
+            .eq('clinic_id', this.clinicId)
+            .order('name', { ascending: true });
+
+        if (activeOnly) {
+            query = query.eq('active', true);
+        }
+
+        const { data, error } = await query;
+        if (error) throw new Error(error.message);
+        return data.map(this.mapToDoctor);
+    }
+
+    async findById(id: string): Promise<Doctor | undefined> {
+        const { data, error } = await this.supabase
+            .from('doctors')
+            .select('*')
+            .eq('id', id)
+            .eq('clinic_id', this.clinicId)
+            .maybeSingle();
+
+        if (error || !data) return undefined;
+        return this.mapToDoctor(data);
+    }
+
+    async create(input: DoctorInput): Promise<Doctor> {
+        const { data, error } = await this.supabase
+            .from('doctors')
+            .insert([{
+                name: input.name,
+                specialty: input.specialty,
+                profile_id: input.profileId,
+                clinic_id: this.clinicId,
+                active: true
+            }])
+            .select()
+            .single();
+
+        if (error) throw new Error(error.message);
+        return this.mapToDoctor(data);
+    }
+
+    async update(id: string, input: Partial<Doctor>): Promise<Doctor | null> {
+        // Ensure we don't accidentally wipe clinic_id
+        const { profileId, name, specialty, active } = input;
+        const updateData: any = { updated_at: new Date().toISOString() };
+        if (profileId !== undefined) updateData.profile_id = profileId;
+        if (name !== undefined) updateData.name = name;
+        if (specialty !== undefined) updateData.specialty = specialty;
+        if (active !== undefined) updateData.active = active;
+
+        const { data, error } = await this.supabase
+            .from('doctors')
+            .update(updateData)
+            .eq('id', id)
+            .eq('clinic_id', this.clinicId)
+            .select()
+            .single();
+
+        if (error) throw new Error(error.message);
+        return this.mapToDoctor(data);
+    }
+
+    private mapToDoctor(row: any): Doctor {
+        return {
+            id: row.id,
+            profileId: row.profile_id,
+            name: row.name,
+            specialty: row.specialty,
+            active: row.active,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at
+        };
+    }
+}

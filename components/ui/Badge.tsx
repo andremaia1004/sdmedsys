@@ -3,7 +3,7 @@ import styles from './Badge.module.css';
 
 interface BadgeProps {
     children: React.ReactNode;
-    variant?: 'waiting' | 'called' | 'in_service' | 'done' | 'danger' | 'info';
+    variant?: 'waiting' | 'called' | 'in_service' | 'done' | 'danger' | 'info' | 'success' | 'secondary';
     className?: string;
 }
 

@@ -10,7 +10,8 @@ export default function WeeklyCalendar({
     doctorId
 }: {
     appointments: Appointment[],
-    doctorId: string
+    doctorId: string,
+    role?: string
 }) {
     const [selectedSlot, setSelectedSlot] = useState<{ date: string, time: string } | null>(null);
 

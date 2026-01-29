@@ -4,7 +4,13 @@ import { useEffect, useState } from 'react';
 import { QueueItemWithPatient } from '../types';
 import styles from '../styles/Queue.module.css';
 
-export default function TVBoard({ items = [] }: { items?: Partial<QueueItemWithPatient>[] }) {
+export default function TVBoard({
+    items = [],
+    clinicName = 'SDMED SYS'
+}: {
+    items?: Partial<QueueItemWithPatient>[],
+    clinicName?: string
+}) {
     const [calling, setCalling] = useState<Partial<QueueItemWithPatient> | null>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -56,7 +62,7 @@ export default function TVBoard({ items = [] }: { items?: Partial<QueueItemWithP
             </aside>
 
             <footer className={styles.tvFooter}>
-                <div className={styles.clinicName}>SDMED <span style={{ color: 'var(--accent)' }}>SYS</span></div>
+                <div className={styles.clinicName}>{clinicName}</div>
                 <div className={styles.clock}>
                     {mounted && new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </div>
