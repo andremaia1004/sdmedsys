@@ -1,31 +1,76 @@
+import Link from 'next/link';
 import { logoutAction } from '@/app/actions/auth';
+import { getCurrentUser } from '@/lib/session';
+import styles from './layout.module.css';
+import { Button } from '@/components/ui/Button';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const user = await getCurrentUser();
+
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-            <aside style={{ width: '250px', backgroundColor: '#f5f5f5', padding: '1rem', borderRight: '1px solid #ddd' }}>
-                <h2 style={{ marginBottom: '2rem' }}>SDMED SYS</h2>
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <h3 style={{ fontSize: '0.85rem', color: '#888', marginBottom: '0.5rem' }}>Modules</h3>
-                    <a href="/secretary/agenda" style={{ display: 'block', textDecoration: 'none', color: '#333', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', marginBottom: '0.5rem' }}>Agenda</a>
-                    <a href="/secretary/queue" style={{ display: 'block', textDecoration: 'none', color: '#333', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', marginBottom: '0.5rem' }}>Queue Control</a>
-                    <a href="/admin/patients" style={{ display: 'block', textDecoration: 'none', color: '#333', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', marginBottom: '0.5rem' }}>Patient Management</a>
-                    <a href="/tv" target="_blank" style={{ display: 'block', textDecoration: 'none', color: '#0070f3', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}>Open TV View</a>
+        <div className={styles.layout}>
+            <aside className={styles.sidebar}>
+                <div className={styles.logoContainer}>
+                    <span className={styles.logoText}>SDMED<span className={styles.logoAccent}>SYS</span></span>
+                </div>
+
+                <nav className={styles.navSection}>
+                    <h3 className={styles.navTitle}>Modules</h3>
+                    <Link href="/secretary/agenda" className={styles.navLink}>
+                        Agenda
+                    </Link>
+                    <Link href="/secretary/queue" className={styles.navLink}>
+                        Queue Control
+                    </Link>
+                    <Link href="/admin/patients" className={styles.navLink}>
+                        Patients
+                    </Link>
+                    <Link href="/tv" target="_blank" className={styles.navLink} style={{ color: '#fff', backgroundColor: 'rgba(59, 130, 246, 0.2)', marginTop: '1rem' }}>
+                        Live TV Board
+                    </Link>
                 </nav>
 
-                <form action={logoutAction} style={{ marginTop: 'auto' }}>
-                    <button type="submit" style={{ width: '100%', padding: '0.5rem', backgroundColor: '#e00', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        Logout
-                    </button>
-                </form>
+                <div className={styles.logoutContainer}>
+                    <form action={logoutAction}>
+                        <Button variant="accent" fullWidth type="submit">
+                            Logout
+                        </Button>
+                    </form>
+                </div>
             </aside>
-            <main style={{ flex: 1, padding: '2rem' }}>
-                {children}
-            </main>
+
+            <div className={styles.mainArea}>
+                <header className={styles.topbar}>
+                    <div className={styles.userInfo}>
+                        <div style={{ textAlign: 'right' }}>
+                            <div className={styles.userName}>{user?.name || 'User'}</div>
+                            <div className={styles.userRole}>{user?.role || 'Role'}</div>
+                        </div>
+                        <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: 'var(--primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            fontSize: '1.2rem'
+                        }}>
+                            {(user?.name || 'U').charAt(0).toUpperCase()}
+                        </div>
+                    </div>
+                </header>
+
+                <main className={styles.content}>
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }

@@ -1,0 +1,116 @@
+.queueContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+}
+
+.manualAdd {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.addForm {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+/* TV Board Specifics */
+.tvContainer {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 3rem;
+    padding: 3rem;
+    background-color: var(--primary);
+    color: white;
+}
+
+.callingSection {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.tvHeader {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-bottom: 4px solid var(--accent);
+    padding-bottom: 1rem;
+}
+
+.calledCard {
+    padding: 4rem;
+    background-color: white;
+    color: var(--primary);
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s infinite;
+}
+
+.calledTicket {
+    font-size: 8rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.calledRoom {
+    font-size: 2.5rem;
+    margin-top: 1.5rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.nextSection {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nextTitle {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2rem;
+}
+
+.nextList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.nextItem {
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

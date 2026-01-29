@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Patient } from '@/features/patients/types';
 import { searchPatientsAction } from '../actions';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import styles from '../styles/Patients.module.css';
 
 export default function PatientList({ initialPatients = [], role }: { initialPatients?: Patient[], role: string }) {
     const [query, setQuery] = useState('');
@@ -21,44 +24,47 @@ export default function PatientList({ initialPatients = [], role }: { initialPat
     }, [query]);
 
     return (
-        <div>
-            <div style={{ marginBottom: '1rem' }}>
-                <input
+        <div className={styles.tableContainer}>
+            <div className={styles.searchBar}>
+                <Input
                     type="text"
                     placeholder="Search by name, document or phone..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc' }}
                 />
-                {loading && <span style={{ marginLeft: '1rem', color: '#888' }}>Searching...</span>}
+                {loading && <span className={styles.searchLoading}>Searching...</span>}
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className={styles.table}>
                 <thead>
-                    <tr style={{ textAlign: 'left', backgroundColor: '#f5f5f5' }}>
-                        <th style={{ padding: '0.5rem' }}>Name</th>
-                        <th style={{ padding: '0.5rem' }}>Document</th>
-                        <th style={{ padding: '0.5rem' }}>Phone</th>
-                        <th style={{ padding: '0.5rem' }}>Actions</th>
+                    <tr>
+                        <th>Name</th>
+                        <th>Document</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {patients.map(p => (
-                        <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
-                            <td style={{ padding: '0.5rem' }}>{p.name}</td>
-                            <td style={{ padding: '0.5rem' }}>{p.document}</td>
-                            <td style={{ padding: '0.5rem' }}>{p.phone}</td>
-                            <td style={{ padding: '0.5rem' }}>
-                                {(role === 'ADMIN' || role === 'SECRETARY') && (
-                                    <button style={{ marginRight: '0.5rem', cursor: 'pointer' }}>Edit</button>
-                                )}
-                                <button style={{ cursor: 'pointer' }}>View</button>
+                        <tr key={p.id}>
+                            <td><strong>{p.name}</strong></td>
+                            <td>{p.document}</td>
+                            <td>{p.phone}</td>
+                            <td>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    {(role === 'ADMIN' || role === 'SECRETARY') && (
+                                        <Button variant="ghost" size="sm">Edit</Button>
+                                    )}
+                                    <Button variant="secondary" size="sm">View</Button>
+                                </div>
                             </td>
                         </tr>
                     ))}
                     {patients.length === 0 && (
                         <tr>
-                            <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: '#888' }}>No patients found.</td>
+                            <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                No patients found.
+                            </td>
                         </tr>
                     )}
                 </tbody>

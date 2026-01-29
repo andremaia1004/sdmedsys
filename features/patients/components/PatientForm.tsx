@@ -2,50 +2,64 @@
 
 import { useActionState } from 'react';
 import { createPatientAction } from '../actions';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import styles from '../styles/Patients.module.css';
 
-const initialState = { error: '', success: false };
+const initialState = {
+    error: '',
+    message: '',
+};
 
 export default function PatientForm() {
-    // @ts-ignore
+    // @ts-ignore - React 19 types
     const [state, formAction, isPending] = useActionState(createPatientAction, initialState);
 
-    if (state?.success) {
-        return (
-            <div style={{ padding: '1rem', backgroundColor: '#e6fffa', color: '#006644', borderRadius: '4px' }}>
-                Patient created successfully!
-                <button onClick={() => window.location.reload()} style={{ marginLeft: '1rem', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}>Add another</button>
-            </div>
-        )
-    }
-
     return (
-        <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
-            <div>
-                <label style={{ display: 'block', marginBottom: '0.2rem' }}>Name*</label>
-                <input name="name" required style={{ width: '100%', padding: '0.5rem' }} />
-            </div>
-            <div>
-                <label style={{ display: 'block', marginBottom: '0.2rem' }}>Document (CPF)*</label>
-                <input name="document" required style={{ width: '100%', padding: '0.5rem' }} />
-            </div>
-            <div>
-                <label style={{ display: 'block', marginBottom: '0.2rem' }}>Phone*</label>
-                <input name="phone" required style={{ width: '100%', padding: '0.5rem' }} />
-            </div>
-            <div>
-                <label style={{ display: 'block', marginBottom: '0.2rem' }}>Birth Date</label>
-                <input name="birthDate" type="date" style={{ width: '100%', padding: '0.5rem' }} />
-            </div>
+        <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <Input
+                label="Full Name"
+                name="name"
+                required
+                placeholder="e.g. John Doe"
+            />
 
-            {state?.error && <p style={{ color: 'red' }}>{state.error}</p>}
+            <Input
+                label="Document (CPF/RG)"
+                name="document"
+                required
+                placeholder="000.000.000-00"
+            />
 
-            <button
+            <Input
+                label="Phone Number"
+                name="phone"
+                required
+                placeholder="(00) 00000-0000"
+            />
+
+            <Input
+                label="Date of Birth"
+                name="birthDate"
+                type="date"
+                required
+            />
+
+            <Button
                 type="submit"
+                variant="primary"
+                fullWidth
                 disabled={isPending}
-                style={{ padding: '0.8rem', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '1rem' }}
             >
-                {isPending ? 'Saving...' : 'Create Patient'}
-            </button>
+                {isPending ? 'Saving...' : 'Register Patient'}
+            </Button>
+
+            {state?.error && (
+                <p style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>{state.error}</p>
+            )}
+            {state?.message && (
+                <p style={{ color: 'var(--success)', fontSize: '0.875rem' }}>{state.message}</p>
+            )}
         </form>
     );
 }

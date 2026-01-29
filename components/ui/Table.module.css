@@ -1,0 +1,49 @@
+.container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-sm);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--bg-surface);
+    text-align: left;
+}
+
+.table th {
+    padding: 1rem;
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border);
+}
+
+.table td {
+    padding: 1rem;
+    font-size: 0.9375rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Zebra Stripes */
+.table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+.table tr:hover {
+    background-color: rgba(0, 45, 94, 0.02);
+}
+
+.sticky th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}

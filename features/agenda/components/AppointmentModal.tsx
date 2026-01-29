@@ -1,10 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useActionState } from 'react';
 import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
 import { searchPatientsAction } from '@/features/patients/actions';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import styles from '../styles/Agenda.module.css';
 
 export default function AppointmentModal({
     doctorId,
@@ -27,8 +31,12 @@ export default function AppointmentModal({
     if (state?.success) {
         setTimeout(() => onClose(), 1500);
         return (
-            <div style={{ padding: '2rem', backgroundColor: '#fff', borderRadius: '8px', textAlign: 'center' }}>
-                <h3 style={{ color: 'green' }}>Appointment Scheduled!</h3>
+            <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+                <Card padding="lg" style={{ width: '350px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
+                    <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>Appointment Scheduled!</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>Updating calendar...</p>
+                </Card>
             </div>
         )
     }
@@ -42,60 +50,118 @@ export default function AppointmentModal({
     };
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', width: '400px' }}>
-                <h3>New Appointment</h3>
-                <p style={{ marginBottom: '1rem', color: '#666' }}>{date} at {time}</p>
-
-                <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <input type="hidden" name="doctorId" value={doctorId} />
-                    <input type="hidden" name="date" value={date} />
-                    <input type="hidden" name="time" value={time} />
-
-                    {!selectedPatient ? (
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Search Patient</label>
-                            <input
-                                value={searchQuery}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                placeholder="Type name..."
-                                style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem' }}
-                            />
-                            <ul style={{ border: '1px solid #eee', maxHeight: '100px', overflowY: 'auto', listStyle: 'none', padding: 0 }}>
-                                {searchResults.map(p => (
-                                    <li
-                                        key={p.id}
-                                        onClick={() => setSelectedPatient(p)}
-                                        style={{ padding: '0.5rem', cursor: 'pointer', borderBottom: '1px solid #f0f0f0' }}
-                                    >
-                                        {p.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ) : (
-                        <div style={{ padding: '0.5rem', backgroundColor: '#eef', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
-                            <span>{selectedPatient.name}</span>
-                            <button type="button" onClick={() => setSelectedPatient(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'red' }}>Change</button>
-                            <input type="hidden" name="patientId" value={selectedPatient.id} />
-                            <input type="hidden" name="patientName" value={selectedPatient.name} />
-                        </div>
-                    )}
-
-                    {state?.error && <p style={{ color: 'red' }}>{state.error}</p>}
-
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <button type="button" onClick={onClose} style={{ flex: 1, padding: '0.8rem', cursor: 'pointer' }}>Cancel</button>
-                        <button
-                            type="submit"
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+            <Card
+                className={styles.modalCard}
+                header="New Appointment"
+                style={{ width: '450px', animation: 'slideUp 0.3s ease-out' }}
+                footer={
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <Button variant="secondary" onClick={onClose} fullWidth>Cancel</Button>
+                        <Button
+                            variant="primary"
                             disabled={!selectedPatient || isPending}
-                            style={{ flex: 1, padding: '0.8rem', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}
+                            onClick={() => (document.getElementById('appointment-form') as HTMLFormElement)?.requestSubmit()}
+                            fullWidth
                         >
                             {isPending ? 'Scheduling...' : 'Confirm'}
-                        </button>
+                        </Button>
                     </div>
-                </form>
-            </div>
+                }
+            >
+                <div style={{ padding: '1.5rem' }}>
+                    <div style={{ marginBottom: '1.5rem', padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: '8px', borderLeft: '4px solid var(--accent)' }}>
+                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Scheduled Slot</div>
+                        <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{date} at {time}</div>
+                    </div>
+
+                    <form id="appointment-form" action={formAction}>
+                        <input type="hidden" name="doctorId" value={doctorId} />
+                        <input type="hidden" name="date" value={date} />
+                        <input type="hidden" name="time" value={time} />
+
+                        {!selectedPatient ? (
+                            <div>
+                                <Input
+                                    label="Search Patient"
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                    placeholder="Type patient name or document..."
+                                    autoFocus
+                                />
+                                {searchQuery.length > 2 && (
+                                    <ul style={{
+                                        marginTop: '0.5rem',
+                                        border: '1px solid var(--border)',
+                                        borderRadius: '8px',
+                                        maxHeight: '150px',
+                                        overflowY: 'auto',
+                                        listStyle: 'none',
+                                        padding: 0,
+                                        boxShadow: 'var(--shadow-sm)'
+                                    }}>
+                                        {searchResults.map(p => (
+                                            <li
+                                                key={p.id}
+                                                onClick={() => setSelectedPatient(p)}
+                                                style={{
+                                                    padding: '0.75rem 1rem',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid var(--border)',
+                                                    transition: 'all 0.2s ease',
+                                                    fontSize: '0.9375rem'
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                            >
+                                                <strong>{p.name}</strong>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.document}</div>
+                                            </li>
+                                        ))}
+                                        {searchResults.length === 0 && searchQuery.length > 2 && (
+                                            <li style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                                                No patients found
+                                            </li>
+                                        )}
+                                    </ul>
+                                )}
+                            </div>
+                        ) : (
+                            <div style={{
+                                padding: '1rem',
+                                backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                border: '1px solid rgba(59, 130, 246, 0.2)'
+                            }}>
+                                <div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Selected Patient</div>
+                                    <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{selectedPatient.name}</div>
+                                </div>
+                                <Button variant="ghost" size="sm" onClick={() => setSelectedPatient(null)} style={{ color: 'var(--danger)' }}>Change</Button>
+                                <input type="hidden" name="patientId" value={selectedPatient.id} />
+                                <input type="hidden" name="patientName" value={selectedPatient.name} />
+                            </div>
+                        )}
+
+                        {state?.error && (
+                            <div style={{
+                                marginTop: '1rem',
+                                padding: '0.75rem',
+                                backgroundColor: '#fee2e2',
+                                color: '#991b1b',
+                                borderRadius: '8px',
+                                fontSize: '0.875rem',
+                                border: '1px solid #fecaca'
+                            }}>
+                                {state.error}
+                            </div>
+                        )}
+                    </form>
+                </div>
+            </Card>
         </div>
     );
 }

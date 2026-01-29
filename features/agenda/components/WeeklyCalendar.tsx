@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Appointment } from '@/features/agenda/types';
 import AppointmentModal from './AppointmentModal';
+import styles from '../styles/Agenda.module.css';
 
 const HOURS = Array.from({ length: 11 }, (_, i) => i + 8); // 08:00 to 18:00
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -19,13 +20,11 @@ export default function WeeklyCalendar({
     const [modalData, setModalData] = useState<{ date: string, time: string } | null>(null);
 
     const getEvent = (dayIndex: number, hour: number) => {
-        // Mock Date Mapping: Assume current week starts Mon Jan 29 2026 for simplicity of MVP Visual
-        // Real app would calculate exact dates
+        // Mock Date Mapping: Assume current week starts Mon Jan 29 2026
         const mockDate = `2026-01-${29 + dayIndex}`;
 
         return appointments.find(a => {
             const d = new Date(a.startTime);
-            // Simple match
             return d.getDate() === (29 + dayIndex) && d.getHours() === hour;
         });
     };
@@ -39,43 +38,44 @@ export default function WeeklyCalendar({
     };
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '50px repeat(5, 1fr)', gap: '1px', backgroundColor: '#ddd', border: '1px solid #ccc' }}>
-            {/* Header */}
-            <div style={{ backgroundColor: '#f9f9f9' }}></div>
-            {DAYS.map(d => <div key={d} style={{ backgroundColor: '#f9f9f9', padding: '0.5rem', textAlign: 'center', fontWeight: 'bold' }}>{d}</div>)}
-
-            {/* Grid */}
-            {HOURS.map(hour => (
-                <>
-                    <div key={`h-${hour}`} style={{ backgroundColor: '#fff', padding: '0.5rem', textAlign: 'right', fontSize: '0.8rem', color: '#666' }}>
-                        {hour}:00
+        <div className={styles.agendaContainer}>
+            <div className={styles.calendarGrid}>
+                {/* Header Row */}
+                <div className={styles.timeHeaderPlaceholder}></div>
+                {DAYS.map(d => (
+                    <div key={d} className={styles.dayHeader}>
+                        {d}
                     </div>
-                    {DAYS.map((_, dayIndex) => {
-                        const event = getEvent(dayIndex, hour);
-                        return (
-                            <div
-                                key={`${dayIndex}-${hour}`}
-                                onClick={() => !event && handleCellClick(dayIndex, hour)}
-                                style={{
-                                    backgroundColor: event ? '#e6f7ff' : '#fff',
-                                    padding: '0.2rem',
-                                    minHeight: '40px',
-                                    cursor: !event && role !== 'DOCTOR' ? 'pointer' : 'default',
-                                    borderLeft: event ? '3px solid #0070f3' : 'none',
-                                    fontSize: '0.8rem'
-                                }}
-                            >
-                                {event ? (
-                                    <div>
-                                        <strong>{event.patientName}</strong>
-                                        <div style={{ fontSize: '0.7rem', color: '#666' }}>{event.status}</div>
-                                    </div>
-                                ) : null}
-                            </div>
-                        );
-                    })}
-                </>
-            ))}
+                ))}
+
+                {/* Hour Rows */}
+                {HOURS.map(hour => (
+                    <React.Fragment key={`row-${hour}`}>
+                        <div className={styles.timeCell}>
+                            {hour}:00
+                        </div>
+                        {DAYS.map((_, dayIndex) => {
+                            const event = getEvent(dayIndex, hour);
+                            const isClickable = !event && role !== 'DOCTOR';
+
+                            return (
+                                <div
+                                    key={`${dayIndex}-${hour}`}
+                                    onClick={() => isClickable && handleCellClick(dayIndex, hour)}
+                                    className={`${styles.calendarCell} ${isClickable ? styles.clickableCell : ''}`}
+                                >
+                                    {event ? (
+                                        <div className={styles.appointment}>
+                                            <span className={styles.patientName}>{event.patientName}</span>
+                                            <span className={styles.statusText}>{event.status}</span>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            );
+                        })}
+                    </React.Fragment>
+                ))}
+            </div>
 
             {modalData && (
                 <AppointmentModal
@@ -88,3 +88,6 @@ export default function WeeklyCalendar({
         </div>
     );
 }
+
+// React import for Fragment if not available globally in common patterns, but usually standard in TSX
+import React from 'react';

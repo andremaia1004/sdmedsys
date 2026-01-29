@@ -2,6 +2,11 @@
 
 import { QueueItemWithPatient } from '@/features/queue/types';
 import { changeQueueStatusAction } from '@/app/actions/queue';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Table } from '@/components/ui/Table';
+import Link from 'next/link';
 
 export default function DoctorQueue({ items }: { items: QueueItemWithPatient[] }) {
     const currentPatient = items.find(i => i.status === 'IN_SERVICE');
@@ -9,49 +14,83 @@ export default function DoctorQueue({ items }: { items: QueueItemWithPatient[] }
     const waitingList = items.filter(i => i.status === 'WAITING');
 
     return (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {currentPatient && (
-                <div style={{ padding: '2rem', backgroundColor: '#e6f7ff', border: '1px solid #1890ff', marginBottom: '2rem', borderRadius: '8px' }}>
-                    <h2>In Service</h2>
-                    <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{currentPatient.patientName}</p>
-                    <p>Ticket: {currentPatient.ticketCode}</p>
-                    <button onClick={() => changeQueueStatusAction(currentPatient.id, 'DONE')} style={{ marginTop: '1rem', padding: '0.8rem', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}>
-                        Finish Consultation
-                    </button>
-                </div>
+                <Card
+                    header="Current Service"
+                    style={{ borderLeft: '8px solid var(--primary)', backgroundColor: 'rgba(0, 45, 94, 0.02)' }}
+                    footer={
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <Link href={`/doctor/consultation/${currentPatient.id}`} style={{ flex: 1 }}>
+                                <Button fullWidth variant="primary" size="lg">Open Consultation Workspace</Button>
+                            </Link>
+                            <Button onClick={() => changeQueueStatusAction(currentPatient.id, 'DONE')} variant="secondary" size="lg">
+                                Mark as Done
+                            </Button>
+                        </div>
+                    }
+                >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Patient in Room</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)' }}>{currentPatient.patientName}</div>
+                            <div style={{ marginTop: '0.5rem' }}>
+                                <Badge variant="in_service">TICKET: {currentPatient.ticketCode}</Badge>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
             )}
 
             {calledPatient && !currentPatient && (
-                <div style={{ padding: '2rem', backgroundColor: '#fffbe6', border: '1px solid #ffe58f', marginBottom: '2rem', borderRadius: '8px' }}>
-                    <h2>Waiting for Patient</h2>
-                    <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{calledPatient.patientName}</p>
-                    <p>Ticket: {calledPatient.ticketCode}</p>
-                    <button onClick={() => changeQueueStatusAction(calledPatient.id, 'IN_SERVICE')} style={{ marginTop: '1rem', padding: '0.8rem', backgroundColor: '#faad14', color: 'white', border: 'none', cursor: 'pointer' }}>
-                        Start Service
-                    </button>
-                </div>
+                <Card
+                    header="Awaiting Arrival"
+                    style={{ borderLeft: '8px solid var(--warning)' }}
+                    footer={
+                        <Button onClick={() => changeQueueStatusAction(calledPatient.id, 'IN_SERVICE')} variant="primary" size="lg" fullWidth>
+                            Start Service
+                        </Button>
+                    }
+                >
+                    <div style={{ textAlign: 'center', padding: '1rem' }}>
+                        <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>Patient Called</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 700 }}>{calledPatient.patientName}</div>
+                        <div style={{ marginTop: '1rem' }}>
+                            <Badge variant="called">TICKET: {calledPatient.ticketCode}</Badge>
+                        </div>
+                    </div>
+                </Card>
             )}
 
-            <h3>Waiting List</h3>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-                {waitingList.map(item => (
-                    <li key={item.id} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                            <strong>{item.ticketCode}</strong> - {item.patientName}
-                        </div>
-                        {!calledPatient && !currentPatient && (
-                            <form action={async () => {
-                                await changeQueueStatusAction(item.id, 'CALLED');
-                            }}>
-                                <button type="submit" style={{ padding: '0.5rem', cursor: 'pointer', backgroundColor: '#0070f3', color: 'white', border: 'none' }}>
-                                    Call Next
-                                </button>
-                            </form>
-                        )}
-                    </li>
-                ))}
-                {waitingList.length === 0 && <p style={{ color: '#888' }}>No patients waiting.</p>}
-            </ul>
+            <Card header={`Patients in Queue (${waitingList.length})`} padding="none">
+                <Table headers={['Ticket', 'Patient', 'Status', 'Actions']}>
+                    {waitingList.map(item => (
+                        <tr key={item.id}>
+                            <td><strong>{item.ticketCode}</strong></td>
+                            <td>{item.patientName}</td>
+                            <td><Badge variant="waiting">{item.status}</Badge></td>
+                            <td>
+                                {!calledPatient && !currentPatient && (
+                                    <form action={async () => {
+                                        await changeQueueStatusAction(item.id, 'CALLED');
+                                    }}>
+                                        <Button type="submit" size="sm">
+                                            Call Next
+                                        </Button>
+                                    </form>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                    {waitingList.length === 0 && (
+                        <tr>
+                            <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                No patients waiting.
+                            </td>
+                        </tr>
+                    )}
+                </Table>
+            </Card>
         </div>
     );
 }

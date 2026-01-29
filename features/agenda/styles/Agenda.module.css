@@ -1,0 +1,89 @@
+.agendaContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    gap: 1px;
+    background-color: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.timeHeaderPlaceholder {
+    background-color: var(--bg-surface);
+    border-bottom: 2px solid var(--border);
+}
+
+.dayHeader {
+    background-color: var(--bg-surface);
+    padding: 1rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 2px solid var(--border);
+    font-size: 0.9375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.timeCell {
+    background-color: var(--bg-surface);
+    padding: 1rem;
+    text-align: right;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.calendarCell {
+    background-color: var(--bg-surface);
+    padding: 0.5rem;
+    min-height: 80px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.clickableCell:hover {
+    background-color: #f1f5f9;
+    cursor: pointer;
+}
+
+.clickableCell:hover::after {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: var(--primary);
+    opacity: 0.3;
+}
+
+.appointment {
+    height: 100%;
+    background-color: rgba(0, 45, 94, 0.05);
+    border-left: 4px solid var(--primary);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.patientName {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.statusText {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}

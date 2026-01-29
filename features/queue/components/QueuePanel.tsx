@@ -2,72 +2,93 @@
 
 import { QueueItemWithPatient } from '@/features/queue/types';
 import { changeQueueStatusAction, addToQueueAction } from '@/app/actions/queue';
-import { useActionState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import styles from '@/features/patients/styles/Patients.module.css'; // Reuse table styles
+import qStyles from '../styles/Queue.module.css';
 
 export default function QueuePanel({ items }: { items: QueueItemWithPatient[] }) {
     return (
-        <div>
-            <div style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #ddd' }}>
-                <h3>Add to Queue (Manual)</h3>
-                <form action={addToQueueAction} style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                    <input name="patientName" placeholder="Patient Name" required style={{ padding: '0.5rem' }} />
-                    <select name="doctorId" style={{ padding: '0.5rem' }}>
-                        <option value="">General Queue</option>
-                        <option value="doc">Dr. House</option>
-                    </select>
-                    <button type="submit" style={{ padding: '0.5rem', cursor: 'pointer' }}>Add Ticket</button>
+        <div className={qStyles.queueContainer}>
+            <Card header="Issue Manual Ticket" className={qStyles.manualAdd}>
+                <form action={addToQueueAction} className={qStyles.addForm}>
+                    <div style={{ flex: 1 }}>
+                        <Input name="patientName" label="Patient Name" placeholder="e.g. John Doe" required />
+                    </div>
+                    <div style={{ width: '200px' }}>
+                        <label style={{ fontSize: '0.875rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem' }}>Doctor</label>
+                        <select name="doctorId" style={{
+                            width: '100%',
+                            padding: '0.75rem',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: 'var(--bg-surface)'
+                        }}>
+                            <option value="">General Queue</option>
+                            <option value="doc">Dr. House</option>
+                        </select>
+                    </div>
+                    <Button type="submit">Add to Queue</Button>
                 </form>
-            </div>
+            </Card>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr style={{ textAlign: 'left', backgroundColor: '#eee' }}>
-                        <th style={{ padding: '0.5rem' }}>Ticket</th>
-                        <th style={{ padding: '0.5rem' }}>Patient</th>
-                        <th style={{ padding: '0.5rem' }}>Status</th>
-                        <th style={{ padding: '0.5rem' }}>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {items.map(item => (
-                        <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
-                            <td style={{ padding: '0.5rem' }}><strong>{item.ticketCode}</strong></td>
-                            <td style={{ padding: '0.5rem' }}>{item.patientName}</td>
-                            <td style={{ padding: '0.5rem' }}>
-                                <span style={{
-                                    padding: '0.2rem 0.5rem',
-                                    borderRadius: '4px',
-                                    backgroundColor: item.status === 'CALLED' ? '#d4edda' : '#f8d7da',
-                                    color: item.status === 'CALLED' ? '#155724' : '#721c24'
-                                }}>
-                                    {item.status}
-                                </span>
-                            </td>
-                            <td style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                                {item.status === 'WAITING' && (
-                                    <form action={async () => {
-                                        await changeQueueStatusAction(item.id, 'CALLED');
-                                    }}>
-                                        <button type="submit" style={{ cursor: 'pointer' }}>Call</button>
-                                    </form>
-                                )}
-                                {item.status === 'CALLED' && (
-                                    <form action={async () => {
-                                        await changeQueueStatusAction(item.id, 'IN_SERVICE');
-                                    }}>
-                                        <button type="submit" style={{ cursor: 'pointer' }}>Start</button>
-                                    </form>
-                                )}
-                                <form action={async () => {
-                                    await changeQueueStatusAction(item.id, 'NO_SHOW');
-                                }}>
-                                    <button type="submit" style={{ cursor: 'pointer', color: 'red' }}>No Show</button>
-                                </form>
-                            </td>
+            <Card header="Current Queue" padding="none">
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>Ticket</th>
+                            <th>Patient</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {items.map(item => (
+                            <tr key={item.id}>
+                                <td><span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{item.ticketCode}</span></td>
+                                <td>{item.patientName}</td>
+                                <td>
+                                    <Badge variant={item.status.toLowerCase() as any}>
+                                        {item.status}
+                                    </Badge>
+                                </td>
+                                <td>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        {item.status === 'WAITING' && (
+                                            <form action={async () => {
+                                                await changeQueueStatusAction(item.id, 'CALLED');
+                                            }}>
+                                                <Button type="submit" size="sm" variant="primary">Call</Button>
+                                            </form>
+                                        )}
+                                        {item.status === 'CALLED' && (
+                                            <form action={async () => {
+                                                await changeQueueStatusAction(item.id, 'IN_SERVICE');
+                                            }}>
+                                                <Button type="submit" size="sm" variant="primary">Start</Button>
+                                            </form>
+                                        )}
+                                        <form action={async () => {
+                                            await changeQueueStatusAction(item.id, 'NO_SHOW');
+                                        }}>
+                                            <Button type="submit" size="sm" variant="danger">No Show</Button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {items.length === 0 && (
+                            <tr>
+                                <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                    Queue is empty.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </Card>
         </div>
     );
 }

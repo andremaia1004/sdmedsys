@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { Consultation } from '@/features/consultation/types';
 import { updateClinicalNotesAction, finishConsultationAction } from '../actions';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import styles from '../styles/Consultation.module.css';
 
 export default function ConsultationWorkspace({ consultation, patientName }: { consultation: Consultation, patientName: string }) {
     const [notes, setNotes] = useState(consultation.clinicalNotes);
@@ -10,49 +13,59 @@ export default function ConsultationWorkspace({ consultation, patientName }: { c
 
     const handleSave = async () => {
         setSaving(true);
-        await updateClinicalNotesAction(consultation.id, notes);
-        setSaving(false);
+        try {
+            await updateClinicalNotesAction(consultation.id, notes);
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '2rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-                <h1 style={{ marginBottom: '0.5rem' }}>Patient: {patientName}</h1>
-                <div style={{ color: '#666', fontSize: '0.9rem' }}>
-                    Started at: {new Date(consultation.startedAt).toLocaleTimeString()}
+        <div className={styles.container}>
+            <header className={styles.header}>
+                <h1 className={styles.patientName}>{patientName}</h1>
+                <div className={styles.meta}>
+                    <div className={styles.metaItem}>
+                        <span>📅</span> {new Date(consultation.startedAt).toLocaleDateString()}
+                    </div>
+                    <div className={styles.metaItem}>
+                        <span>🕒</span> Started at {new Date(consultation.startedAt).toLocaleTimeString()}
+                    </div>
                 </div>
-            </div>
+            </header>
 
-            <div style={{ marginBottom: '2rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Clinical Notes</label>
+            <div className={styles.notesArea}>
+                <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.875rem' }}>
+                    CLINICAL OBSERVATIONS & NOTES
+                </label>
                 <textarea
+                    className={styles.textarea}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    onBlur={handleSave} // Auto-save on blur
-                    placeholder="Type clinical notes here..."
-                    style={{ width: '100%', minHeight: '300px', padding: '1rem', fontSize: '1rem', lineHeight: '1.5', borderRadius: '8px', border: '1px solid #ccc' }}
+                    onBlur={handleSave}
+                    placeholder="Start typing clinical notes..."
                 />
-                <div style={{ textAlign: 'right', fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
-                    {saving ? 'Saving...' : 'All changes saved'}
+                <div className={styles.statusInfo}>
+                    {saving ? 'Saving changes...' : '✓ All changes saved'}
                 </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+            <footer className={styles.footer}>
                 <form action={async () => {
-                    await handleSave(); // Ensure latest saved
-                    await finishConsultationAction(consultation.id);
+                    if (confirm('Are you sure you want to finish this consultation?')) {
+                        await handleSave();
+                        await finishConsultationAction(consultation.id);
+                    }
                 }}>
-                    <button
+                    <Button
                         type="submit"
-                        style={{ padding: '1rem 2rem', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', fontSize: '1rem', cursor: 'pointer' }}
-                        onClick={(e) => {
-                            if (!confirm('Finish consultation? This cannot be undone.')) e.preventDefault();
-                        }}
+                        variant="accent"
+                        size="lg"
                     >
                         Finish Consultation
-                    </button>
+                    </Button>
                 </form>
-            </div>
+            </footer>
         </div>
     );
 }

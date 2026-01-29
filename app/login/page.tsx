@@ -2,6 +2,10 @@
 
 import { useActionState } from 'react';
 import { loginAction } from '@/app/actions/auth';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
+import styles from './login.module.css';
 
 const initialState = {
     error: '',
@@ -13,52 +17,64 @@ export default function LoginPage() {
     const [state, formAction, isPending] = useActionState(loginAction, initialState);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5' }}>
-            <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                <h1 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#0070f3' }}>SDMED SYS</h1>
+        <div className={styles.page}>
+            <Card className={styles.loginCard} padding="lg">
+                <div className={styles.header}>
+                    <h1 className={styles.title}>
+                        SDMED<span className={styles.titleAccent}>SYS</span>
+                    </h1>
+                    <p className={styles.subtitle}>Medical Management System</p>
+                </div>
 
-                <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '300px' }}>
-                    <div>
-                        <label style={{ fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>Email / Username</label>
-                        <input
-                            name="username"
-                            type="text"
-                            placeholder="user@example.com or 'admin'"
-                            required
-                            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                        />
-                    </div>
+                <form action={formAction} className={styles.form}>
+                    <Input
+                        label="Email or Username"
+                        name="username"
+                        type="text"
+                        placeholder="admin@sdmed.com"
+                        required
+                    />
 
-                    <div>
-                        <label style={{ fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>Password</label>
-                        <input
-                            name="password"
-                            type="password"
-                            placeholder="Password"
-                            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                        />
-                    </div>
+                    <Input
+                        label="Password"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                    />
 
-                    <button
+                    <Button
                         type="submit"
                         disabled={isPending}
-                        style={{ marginTop: '1rem', padding: '0.8rem', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                        fullWidth
+                        size="lg"
                     >
                         {isPending ? 'Signing in...' : 'Sign In'}
-                    </button>
+                    </Button>
 
                     {state?.error && (
-                        <div style={{ marginTop: '1rem', padding: '0.8rem', backgroundColor: '#ffebee', color: '#c62828', borderRadius: '4px', fontSize: '0.9rem' }}>
+                        <div style={{
+                            padding: '0.75rem',
+                            backgroundColor: '#fee2e2',
+                            color: '#991b1b',
+                            borderRadius: '8px',
+                            fontSize: '0.875rem',
+                            textAlign: 'center',
+                            border: '1px solid #fecaca'
+                        }}>
                             {state.error}
                         </div>
                     )}
                 </form>
-            </div>
+            </Card>
 
-            <div style={{ marginTop: '2rem', fontSize: '0.8rem', color: '#666', maxWidth: '300px', textAlign: 'center' }}>
-                <p><strong>Dev & Test Modes:</strong></p>
-                <p>If <code>AUTH_MODE=stub</code>, use 'admin', 'sec', or 'doc' (password ignored).</p>
-                <p>If <code>AUTH_MODE=supabase</code>, use real email/password.</p>
+            <div className={styles.hints}>
+                <p><strong>Demo Mode (AUTH_MODE=stub)</strong></p>
+                <ul className={styles.hintList}>
+                    <li><code>admin</code></li>
+                    <li><code>sec</code></li>
+                    <li><code>doc</code></li>
+                </ul>
             </div>
         </div>
     );
