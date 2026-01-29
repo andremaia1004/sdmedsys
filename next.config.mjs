@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: 'standalone', // Disabled for Vercel
     typescript: {
         ignoreBuildErrors: true,
     },
     eslint: {
         ignoreDuringBuilds: true,
+    },
+    experimental: {
+        // Ensuring app router is explicitly allowed if not default
+        appDir: true,
     }
 };
 
-module.exports = nextConfig;
+export default nextConfig;
