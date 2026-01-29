@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { createPatientAction } from '@/app/actions/patients';
+import { createPatientAction } from '../actions';
 
 const initialState = { error: '', success: false };
 

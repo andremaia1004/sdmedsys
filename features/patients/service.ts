@@ -1,74 +1,40 @@
 import { Patient, PatientInput } from './types';
+import { IPatientsRepository } from './repository.types';
+import { MockPatientsRepository } from './repository.mock';
+import { SupabasePatientsRepository } from './repository.supabase';
 
-// Mock Data Storage
-const MOCK_PATIENTS: Patient[] = [
-    {
-        id: 'p1',
-        name: 'John Doe',
-        document: '12345678900',
-        phone: '5511999999999',
-        birthDate: '1980-01-01',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-    {
-        id: 'p2',
-        name: 'Jane Smith',
-        document: '98765432100',
-        phone: '5511888888888',
-        birthDate: '1990-05-15',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+// Helper to select repository
+// In a real app, this might be a Dependency Injection container
+const getRepository = (): IPatientsRepository => {
+    // Check feature flag - default to false (Mock) for safety during migration
+    const useSupabase = process.env.NEXT_PUBLIC_USE_SUPABASE === 'true';
+
+    // Fallback if Supabase credentials are missing even if flag is true (prevent runtime crash)
+    if (useSupabase) {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            console.warn('USE_SUPABASE is true, but credentials are missing. Falling back to Mock.');
+            return new MockPatientsRepository();
+        }
+        return new SupabasePatientsRepository();
     }
-];
+
+    return new MockPatientsRepository();
+};
 
 export class PatientService {
-    // TODO: Supabase Migration - Replace these methods with DB calls
-
     static async list(query?: string): Promise<Patient[]> {
-        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate latency
-
-        if (!query) return MOCK_PATIENTS;
-
-        const lowerQuery = query.toLowerCase();
-        return MOCK_PATIENTS.filter(p =>
-            p.name.toLowerCase().includes(lowerQuery) ||
-            p.document.includes(lowerQuery) ||
-            p.phone.includes(lowerQuery)
-        );
+        return getRepository().list(query);
     }
 
     static async findById(id: string): Promise<Patient | undefined> {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        return MOCK_PATIENTS.find(p => p.id === id);
+        return getRepository().findById(id);
     }
 
     static async create(input: PatientInput): Promise<Patient> {
-        await new Promise(resolve => setTimeout(resolve, 400));
-
-        const newPatient: Patient = {
-            ...input,
-            id: Math.random().toString(36).substring(7),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
-
-        MOCK_PATIENTS.push(newPatient);
-        return newPatient;
+        return getRepository().create(input);
     }
 
     static async update(id: string, input: PatientInput): Promise<Patient | null> {
-        await new Promise(resolve => setTimeout(resolve, 400));
-
-        const index = MOCK_PATIENTS.findIndex(p => p.id === id);
-        if (index === -1) return null;
-
-        MOCK_PATIENTS[index] = {
-            ...MOCK_PATIENTS[index],
-            ...input,
-            updatedAt: new Date().toISOString(),
-        };
-
-        return MOCK_PATIENTS[index];
+        return getRepository().update(id, input);
     }
 }

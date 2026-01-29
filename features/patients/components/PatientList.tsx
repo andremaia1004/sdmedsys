@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Patient } from '@/features/patients/types';
-import { searchPatientsAction } from '@/app/actions/patients';
+import { searchPatientsAction } from '../actions';
 
 export default function PatientList({ initialPatients = [], role }: { initialPatients?: Patient[], role: string }) {
     const [query, setQuery] = useState('');
