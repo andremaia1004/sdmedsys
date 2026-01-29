@@ -1,12 +1,18 @@
-import { supabaseServer as supabase } from '@/lib/supabase-server';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { QueueItem, QueueItemWithPatient, QueueStatus } from './types';
 import { IQueueRepository } from './repository.types';
 
 export class SupabaseQueueRepository implements IQueueRepository {
+    constructor(
+        private supabase: SupabaseClient,
+        private clinicId: string
+    ) { }
+
     async list(doctorId?: string): Promise<QueueItem[]> {
-        let query = supabase
+        let query = this.supabase
             .from('queue_items')
-            .select('*') // No JOIN
+            .select('*')
+            .eq('clinic_id', this.clinicId)
             .not('status', 'in', '("DONE","CANCELED")')
             .order('created_at', { ascending: true });
 
@@ -25,10 +31,10 @@ export class SupabaseQueueRepository implements IQueueRepository {
     }
 
     async getTVList(): Promise<Partial<QueueItemWithPatient>[]> {
-        // TV shows WAITING, CALLED, IN_SERVICE
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('queue_items')
             .select('ticket_code, status, doctor_id')
+            .eq('clinic_id', this.clinicId)
             .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
             .order('updated_at', { ascending: false });
 
@@ -45,15 +51,14 @@ export class SupabaseQueueRepository implements IQueueRepository {
     }
 
     async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string): Promise<QueueItem> {
-        // Generate Ticket Code: A + Sequence reset daily
         const today = new Date().toISOString().split('T')[0];
         const startOfDay = `${today}T00:00:00.000Z`;
         const endOfDay = `${today}T23:59:59.999Z`;
 
-        // Count items created TODAY
-        const { count, error: countError } = await supabase
+        const { count, error: countError } = await this.supabase
             .from('queue_items')
             .select('*', { count: 'exact', head: true })
+            .eq('clinic_id', this.clinicId)
             .gte('created_at', startOfDay)
             .lte('created_at', endOfDay);
 
@@ -62,12 +67,10 @@ export class SupabaseQueueRepository implements IQueueRepository {
             throw new Error('Failed to generate ticket code');
         }
 
-        // MVP: Simple Increment. 
-        // Note: unique constraint on ticket_code + day would be better in DB schema, but we handle logic here.
         const nextNum = (count || 0) + 1;
         const code = `A${nextNum.toString().padStart(3, '0')}`;
 
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('queue_items')
             .insert([{
                 patient_id: item.patientId,
@@ -76,7 +79,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
                 status: item.status,
                 ticket_code: code,
                 created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
+                clinic_id: this.clinicId
             }])
             .select()
             .single();
@@ -90,13 +94,14 @@ export class SupabaseQueueRepository implements IQueueRepository {
     }
 
     async changeStatus(id: string, newStatus: QueueStatus, actorRole: string): Promise<QueueItem> {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('queue_items')
             .update({
                 status: newStatus,
                 updated_at: new Date().toISOString()
             })
             .eq('id', id)
+            .eq('clinic_id', this.clinicId)
             .select()
             .single();
 

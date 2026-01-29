@@ -1,18 +1,23 @@
-import { supabaseServer as supabase } from '@/lib/supabase-server';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { Consultation, ConsultationInput } from './types';
 import { IConsultationRepository } from './repository.types';
 
 export class SupabaseConsultationRepository implements IConsultationRepository {
+    constructor(
+        private supabase: SupabaseClient,
+        private clinicId: string
+    ) { }
+
     async start(input: ConsultationInput): Promise<Consultation> {
-        // Map camelCase to snake_case for DB
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('consultations')
             .insert([{
                 patient_id: input.patientId,
                 doctor_id: input.doctorId,
                 queue_item_id: input.queueItemId,
                 clinical_notes: '',
-                started_at: new Date().toISOString()
+                started_at: new Date().toISOString(),
+                clinic_id: this.clinicId
             }])
             .select()
             .single();
@@ -26,16 +31,17 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
     }
 
     async getActiveByDoctor(doctorId: string): Promise<Consultation | undefined> {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('consultations')
             .select('*')
+            .eq('clinic_id', this.clinicId)
             .eq('doctor_id', doctorId)
             .is('finished_at', null)
-            .maybeSingle(); // Use maybeSingle to avoid 406 if none found
+            .maybeSingle();
 
         if (error) {
             console.error('Supabase Error (getActiveByDoctor):', error);
-            return undefined; // Fail gracefully or throw
+            return undefined;
         }
 
         if (!data) return undefined;
@@ -44,10 +50,11 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
     }
 
     async findById(id: string): Promise<Consultation | undefined> {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('consultations')
             .select('*')
             .eq('id', id)
+            .eq('clinic_id', this.clinicId)
             .single();
 
         if (error) {
@@ -60,13 +67,14 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
     }
 
     async updateNotes(id: string, notes: string): Promise<void> {
-        const { error } = await supabase
+        const { error } = await this.supabase
             .from('consultations')
             .update({
                 clinical_notes: notes,
                 updated_at: new Date().toISOString()
             })
-            .eq('id', id);
+            .eq('id', id)
+            .eq('clinic_id', this.clinicId);
 
         if (error) {
             console.error('Supabase Error (updateNotes):', error);
@@ -75,13 +83,14 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
     }
 
     async finish(id: string): Promise<void> {
-        const { error } = await supabase
+        const { error } = await this.supabase
             .from('consultations')
             .update({
                 finished_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             })
-            .eq('id', id);
+            .eq('id', id)
+            .eq('clinic_id', this.clinicId);
 
         if (error) {
             console.error('Supabase Error (finish):', error);

@@ -2,41 +2,47 @@ import { Appointment, AppointmentInput, AppointmentStatus } from './types';
 import { IAppointmentsRepository } from './repository.types';
 import { MockAppointmentsRepository } from './repository.mock';
 import { SupabaseAppointmentsRepository } from './repository.supabase';
+import { getCurrentUser } from '@/lib/session';
+import { createClient } from '@/lib/supabase-auth';
+import { supabaseServer } from '@/lib/supabase-server';
 
-const getRepository = (): IAppointmentsRepository => {
+const getRepository = async (): Promise<IAppointmentsRepository> => {
     const useSupabase = process.env.USE_SUPABASE === 'true';
 
     if (useSupabase) {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            console.warn('USE_SUPABASE is true, but credentials are missing. Falling back to Mock.');
-            return new MockAppointmentsRepository();
+        const user = await getCurrentUser();
+        const authMode = process.env.AUTH_MODE || 'stub';
+        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
+        const clinicId = user?.clinicId || defaultClinicId;
+
+        if (authMode === 'supabase' && user) {
+            const client = await createClient();
+            return new SupabaseAppointmentsRepository(client, clinicId);
         }
-        return new SupabaseAppointmentsRepository();
+
+        return new SupabaseAppointmentsRepository(supabaseServer, clinicId);
     }
 
     return new MockAppointmentsRepository();
 };
 
 export class AppointmentService {
-    static async checkConflict(doctorId: string, startTime: string, endTime: string): Promise<boolean> {
-        return getRepository().checkConflict(doctorId, startTime, endTime);
-    }
-
     static async create(input: AppointmentInput): Promise<Appointment> {
-        // Enforce conflict check before creation
-        const hasConflict = await this.checkConflict(input.doctorId, input.startTime, input.endTime);
+        const repo = await getRepository();
+        const hasConflict = await repo.checkConflict(input.doctorId, input.startTime, input.endTime);
         if (hasConflict) {
-            throw new Error('Conflict detected: Time slot is not available.');
+            throw new Error('Conflito de horário para este profissional.');
         }
-
-        return getRepository().create(input);
+        return repo.create(input);
     }
 
     static async list(doctorId?: string, startRange?: string, endRange?: string): Promise<Appointment[]> {
-        return getRepository().list(doctorId, startRange, endRange);
+        const repo = await getRepository();
+        return repo.list(doctorId, startRange, endRange);
     }
 
     static async updateStatus(id: string, status: AppointmentStatus): Promise<Appointment | null> {
-        return getRepository().updateStatus(id, status);
+        const repo = await getRepository();
+        return repo.updateStatus(id, status);
     }
 }

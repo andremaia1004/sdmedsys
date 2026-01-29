@@ -1,20 +1,21 @@
-import { supabaseServer as supabase } from '@/lib/supabase-server';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { Appointment, AppointmentInput, AppointmentStatus } from './types';
 import { IAppointmentsRepository } from './repository.types';
 
 export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
-    async checkConflict(doctorId: string, startTime: string, endTime: string): Promise<boolean> {
-        // Supabase/Postgres Overlap Logic:
-        // (StartA < EndB) AND (EndA > StartB)
-        // We look for any appointment that starts before our end AND ends after our start
-        // AND is not canceled AND belongs to the same doctor.
+    constructor(
+        private supabase: SupabaseClient,
+        private clinicId: string
+    ) { }
 
+    async checkConflict(doctorId: string, startTime: string, endTime: string): Promise<boolean> {
         const start = new Date(startTime).toISOString();
         const end = new Date(endTime).toISOString();
 
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('appointments')
             .select('id')
+            .eq('clinic_id', this.clinicId)
             .eq('doctor_id', doctorId)
             .neq('status', 'CANCELED')
             .lt('start_time', end)
@@ -22,7 +23,6 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
 
         if (error) {
             console.error('Supabase Error (checkConflict):', error);
-            // Fail safe: assume conflict if DB errors to prevent double booking
             return true;
         }
 
@@ -30,7 +30,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
     }
 
     async create(input: AppointmentInput): Promise<Appointment> {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('appointments')
             .insert([{
                 patient_id: input.patientId,
@@ -39,7 +39,8 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
                 start_time: input.startTime,
                 end_time: input.endTime,
                 status: input.status,
-                notes: input.notes
+                notes: input.notes,
+                clinic_id: this.clinicId
             }])
             .select()
             .single();
@@ -53,10 +54,11 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
     }
 
     async list(doctorId?: string, startRange?: string, endRange?: string): Promise<Appointment[]> {
-        let builder = supabase
+        let builder = this.supabase
             .from('appointments')
             .select('*')
-            .neq('status', 'CANCELED') // By default hide canceled? Matches mock logic
+            .eq('clinic_id', this.clinicId)
+            .neq('status', 'CANCELED')
             .order('start_time', { ascending: true });
 
         if (doctorId) {
@@ -66,7 +68,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
         if (startRange && endRange) {
             builder = builder
                 .gte('start_time', startRange)
-                .lte('start_time', endRange); // Checks if start time is within range
+                .lte('start_time', endRange);
         }
 
         const { data, error } = await builder;
@@ -80,13 +82,14 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
     }
 
     async updateStatus(id: string, status: AppointmentStatus): Promise<Appointment | null> {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('appointments')
             .update({
                 status: status,
                 updated_at: new Date().toISOString()
             })
             .eq('id', id)
+            .eq('clinic_id', this.clinicId)
             .select()
             .single();
 

@@ -2,20 +2,29 @@ import { Patient, PatientInput } from './types';
 import { IPatientsRepository } from './repository.types';
 import { MockPatientsRepository } from './repository.mock';
 import { SupabasePatientsRepository } from './repository.supabase';
+import { getCurrentUser } from '@/lib/session';
+import { createClient } from '@/lib/supabase-auth';
+import { supabaseServer } from '@/lib/supabase-server';
 
-// Helper to select repository
-// In a real app, this might be a Dependency Injection container
-const getRepository = (): IPatientsRepository => {
-    // Check feature flag - controlled server-side
+const getRepository = async (): Promise<IPatientsRepository> => {
     const useSupabase = process.env.USE_SUPABASE === 'true';
 
-    // Fallback if Supabase credentials are missing even if flag is true (prevent runtime crash)
     if (useSupabase) {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            console.warn('USE_SUPABASE is true, but credentials are missing. Falling back to Mock.');
-            return new MockPatientsRepository();
+        const user = await getCurrentUser();
+        const authMode = process.env.AUTH_MODE || 'stub';
+
+        // default clinic id for all data for now as per requirement
+        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
+        const clinicId = user?.clinicId || defaultClinicId;
+
+        // If we have a real supabase session, use the authenticated client to respect RLS
+        if (authMode === 'supabase' && user) {
+            const client = await createClient();
+            return new SupabasePatientsRepository(client, clinicId);
         }
-        return new SupabasePatientsRepository();
+
+        // Fallback to Service Role (e.g., initialization or if auth is stub but DB is supabase)
+        return new SupabasePatientsRepository(supabaseServer, clinicId);
     }
 
     return new MockPatientsRepository();
@@ -23,18 +32,22 @@ const getRepository = (): IPatientsRepository => {
 
 export class PatientService {
     static async list(query?: string): Promise<Patient[]> {
-        return getRepository().list(query);
+        const repo = await getRepository();
+        return repo.list(query);
     }
 
     static async findById(id: string): Promise<Patient | undefined> {
-        return getRepository().findById(id);
+        const repo = await getRepository();
+        return repo.findById(id);
     }
 
     static async create(input: PatientInput): Promise<Patient> {
-        return getRepository().create(input);
+        const repo = await getRepository();
+        return repo.create(input);
     }
 
     static async update(id: string, input: PatientInput): Promise<Patient | null> {
-        return getRepository().update(id, input);
+        const repo = await getRepository();
+        return repo.update(id, input);
     }
 }

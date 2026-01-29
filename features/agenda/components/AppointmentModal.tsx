@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';

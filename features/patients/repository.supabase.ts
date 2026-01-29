@@ -1,23 +1,23 @@
-import { supabaseServer as supabase } from '@/lib/supabase-server';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { Patient, PatientInput } from './types';
 import { IPatientsRepository } from './repository.types';
 
 export class SupabasePatientsRepository implements IPatientsRepository {
+    constructor(
+        private supabase: SupabaseClient,
+        private clinicId: string
+    ) { }
+
     async list(query?: string): Promise<Patient[]> {
-        let builder = supabase
+        let builder = this.supabase
             .from('patients')
             .select('*')
+            .eq('clinic_id', this.clinicId)
             .order('name', { ascending: true });
 
         if (query) {
             const q = query.trim();
-            // Normalize query for phone search (remove non-digits)
             const phoneQuery = q.replace(/\D/g, '');
-
-            // Build OR clause: 
-            // 1. Name matches (case-insensitive)
-            // 2. Document matches (case-insensitive)
-            // 3. Phone matches (if query contains digits)
             let orClause = `name.ilike.%${q}%,document.ilike.%${q}%`;
 
             if (phoneQuery.length > 0) {
@@ -38,10 +38,11 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async findById(id: string): Promise<Patient | undefined> {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('patients')
             .select('*')
             .eq('id', id)
+            .eq('clinic_id', this.clinicId)
             .single();
 
         if (error) {
@@ -54,16 +55,16 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async create(input: PatientInput): Promise<Patient> {
-        // Normalize phone: maintain only digits
         const normalizedPhone = input.phone.replace(/\D/g, '');
 
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('patients')
             .insert([{
                 name: input.name,
-                document: input.document.replace(/\D/g, ''), // Normalize document too
+                document: input.document.replace(/\D/g, ''),
                 phone: normalizedPhone,
                 birth_date: input.birthDate,
+                clinic_id: this.clinicId
             }])
             .select()
             .single();
@@ -79,7 +80,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     async update(id: string, input: PatientInput): Promise<Patient | null> {
         const normalizedPhone = input.phone.replace(/\D/g, '');
 
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
             .from('patients')
             .update({
                 name: input.name,
@@ -87,8 +88,10 @@ export class SupabasePatientsRepository implements IPatientsRepository {
                 phone: normalizedPhone,
                 birth_date: input.birthDate,
                 updated_at: new Date().toISOString(),
+                // clinic_id technically shouldn't change, but we could add it to eq
             })
             .eq('id', id)
+            .eq('clinic_id', this.clinicId)
             .select()
             .single();
 
@@ -100,14 +103,13 @@ export class SupabasePatientsRepository implements IPatientsRepository {
         return this.mapToPatient(data);
     }
 
-    // Mapper to convert snake_case (DB) to camelCase (App)
     private mapToPatient(row: any): Patient {
         return {
             id: row.id,
             name: row.name,
             document: row.document,
             phone: row.phone,
-            birthDate: row.birth_date, // Map back
+            birthDate: row.birth_date,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
         };

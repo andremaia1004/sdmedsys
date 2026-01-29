@@ -3,16 +3,32 @@ import { IQueueRepository } from './repository.types';
 import { MockQueueRepository } from './repository.mock';
 import { SupabaseQueueRepository } from './repository.supabase';
 import { PatientService } from '../patients/service';
+import { getCurrentUser } from '@/lib/session';
+import { createClient } from '@/lib/supabase-auth';
+import { supabaseServer } from '@/lib/supabase-server';
 
-const getRepository = (): IQueueRepository => {
+const getRepository = async (): Promise<IQueueRepository> => {
     const useSupabase = process.env.USE_SUPABASE === 'true';
 
     if (useSupabase) {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            console.warn('Fallback to Mock (Queue).');
-            return new MockQueueRepository();
+        const user = await getCurrentUser();
+        const authMode = process.env.AUTH_MODE || 'stub';
+        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
+        const clinicId = user?.clinicId || defaultClinicId;
+
+        // Special case for TV: If accessing from TV, we might NOT have a session if it's public.
+        // But TV usually uses a PIN and the middleware handles session?
+        // Let's assume for now that if they are authenticated or have a PIN cookie, we can use the appropriate client.
+        // Actually, TV usually wants Service Role because it's a "display" with limited input.
+        // However, RLS Phase 2 policy allows Reading TV list for Anon? 
+        // No, requirements say: "Garantir que /tv continue público apenas via middleware PIN e que o endpoint de TV use um caminho server-side que não vaze nomes."
+
+        if (authMode === 'supabase' && user) {
+            const client = await createClient();
+            return new SupabaseQueueRepository(client, clinicId);
         }
-        return new SupabaseQueueRepository();
+
+        return new SupabaseQueueRepository(supabaseServer, clinicId);
     }
 
     return new MockQueueRepository();
@@ -20,9 +36,9 @@ const getRepository = (): IQueueRepository => {
 
 export class QueueService {
     static async list(doctorId?: string): Promise<QueueItemWithPatient[]> {
-        const items = await getRepository().list(doctorId);
+        const repo = await getRepository();
+        const items = await repo.list(doctorId);
 
-        // Enrich with Patient Data (Decoupled from Repo)
         const enriched: QueueItemWithPatient[] = [];
         for (const item of items) {
             const patient = await PatientService.findById(item.patientId);
@@ -35,14 +51,17 @@ export class QueueService {
     }
 
     static async getTVList(): Promise<Partial<QueueItemWithPatient>[]> {
-        return getRepository().getTVList();
+        const repo = await getRepository();
+        return repo.getTVList();
     }
 
     static async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string): Promise<QueueItem> {
-        return getRepository().add(item, actorRole);
+        const repo = await getRepository();
+        return repo.add(item, actorRole);
     }
 
     static async changeStatus(id: string, newStatus: QueueStatus, actorRole: string): Promise<QueueItem> {
-        return getRepository().changeStatus(id, newStatus, actorRole);
+        const repo = await getRepository();
+        return repo.changeStatus(id, newStatus, actorRole);
     }
 }

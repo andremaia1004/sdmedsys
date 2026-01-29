@@ -1,18 +1,26 @@
 import { Consultation, ConsultationInput } from './types';
-import { QueueService } from '@/features/queue/service';
 import { IConsultationRepository } from './repository.types';
 import { MockConsultationRepository } from './repository.mock';
 import { SupabaseConsultationRepository } from './repository.supabase';
+import { getCurrentUser } from '@/lib/session';
+import { createClient } from '@/lib/supabase-auth';
+import { supabaseServer } from '@/lib/supabase-server';
 
-const getRepository = (): IConsultationRepository => {
+const getRepository = async (): Promise<IConsultationRepository> => {
     const useSupabase = process.env.USE_SUPABASE === 'true';
 
     if (useSupabase) {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            console.warn('Fallback to Mock (Consultation).');
-            return new MockConsultationRepository();
+        const user = await getCurrentUser();
+        const authMode = process.env.AUTH_MODE || 'stub';
+        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
+        const clinicId = user?.clinicId || defaultClinicId;
+
+        if (authMode === 'supabase' && user) {
+            const client = await createClient();
+            return new SupabaseConsultationRepository(client, clinicId);
         }
-        return new SupabaseConsultationRepository();
+
+        return new SupabaseConsultationRepository(supabaseServer, clinicId);
     }
 
     return new MockConsultationRepository();
@@ -20,43 +28,27 @@ const getRepository = (): IConsultationRepository => {
 
 export class ConsultationService {
     static async start(input: ConsultationInput): Promise<Consultation> {
-        // Validation could go here (e.g. check if doc already has active)
-        return getRepository().start(input);
+        const repo = await getRepository();
+        return repo.start(input);
     }
 
     static async getActiveByDoctor(doctorId: string): Promise<Consultation | undefined> {
-        return getRepository().getActiveByDoctor(doctorId);
+        const repo = await getRepository();
+        return repo.getActiveByDoctor(doctorId);
     }
 
-    static async getById(id: string): Promise<Consultation | undefined> {
-        return getRepository().findById(id);
+    static async findById(id: string): Promise<Consultation | undefined> {
+        const repo = await getRepository();
+        return repo.findById(id);
     }
 
-    static async updateNotes(id: string, notes: string, doctorId: string): Promise<void> {
-        const consultation = await this.getById(id);
-        if (!consultation) throw new Error('Consultation not found');
-        if (consultation.doctorId !== doctorId) throw new Error('Unauthorized');
-
-        await getRepository().updateNotes(id, notes);
+    static async updateNotes(id: string, notes: string): Promise<void> {
+        const repo = await getRepository();
+        return repo.updateNotes(id, notes);
     }
 
-    static async finish(id: string, doctorId: string): Promise<void> {
-        const consultation = await this.getById(id);
-        if (!consultation) throw new Error('Consultation not found');
-        if (consultation.doctorId !== doctorId) throw new Error('Unauthorized');
-
-        await getRepository().finish(id);
-
-        // Update Queue status to DONE
-        // In a real microservice architecture, this might be an event. 
-        // Here we explicitly call the other service.
-        try {
-            if (consultation.queueItemId) {
-                await QueueService.changeStatus(consultation.queueItemId, 'DONE', 'DOCTOR');
-            }
-        } catch (e) {
-            console.error("Failed to update queue status during finish", e);
-            // We don't rollback finish here for MVP, but ideally we should transactionalize.
-        }
+    static async finish(id: string): Promise<void> {
+        const repo = await getRepository();
+        return repo.finish(id);
     }
 }
