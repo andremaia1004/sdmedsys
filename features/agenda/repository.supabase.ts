@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseServer as supabase } from '@/lib/supabase-server';
 import { Appointment, AppointmentInput, AppointmentStatus } from './types';
 import { IAppointmentsRepository } from './repository.types';
 

@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseServer as supabase } from '@/lib/supabase-server';
 import { QueueItem, QueueItemWithPatient, QueueStatus } from './types';
 import { IQueueRepository } from './repository.types';
 

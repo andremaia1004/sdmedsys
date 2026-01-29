@@ -48,6 +48,8 @@ Create a `.env.local` file (not needed for mock MVP, but for Supabase):
 ```env
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=... # Client-Server RLS Bypass
+USE_SUPABASE=true
 ```
 
 ### Database Migration

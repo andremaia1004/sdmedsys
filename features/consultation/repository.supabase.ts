@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseServer as supabase } from '@/lib/supabase-server';
 import { Consultation, ConsultationInput } from './types';
 import { IConsultationRepository } from './repository.types';
 
