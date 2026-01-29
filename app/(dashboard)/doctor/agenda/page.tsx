@@ -1,5 +1,5 @@
 import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
-import { fetchAppointmentsAction } from '@/app/actions/agenda';
+import { fetchAppointmentsAction } from '@/features/agenda/actions';
 
 export default async function DoctorAgendaPage() {
     // Doctor sees only their own agenda

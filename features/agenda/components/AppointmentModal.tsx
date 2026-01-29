@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useActionState } from 'react';
-import { createAppointmentAction } from '@/app/actions/agenda';
+import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
-import { searchPatientsAction } from '@/app/actions/patients';
+import { searchPatientsAction } from '@/features/patients/actions';
 
 export default function AppointmentModal({
     doctorId,

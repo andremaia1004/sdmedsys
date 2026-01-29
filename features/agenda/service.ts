@@ -1,61 +1,42 @@
-import { Appointment, AppointmentInput } from './types';
+import { Appointment, AppointmentInput, AppointmentStatus } from './types';
+import { IAppointmentsRepository } from './repository.types';
+import { MockAppointmentsRepository } from './repository.mock';
+import { SupabaseAppointmentsRepository } from './repository.supabase';
 
-// Mock Data
-let MOCK_APPOINTMENTS: Appointment[] = [];
+const getRepository = (): IAppointmentsRepository => {
+    const useSupabase = process.env.NEXT_PUBLIC_USE_SUPABASE === 'true';
+
+    if (useSupabase) {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            console.warn('USE_SUPABASE is true, but credentials are missing. Falling back to Mock.');
+            return new MockAppointmentsRepository();
+        }
+        return new SupabaseAppointmentsRepository();
+    }
+
+    return new MockAppointmentsRepository();
+};
 
 export class AppointmentService {
-    // Overlap Logic: (StartA < EndB) && (EndA > StartB)
     static async checkConflict(doctorId: string, startTime: string, endTime: string): Promise<boolean> {
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        const start = new Date(startTime).getTime();
-        const end = new Date(endTime).getTime();
-
-        return MOCK_APPOINTMENTS.some(appt => {
-            if (appt.doctorId !== doctorId) return false;
-            if (appt.status === 'CANCELED') return false;
-
-            const apptStart = new Date(appt.startTime).getTime();
-            const apptEnd = new Date(appt.endTime).getTime();
-
-            return (start < apptEnd) && (end > apptStart);
-        });
+        return getRepository().checkConflict(doctorId, startTime, endTime);
     }
 
     static async create(input: AppointmentInput): Promise<Appointment> {
-        // Conflict check should be done by caller or here. Let's enforce here.
+        // Enforce conflict check before creation
         const hasConflict = await this.checkConflict(input.doctorId, input.startTime, input.endTime);
         if (hasConflict) {
             throw new Error('Conflict detected: Time slot is not available.');
         }
 
-        const newAppt: Appointment = {
-            ...input,
-            id: Math.random().toString(36).substring(7),
-        };
-
-        MOCK_APPOINTMENTS.push(newAppt);
-        return newAppt;
+        return getRepository().create(input);
     }
 
     static async list(doctorId?: string, startRange?: string, endRange?: string): Promise<Appointment[]> {
-        await new Promise(resolve => setTimeout(resolve, 300));
+        return getRepository().list(doctorId, startRange, endRange);
+    }
 
-        let filtered = MOCK_APPOINTMENTS.filter(a => a.status !== 'CANCELED');
-
-        if (doctorId) {
-            filtered = filtered.filter(a => a.doctorId === doctorId);
-        }
-
-        if (startRange && endRange) {
-            const s = new Date(startRange).getTime();
-            const e = new Date(endRange).getTime();
-            filtered = filtered.filter(a => {
-                const as = new Date(a.startTime).getTime();
-                return as >= s && as <= e;
-            });
-        }
-
-        return filtered;
+    static async updateStatus(id: string, status: AppointmentStatus): Promise<Appointment | null> {
+        return getRepository().updateStatus(id, status);
     }
 }
