@@ -8,6 +8,10 @@ export interface RBACRule {
 
 export const RBAC_RULES: RBACRule[] = [
     {
+        pathPrefix: '/patients',
+        allowedRoles: ['ADMIN', 'SECRETARY', 'DOCTOR'],
+    },
+    {
         pathPrefix: '/admin',
         allowedRoles: ['ADMIN'],
     },
@@ -22,7 +26,7 @@ export const RBAC_RULES: RBACRule[] = [
 ];
 
 export const ROLE_HOMES: Record<Role, string> = {
-    'ADMIN': '/admin/patients',
+    'ADMIN': '/admin',
     'DOCTOR': '/doctor/agenda',
     'SECRETARY': '/secretary/agenda',
 };

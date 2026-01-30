@@ -10,10 +10,20 @@ describe('RBAC Logic', () => {
 
         it('should deny DOCTOR to access /admin', () => {
             expect(isPathAuthorized('/admin/doctors', 'DOCTOR')).toBe(false);
+            expect(isPathAuthorized('/admin/patients', 'DOCTOR')).toBe(false);
+            expect(isPathAuthorized('/admin/settings', 'DOCTOR')).toBe(false);
         });
 
         it('should deny SECRETARY to access /admin', () => {
             expect(isPathAuthorized('/admin/settings', 'SECRETARY')).toBe(false);
+            expect(isPathAuthorized('/admin/patients', 'SECRETARY')).toBe(false);
+        });
+
+        it('should allow everyone to access /patients', () => {
+            expect(isPathAuthorized('/patients', 'ADMIN')).toBe(true);
+            expect(isPathAuthorized('/patients', 'DOCTOR')).toBe(true);
+            expect(isPathAuthorized('/patients', 'SECRETARY')).toBe(true);
+            expect(isPathAuthorized('/patients/uuid-123', 'DOCTOR')).toBe(true);
         });
 
         it('should allow DOCTOR to access /doctor', () => {
@@ -44,7 +54,7 @@ describe('RBAC Logic', () => {
 
     describe('getAuthorizedHome', () => {
         it('should return correct home for ADMIN', () => {
-            expect(getAuthorizedHome('ADMIN')).toBe('/admin/patients');
+            expect(getAuthorizedHome('ADMIN')).toBe('/admin');
         });
 
         it('should return correct home for DOCTOR', () => {

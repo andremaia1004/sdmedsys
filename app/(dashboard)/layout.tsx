@@ -24,8 +24,10 @@ const navItems: NavItem[] = [
     { label: 'Minha Fila', href: '/doctor/queue', roles: ['DOCTOR', 'ADMIN'] },
     { label: 'Consultas', href: '/doctor/consultation', roles: ['DOCTOR', 'ADMIN'] },
 
-    // Shared / Admin
-    { label: 'Pacientes', href: '/admin/patients', roles: ['ADMIN', 'SECRETARY', 'DOCTOR'] },
+    // Shared
+    { label: 'Pacientes', href: '/patients', roles: ['ADMIN', 'SECRETARY', 'DOCTOR'] },
+
+    // Admin
     { label: 'Médicos', href: '/admin/doctors', roles: ['ADMIN'] },
     { label: 'Configurações', href: '/admin/settings', roles: ['ADMIN'] },
     { label: 'Auditoria', href: '/admin/audit', roles: ['ADMIN'] },

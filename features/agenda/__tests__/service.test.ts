@@ -28,7 +28,7 @@ describe('AppointmentService', () => {
             status: 'SCHEDULED'
         };
 
-        await expect(AppointmentService.create(input)).rejects.toThrow('Conflict detected');
+        await expect(AppointmentService.create(input)).rejects.toThrow('Conflito de horário');
     });
 
     it('should allow adjacent appointments', async () => {

@@ -69,8 +69,24 @@ export async function middleware(request: NextRequest) {
         userRole = request.cookies.get('mock_role')?.value;
     }
 
-    // 3. Routing Protection (Primary Gate)
-    const protectedPaths = ['/admin', '/secretary', '/doctor'];
+    // 3. Legacy Patient Redirects & Forwarding
+    if (pathname.includes('/patients')) {
+        // Handle legacy role-prefixed patient paths
+        if (pathname.startsWith('/admin/patients') ||
+            pathname.startsWith('/doctor/patients') ||
+            pathname.startsWith('/secretary/patients')) {
+
+            // Extract potential ID: /role/patients/[id]...
+            const pathParts = pathname.split('/');
+            const patientId = pathParts[3]; // e.g., "", "uuid", etc.
+
+            const targetUrl = patientId ? `/patients/${patientId}` : '/patients';
+            return NextResponse.redirect(new URL(targetUrl, request.url));
+        }
+    }
+
+    // 4. Routing Protection (Primary Gate)
+    const protectedPaths = ['/admin', '/secretary', '/doctor', '/patients'];
     const currentPathIsProtected = protectedPaths.some(prefix => pathname.startsWith(prefix));
 
     if (currentPathIsProtected) {

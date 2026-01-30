@@ -38,7 +38,7 @@ describe('ConsultationService', () => {
 
         await ConsultationService.updateNotes(active.id, 'Patient complains of headache', doctorId);
 
-        const updated = await ConsultationService.getById(active.id);
+        const updated = await ConsultationService.findById(active.id);
         expect(updated?.clinicalNotes).toBe('Patient complains of headache');
     });
 
@@ -48,7 +48,7 @@ describe('ConsultationService', () => {
 
         await ConsultationService.finish(active.id, doctorId);
 
-        const finished = await ConsultationService.getById(active.id);
+        const finished = await ConsultationService.findById(active.id);
         expect(finished?.finishedAt).toBeDefined();
 
         // Check Queue Status
