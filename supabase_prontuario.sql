@@ -98,6 +98,7 @@ CREATE POLICY "Admins can view clinical entries for audit" ON clinical_entries
 -- 4.3 SECRETARY: SEM ACESSO (Omitindo políticas de SELECT para secretária garante negar tudo)
 
 -- 5. Trigger for updated_at
+DROP TRIGGER IF EXISTS update_clinical_entries_updated_at ON clinical_entries;
 CREATE TRIGGER update_clinical_entries_updated_at 
 BEFORE UPDATE ON clinical_entries 
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
