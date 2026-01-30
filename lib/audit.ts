@@ -1,8 +1,8 @@
 import { supabaseServer } from './supabase-server';
 import { getCurrentUser } from './session';
 
-export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'STATUS_CHANGE' | 'LOGIN' | 'LOGOUT';
-export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS';
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'STATUS_CHANGE' | 'LOGIN' | 'LOGOUT' | 'FINALIZE';
+export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS' | 'CLINICAL_ENTRY';
 
 /**
  * Records a critical action to the audit logs.

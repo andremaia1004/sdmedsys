@@ -1,5 +1,5 @@
 import ConsultationWorkspace from '@/features/consultation/components/ConsultationWorkspace';
-import { getConsultationAction } from '@/features/consultation/actions';
+import { getConsultationAction, getClinicalEntryAction, getPatientTimelineAction } from '@/features/consultation/actions';
 import { PatientService } from '@/features/patients/service';
 import { redirect } from 'next/navigation';
 
@@ -15,7 +15,18 @@ export default async function ConsultationPage({ params }: { params: Promise<{ i
     const patient = await PatientService.findById(consultation.patientId);
     const patientName = patient ? patient.name : 'Unknown Patient';
 
+    // Fetch existing clinical entry if any
+    const entry = await getClinicalEntryAction(id);
+
+    // Fetch historical timeline
+    const timeline = await getPatientTimelineAction(consultation.patientId);
+
     return (
-        <ConsultationWorkspace consultation={consultation} patientName={patientName} />
+        <ConsultationWorkspace
+            consultation={consultation}
+            patientName={patientName}
+            initialEntry={entry || undefined}
+            timeline={timeline}
+        />
     );
 }
