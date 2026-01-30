@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { isPathAuthorized, getAuthorizedHome } from '@/lib/rbac-rules';
+import { Role } from '@/lib/session';
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -73,29 +75,16 @@ export async function middleware(request: NextRequest) {
 
     if (currentPathIsProtected) {
         if (!userId) {
-            // Not logged in -> /login
             return NextResponse.redirect(new URL('/login', request.url));
         }
 
         if (!userRole) {
-            // Logged in but no role -> /unauthorized
             return NextResponse.redirect(new URL('/unauthorized', request.url));
         }
 
-        // Validate Role for Path
-        let authorized = false;
-        if (pathname.startsWith('/admin') && userRole === 'ADMIN') authorized = true;
-        if (pathname.startsWith('/doctor') && (userRole === 'DOCTOR' || userRole === 'ADMIN')) authorized = true;
-        if (pathname.startsWith('/secretary') && (userRole === 'SECRETARY' || userRole === 'ADMIN')) authorized = true;
-
-        if (!authorized) {
-            // Wrong area -> Redirect to authorized home
-            const roleHome: Record<string, string> = {
-                'ADMIN': '/admin/patients',
-                'DOCTOR': '/doctor/agenda',
-                'SECRETARY': '/secretary/agenda'
-            };
-            const redirectUrl = roleHome[userRole] || '/unauthorized';
+        // Use RBAC logic helper
+        if (!isPathAuthorized(pathname, userRole as Role)) {
+            const redirectUrl = getAuthorizedHome(userRole as Role);
             return NextResponse.redirect(new URL(redirectUrl, request.url));
         }
     }
@@ -108,3 +97,5 @@ export const config = {
         '/((?!_next/static|_next/image|favicon.ico|login|unauthorized|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 };
+bitumen
+bitumen
