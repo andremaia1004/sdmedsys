@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS clinical_entries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     consultation_id UUID REFERENCES consultations(id) ON DELETE SET NULL,
     patient_id UUID NOT NULL REFERENCES patients(id),
-    doctor_user_id UUID NOT NULL, -- Alinhado com auth.uid() para segurança máxima
+    doctor_user_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'::uuid, -- Alinhado com auth.uid()
     clinic_id UUID NOT NULL DEFAULT '550e8400-e29b-41d4-a716-446655440000',
     
     chief_complaint TEXT,           -- Queixa principal
@@ -20,6 +20,19 @@ CREATE TABLE IF NOT EXISTS clinical_entries (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Suporte para migrações parciais anteriores: se existia doctor_id em vez de doctor_user_id, renomeia
+DO $$ 
+BEGIN 
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='clinical_entries' AND column_name='doctor_id') THEN
+        ALTER TABLE clinical_entries RENAME COLUMN doctor_id TO doctor_user_id;
+    END IF;
+
+    -- Garante que o campo existe se a tabela já existia sem ele
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='clinical_entries' AND column_name='doctor_user_id') THEN
+        ALTER TABLE clinical_entries ADD COLUMN doctor_user_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'::uuid;
+    END IF;
+END $$;
 
 -- 2. Indices for Timeline Performance
 CREATE INDEX IF NOT EXISTS idx_clinical_entries_patient_time ON clinical_entries(patient_id, created_at DESC);
