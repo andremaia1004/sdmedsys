@@ -22,9 +22,9 @@ CREATE TABLE IF NOT EXISTS clinical_entries (
 );
 
 -- 2. Indices for Timeline Performance
-CREATE INDEX idx_clinical_entries_patient_time ON clinical_entries(patient_id, created_at DESC);
-CREATE INDEX idx_clinical_entries_doctor_time ON clinical_entries(doctor_user_id, created_at DESC);
-CREATE INDEX idx_clinical_entries_consultation ON clinical_entries(consultation_id);
+CREATE INDEX IF NOT EXISTS idx_clinical_entries_patient_time ON clinical_entries(patient_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_clinical_entries_doctor_time ON clinical_entries(doctor_user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_clinical_entries_consultation ON clinical_entries(consultation_id);
 
 -- 3. Data Migration (Preserving History)
 -- Migra notas clínicas existentes de consultations para clinical_entries
