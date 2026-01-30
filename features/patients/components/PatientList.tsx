@@ -5,13 +5,12 @@ import { Patient } from '../types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Table } from '@/components/ui/Table';
-import { Badge } from '@/components/ui/Badge';
 import styles from '../styles/Patients.module.css';
 
 export default function PatientList({ patients, canEdit = false }: { patients: Patient[], canEdit?: boolean }) {
     const [search, setSearch] = useState('');
 
-    const filtered = patients.filter(p =>
+    const filtered = (patients || []).filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.document.includes(search)
     );
