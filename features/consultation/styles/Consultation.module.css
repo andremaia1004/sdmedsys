@@ -101,3 +101,23 @@
     gap: 1rem;
     z-index: 100;
 }
+
+.pdfLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    color: var(--text-main);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.pdfLink:hover {
+    background: #e2e8f0;
+    border-color: var(--text-muted);
+}

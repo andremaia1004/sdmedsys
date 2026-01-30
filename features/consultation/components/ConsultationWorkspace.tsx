@@ -145,6 +145,25 @@ export default function ConsultationWorkspace({ consultation, patientName, initi
                     Salvar Rascunho
                 </Button>
 
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <a
+                        href={`/api/documents/prescription/${consultation.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.pdfLink}
+                    >
+                        📄 Receita (PDF)
+                    </a>
+                    <a
+                        href={`/api/documents/certificate/${consultation.id}?days=1`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.pdfLink}
+                    >
+                        📜 Atestado (PDF)
+                    </a>
+                </div>
+
                 <form action={async () => {
                     if (confirm('Deseja FINALIZAR o prontuário? Após finalizado, o registro não poderá mais ser editado.')) {
                         await handleSave(true);
