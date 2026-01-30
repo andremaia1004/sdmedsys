@@ -1,6 +1,6 @@
 import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
-import { fetchAppointmentsAction } from '@/features/agenda/actions';
-import { fetchDoctorsAction } from '@/app/actions/admin';
+import { DoctorService } from '@/features/doctors/service';
+import { AppointmentService } from '@/features/agenda/service';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 
@@ -8,11 +8,24 @@ export const dynamic = 'force-dynamic';
 
 export default async function SecretaryAgendaPage(props: { searchParams: Promise<{ doctorId?: string }> }) {
     const searchParams = await props.searchParams;
-    const doctors = await fetchDoctorsAction(true); // Active only
-    const selectedDoctorId = searchParams.doctorId || doctors[0]?.id || 'doc';
 
+    // Call services directly for SSR stability
+    let doctors: any[] = [];
+    try {
+        doctors = await DoctorService.list(true); // Active only
+    } catch (e) {
+        console.error('SecretaryAgendaPage: Failed to fetch doctors', e);
+    }
+
+    const selectedDoctorId = searchParams.doctorId || doctors[0]?.id || 'doc';
     const selectedDoctor = doctors.find((d: any) => d.id === selectedDoctorId);
-    const appointments = await fetchAppointmentsAction(selectedDoctorId);
+
+    let appointments: any[] = [];
+    try {
+        appointments = await AppointmentService.list(selectedDoctorId);
+    } catch (e) {
+        console.error('SecretaryAgendaPage: Failed to fetch appointments', e);
+    }
 
     return (
         <div>

@@ -1,19 +1,30 @@
 import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
-import { fetchAppointmentsAction } from '@/features/agenda/actions';
-import { fetchDoctorsAction } from '@/app/actions/admin';
 import { getCurrentUser } from '@/lib/session';
+import { DoctorService } from '@/features/doctors/service';
+import { AppointmentService } from '@/features/agenda/service';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DoctorAgendaPage() {
     const user = await getCurrentUser();
-    const doctors = await fetchDoctorsAction(true);
+
+    let doctors: any[] = [];
+    try {
+        doctors = await DoctorService.list(true);
+    } catch (e) {
+        console.error('DoctorAgendaPage: Failed to fetch doctors', e);
+    }
 
     // Find matching doctor record for this profile
     const myDoctor = doctors.find((d: any) => d.profileId === user?.id);
     const doctorId = myDoctor?.id || 'doc'; // Fallback to 'doc' if not linked yet
 
-    const appointments = await fetchAppointmentsAction(doctorId);
+    let appointments: any[] = [];
+    try {
+        appointments = await AppointmentService.list(doctorId);
+    } catch (e) {
+        console.error('DoctorAgendaPage: Failed to fetch appointments', e);
+    }
 
     return (
         <div>
