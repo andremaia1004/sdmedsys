@@ -3,9 +3,12 @@ export const dynamic = 'force-dynamic';
 import PatientList from '@/features/patients/components/PatientList';
 import PatientForm from '@/features/patients/components/PatientForm';
 import { PatientService } from '@/features/patients/service';
+import { requireRole } from '@/lib/session';
+import { Patient } from '@/features/patients/types';
 
 export default async function AdminPatientsPage() {
-    let patients = [];
+    await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+    let patients: Patient[] = [];
     try {
         patients = await PatientService.list();
     } catch (e) {

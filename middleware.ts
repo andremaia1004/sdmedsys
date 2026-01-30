@@ -3,22 +3,17 @@ import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    const authMode = process.env.AUTH_MODE || 'stub';
 
-    // 1. TV Protection
+    // 1. TV Protection (Pin based)
     if (pathname.startsWith('/tv')) {
         const tvPin = process.env.TV_PIN;
-        if (!tvPin) {
-            console.warn('TV_PIN is not set. Blocking access via middleware.');
-            return NextResponse.redirect(new URL('/unauthorized', request.url));
-        }
+        if (!tvPin) return NextResponse.redirect(new URL('/unauthorized', request.url));
 
         const authCookie = request.cookies.get('tv_pin_ok');
-        if (authCookie && authCookie.value === '1') {
-            return NextResponse.next();
-        }
+        if (authCookie && authCookie.value === '1') return NextResponse.next();
 
-        const url = request.nextUrl.clone();
-        const pin = url.searchParams.get('pin');
+        const pin = request.nextUrl.searchParams.get('pin');
         if (pin === tvPin) {
             const response = NextResponse.redirect(new URL('/tv', request.url));
             response.cookies.set('tv_pin_ok', '1', {
@@ -32,11 +27,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
 
-    // 2. Auth Session Refresh (Supabase)
-    const authMode = process.env.AUTH_MODE || 'stub';
-    let supabaseResponse = NextResponse.next({
-        request,
-    });
+    // 2. Auth Session Refresh & RBAC
+    let supabaseResponse = NextResponse.next({ request });
+    let userRole: string | undefined;
+    let userId: string | undefined;
 
     if (authMode === 'supabase' && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
         const supabase = createServerClient(
@@ -44,14 +38,10 @@ export async function middleware(request: NextRequest) {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
             {
                 cookies: {
-                    getAll() {
-                        return request.cookies.getAll();
-                    },
+                    getAll() { return request.cookies.getAll(); },
                     setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
-                        supabaseResponse = NextResponse.next({
-                            request,
-                        });
+                        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+                        supabaseResponse = NextResponse.next({ request });
                         cookiesToSet.forEach(({ name, value, options }) =>
                             supabaseResponse.cookies.set(name, value, options)
                         );
@@ -60,23 +50,53 @@ export async function middleware(request: NextRequest) {
             }
         );
 
-        // Refresh session
         const { data: { user } } = await supabase.auth.getUser();
-
-        // 3. Protected Routes
-        const protectedPrefixes = ['/admin', '/secretary', '/doctor'];
-        const isProtected = protectedPrefixes.some(prefix => pathname.startsWith(prefix));
-
-        if (isProtected && !user) {
-            return NextResponse.redirect(new URL('/login', request.url));
+        if (user) {
+            userId = user.id;
+            // Get role from profile
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+            userRole = profile?.role;
         }
     } else {
-        const isProtected = ['/admin', '/secretary', '/doctor'].some(prefix => pathname.startsWith(prefix));
-        if (isProtected) {
-            const mockRole = request.cookies.get('mock_role');
-            if (!mockRole) {
-                return NextResponse.redirect(new URL('/login', request.url));
-            }
+        // Stub Mode
+        userId = 'stub-id';
+        userRole = request.cookies.get('mock_role')?.value;
+    }
+
+    // 3. Routing Protection (Primary Gate)
+    const protectedPaths = ['/admin', '/secretary', '/doctor'];
+    const currentPathIsProtected = protectedPaths.some(prefix => pathname.startsWith(prefix));
+
+    if (currentPathIsProtected) {
+        if (!userId) {
+            // Not logged in -> /login
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+
+        if (!userRole) {
+            // Logged in but no role -> /unauthorized
+            return NextResponse.redirect(new URL('/unauthorized', request.url));
+        }
+
+        // Validate Role for Path
+        let authorized = false;
+        if (pathname.startsWith('/admin') && userRole === 'ADMIN') authorized = true;
+        if (pathname.startsWith('/doctor') && (userRole === 'DOCTOR' || userRole === 'ADMIN')) authorized = true;
+        if (pathname.startsWith('/secretary') && (userRole === 'SECRETARY' || userRole === 'ADMIN')) authorized = true;
+
+        if (!authorized) {
+            // Wrong area -> Redirect to authorized home
+            const roleHome: Record<string, string> = {
+                'ADMIN': '/admin/patients',
+                'DOCTOR': '/doctor/agenda',
+                'SECRETARY': '/secretary/agenda'
+            };
+            const redirectUrl = roleHome[userRole] || '/unauthorized';
+            return NextResponse.redirect(new URL(redirectUrl, request.url));
         }
     }
 

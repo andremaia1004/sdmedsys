@@ -3,10 +3,12 @@ import { DoctorService } from '@/features/doctors/service';
 import { AppointmentService } from '@/features/agenda/service';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { requireRole } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SecretaryAgendaPage(props: { searchParams: Promise<{ doctorId?: string }> }) {
+    await requireRole(['SECRETARY', 'ADMIN']);
     const searchParams = await props.searchParams;
 
     // Call services directly for SSR stability

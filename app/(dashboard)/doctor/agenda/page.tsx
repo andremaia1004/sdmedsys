@@ -1,12 +1,12 @@
 import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
-import { getCurrentUser } from '@/lib/session';
+import { getCurrentUser, requireRole } from '@/lib/session';
 import { DoctorService } from '@/features/doctors/service';
 import { AppointmentService } from '@/features/agenda/service';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DoctorAgendaPage() {
-    const user = await getCurrentUser();
+    const user = await requireRole(['DOCTOR', 'ADMIN']);
 
     let doctors: any[] = [];
     try {

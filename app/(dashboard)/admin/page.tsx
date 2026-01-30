@@ -1,6 +1,9 @@
+import { requireRole } from '@/lib/session';
+
 export const dynamic = 'force-dynamic';
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+    await requireRole(['ADMIN']);
     return (
         <div>
             <h1>Admin Dashboard</h1>

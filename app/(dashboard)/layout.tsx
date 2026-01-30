@@ -2,9 +2,37 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { logoutAction } from '@/app/actions/auth';
-import { getCurrentUser } from '@/lib/session';
+import { getCurrentUser, Role } from '@/lib/session';
 import styles from './layout.module.css';
 import { Button } from '@/components/ui/Button';
+
+interface NavItem {
+    label: string;
+    href: string;
+    roles: Role[];
+    icon?: string;
+    target?: string;
+}
+
+const navItems: NavItem[] = [
+    // Secretary specific
+    { label: 'Agenda (Séc)', href: '/secretary/agenda', roles: ['SECRETARY', 'ADMIN'] },
+    { label: 'Controle de Fila', href: '/secretary/queue', roles: ['SECRETARY', 'ADMIN'] },
+
+    // Doctor specific
+    { label: 'Agenda (Doc)', href: '/doctor/agenda', roles: ['DOCTOR', 'ADMIN'] },
+    { label: 'Minha Fila', href: '/doctor/queue', roles: ['DOCTOR', 'ADMIN'] },
+    { label: 'Consultas', href: '/doctor/consultation', roles: ['DOCTOR', 'ADMIN'] },
+
+    // Shared / Admin
+    { label: 'Pacientes', href: '/admin/patients', roles: ['ADMIN', 'SECRETARY', 'DOCTOR'] },
+    { label: 'Médicos', href: '/admin/doctors', roles: ['ADMIN'] },
+    { label: 'Configurações', href: '/admin/settings', roles: ['ADMIN'] },
+    { label: 'Auditoria', href: '/admin/audit', roles: ['ADMIN'] },
+
+    // Utility
+    { label: 'Painel TV', href: '/tv', roles: ['ADMIN', 'SECRETARY'], target: '_blank' },
+];
 
 export default async function DashboardLayout({
     children,
@@ -12,6 +40,10 @@ export default async function DashboardLayout({
     children: React.ReactNode;
 }) {
     const user = await getCurrentUser();
+    const role = user?.role || 'SECRETARY';
+
+    // Filter nav items based on user role
+    const filteredNav = navItems.filter(item => item.roles.includes(role));
 
     // Map roles to Portuguese
     const roleMap: Record<string, string> = {
@@ -29,18 +61,18 @@ export default async function DashboardLayout({
 
                 <nav className={styles.navSection}>
                     <h3 className={styles.navTitle}>Módulos</h3>
-                    <Link href="/secretary/agenda" className={styles.navLink}>
-                        Agenda
-                    </Link>
-                    <Link href="/secretary/queue" className={styles.navLink}>
-                        Controle de Fila
-                    </Link>
-                    <Link href="/admin/patients" className={styles.navLink}>
-                        Pacientes
-                    </Link>
-                    <Link href="/tv" target="_blank" className={styles.navLink} style={{ color: '#fff', backgroundColor: 'rgba(211, 47, 47, 0.4)', marginTop: '1rem' }}>
-                        Painel de TV (Live)
-                    </Link>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        {filteredNav.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                target={item.target}
+                                className={styles.navLink}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </div>
                 </nav>
 
                 <div className={styles.logoutContainer}>
@@ -57,7 +89,7 @@ export default async function DashboardLayout({
                     <div className={styles.userInfo}>
                         <div style={{ textAlign: 'right' }}>
                             <div className={styles.userName}>{user?.name || 'Usuário'}</div>
-                            <div className={styles.userRole}>{roleMap[user?.role || ''] || user?.role || 'Acesso'}</div>
+                            <div className={styles.userRole}>{roleMap[role] || role}</div>
                         </div>
                         <div style={{
                             width: '40px',

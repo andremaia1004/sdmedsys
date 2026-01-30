@@ -1,6 +1,9 @@
+import { requireRole } from '@/lib/session';
+
 export const dynamic = 'force-dynamic';
 
-export default function DoctorDashboard() {
+export default async function DoctorDashboard() {
+    await requireRole(['DOCTOR', 'ADMIN']);
     return (
         <div>
             <h1>Doctor Dashboard</h1>
