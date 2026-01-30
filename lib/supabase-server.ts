@@ -19,4 +19,3 @@ export const supabaseServer = createClient(supabaseUrl, supabaseServiceKey, {
         detectSessionInUrl: false,
     },
 });
-bitumen

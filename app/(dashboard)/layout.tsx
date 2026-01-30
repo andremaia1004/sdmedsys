@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { logoutAction } from '@/app/actions/auth';
 import { getCurrentUser } from '@/lib/session';

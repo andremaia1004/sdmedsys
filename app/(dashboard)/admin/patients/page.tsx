@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import PatientList from '@/features/patients/components/PatientList';
 import PatientForm from '@/features/patients/components/PatientForm';
 
