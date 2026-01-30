@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { isPathAuthorized, getAuthorizedHome } from '@/lib/rbac-rules';
-import { Role } from '@/lib/session';
+import { Role } from '@/lib/types/auth';
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -96,6 +96,4 @@ export const config = {
     matcher: [
         '/((?!_next/static|_next/image|favicon.ico|login|unauthorized|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
-};
-bitumen
-bitumen
+}

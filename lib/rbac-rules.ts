@@ -1,4 +1,4 @@
-import { Role } from './session';
+import { Role } from './types/auth';
 
 export interface RBACRule {
     pathPrefix: string;

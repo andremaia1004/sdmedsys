@@ -2,15 +2,9 @@ import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase-auth';
 import { supabaseServer } from '@/lib/supabase-server';
 
-export type Role = 'ADMIN' | 'SECRETARY' | 'DOCTOR';
+import { Role, UserSession } from './types/auth';
 
-export interface UserSession {
-    id: string;
-    name: string;
-    role: Role;
-    clinicId?: string;
-    email?: string;
-}
+export { type Role, type UserSession };
 
 // 1. Stub Implementation (Original)
 async function getStubUser(): Promise<UserSession | null> {
