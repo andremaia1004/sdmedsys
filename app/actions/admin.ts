@@ -115,3 +115,13 @@ export async function updateSettingsAction(data: any) {
     revalidatePath('/tv');
     return { success: true, settings };
 }
+
+/**
+ * Publicly accessible configurations for the TV panel.
+ * Protected by PIN in middleware, but doesn't need a full User role.
+ */
+export async function fetchPublicSettingsAction() {
+    const { SettingsService } = await import('@/features/admin/settings/service');
+    // We return only non-sensitive data if needed, but here all clinic settings are safe for TV
+    return SettingsService.get();
+}

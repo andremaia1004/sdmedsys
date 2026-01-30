@@ -8,16 +8,19 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         private clinicId: string
     ) { }
 
-    async get(): Promise<ClinicSettings> {
+    async get(): Promise<ClinicSettings | null> {
         const { data, error } = await this.supabase
             .from('clinic_settings')
             .select('*')
             .eq('clinic_id', this.clinicId)
             .maybeSingle();
 
-        if (error || !data) {
-            throw new Error('Configurações da clínica não encontradas');
+        if (error) {
+            console.error('Supabase Error (get settings):', error);
+            return null;
         }
+
+        if (!data) return null;
 
         return this.mapToSettings(data);
     }

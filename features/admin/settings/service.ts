@@ -27,8 +27,27 @@ const getRepository = async (): Promise<ISettingsRepository> => {
 
 export class SettingsService {
     static async get(): Promise<ClinicSettings> {
-        const repo = await getRepository();
-        return repo.get();
+        try {
+            const repo = await getRepository();
+            const settings = await repo.get();
+
+            if (settings) return settings;
+        } catch (e) {
+            console.warn('SettingsService: Failed to fetch settings, using defaults.', e);
+        }
+
+        // Return defaults if not found or error
+        return {
+            id: 'default',
+            clinicId: 'default',
+            clinicName: 'SDMED SYS',
+            workingHours: {},
+            appointmentDurationMinutes: 30,
+            queuePrefix: 'A',
+            tvRefreshSeconds: 30,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
     }
 
     static async update(input: Partial<ClinicSettings>): Promise<ClinicSettings> {
