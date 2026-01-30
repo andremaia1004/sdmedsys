@@ -63,3 +63,113 @@
     font-size: 0.875rem;
     color: var(--text-muted);
 }
+
+/* Overview Styles */
+.overviewContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+}
+
+.patientCard {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+}
+
+.summaryCard {
+    border-left: 4px solid var(--primary);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.cardHeader h2 {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.patientId {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-main);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.field label,
+.summaryField label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.field p,
+.summaryField p {
+    font-size: 1rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.summaryContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dateTag {
+    font-size: 0.875rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.doctorInfo {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.viewTimeline {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+}
+
+.timelineLink {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.timelineLink:hover {
+    text-decoration: underline;
+}
+
+.emptySummary {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--bg-main);
+    border-radius: 8px;
+}
