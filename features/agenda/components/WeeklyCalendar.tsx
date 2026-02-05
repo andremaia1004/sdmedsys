@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Appointment } from '../types';
 import AppointmentModal from './AppointmentModal';
 import styles from '../styles/Agenda.module.css';
+import { Plus } from 'lucide-react';
 
 export default function WeeklyCalendar({
     appointments,
@@ -37,42 +38,46 @@ export default function WeeklyCalendar({
     };
 
     return (
-        <div className={styles.calendarContainer}>
-            <div className={styles.grid}>
-                <div className={styles.timeLabel}></div>
-                {days.map((day, i) => (
-                    <div key={day} className={styles.dayHeader}>
-                        <div className={styles.dayName}>{day}</div>
-                        <div className={styles.dayDate}>
-                            {new Date(currentWeekDates[i]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+        <div className={styles.agendaContainer}>
+            <div className={styles.calendarWrapper}>
+                <div className={styles.grid}>
+                    <div className={styles.timeLabelCell}></div>
+                    {days.map((day, i) => (
+                        <div key={day} className={styles.dayHeader}>
+                            <div className={styles.dayName}>{day}</div>
+                            <div className={styles.dayDate}>
+                                {new Date(currentWeekDates[i]).getDate()}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
 
-                {times.map(time => (
-                    <div key={time} className={styles.row}>
-                        <div className={styles.timeLabel}>{time}</div>
-                        {currentWeekDates.map(date => {
-                            const appt = getAppointment(date, time);
-                            return (
-                                <div
-                                    key={`${date}-${time}`}
-                                    className={`${styles.cell} ${appt ? styles.occupied : styles.empty}`}
-                                    onClick={() => !appt && setSelectedSlot({ date, time })}
-                                >
-                                    {appt ? (
-                                        <div className={styles.appointment}>
-                                            <div className={styles.patientName}>{appt.patientName}</div>
-                                            <div className={styles.apptStatus}>{appt.status}</div>
-                                        </div>
-                                    ) : (
-                                        <span className={styles.plusIcon}>+</span>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
+                    {times.map(time => (
+                        <div key={time} className={styles.row}>
+                            <div className={styles.timeLabel}>{time}</div>
+                            {currentWeekDates.map(date => {
+                                const appt = getAppointment(date, time);
+                                return (
+                                    <div
+                                        key={`${date}-${time}`}
+                                        className={styles.cell}
+                                        onClick={() => !appt && setSelectedSlot({ date, time })}
+                                    >
+                                        {appt ? (
+                                            <div className={styles.appointment}>
+                                                <div className={styles.patientName}>{appt.patientName}</div>
+                                                <div className={styles.apptStatus}>{appt.status}</div>
+                                            </div>
+                                        ) : (
+                                            <div className={styles.plusIcon}>
+                                                <Plus size={24} />
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {selectedSlot && (

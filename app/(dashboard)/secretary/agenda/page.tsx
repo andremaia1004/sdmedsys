@@ -2,8 +2,8 @@ import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
 import { DoctorService } from '@/features/doctors/service';
 import { AppointmentService } from '@/features/agenda/service';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
 import { requireRole } from '@/lib/session';
+import styles from '@/features/agenda/styles/Agenda.module.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,25 +30,32 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     }
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className={styles.agendaContainer}>
+            <div className={styles.agendaHeader}>
                 <div>
-                    <h1 style={{ margin: 0 }}>Agenda (Secretaria)</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Visualizando agenda de: <strong>{selectedDoctor?.name || 'Médico não encontrado'}</strong></p>
+                    <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 850, color: 'var(--primary)', letterSpacing: '-0.02em' }}>
+                        Agenda Semanal
+                    </h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 500, marginTop: '0.25rem' }}>
+                        Visualizando atendimentos de: <strong style={{ color: 'var(--primary)', fontWeight: 700 }}>{selectedDoctor?.name || 'Médico não selecionado'}</strong>
+                    </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', maxWidth: '400px', justifyContent: 'flex-end' }}>
+                <div className={styles.doctorSelector}>
                     {doctors.map((doc: any) => (
-                        <Link key={doc.id} href={`/secretary/agenda?doctorId=${doc.id}`}>
-                            <Button
-                                variant={selectedDoctorId === doc.id ? 'primary' : 'outline'}
-                                size="sm"
+                        <Link key={doc.id} href={`/secretary/agenda?doctorId=${doc.id}`} prefetch={true}>
+                            <button
+                                className={`${styles.doctorTab} ${selectedDoctorId === doc.id ? styles.doctorTabActive : ''}`}
                             >
                                 {doc.name.split(' ')[0]}
-                            </Button>
+                            </button>
                         </Link>
                     ))}
-                    {doctors.length === 0 && <span style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>Nenhum médico ativo cadastrado</span>}
+                    {doctors.length === 0 && (
+                        <span style={{ color: 'var(--danger)', fontSize: '0.75rem', fontWeight: 600, padding: '0.5rem' }}>
+                            Nenhum médico ativo
+                        </span>
+                    )}
                 </div>
             </div>
 

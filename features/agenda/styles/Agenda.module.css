@@ -1,89 +1,298 @@
 .agendaContainer {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
-.calendarGrid {
-    display: grid;
-    grid-template-columns: 80px repeat(5, 1fr);
-    gap: 1px;
-    background-color: var(--border);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header & Controls */
+.agendaHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 0.5rem;
+}
+
+.doctorSelector {
+    display: flex;
+    gap: 0.5rem;
+    background: #fff;
+    padding: 0.35rem;
+    border-radius: 12px;
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
 }
 
-.timeHeaderPlaceholder {
-    background-color: var(--bg-surface);
-    border-bottom: 2px solid var(--border);
-}
-
-.dayHeader {
-    background-color: var(--bg-surface);
-    padding: 1rem;
-    text-align: center;
-    font-weight: 700;
-    color: var(--primary);
-    border-bottom: 2px solid var(--border);
-    font-size: 0.9375rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.timeCell {
-    background-color: var(--bg-surface);
-    padding: 1rem;
-    text-align: right;
-    font-size: 0.8125rem;
+.doctorTab {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
     font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+    background: transparent;
     color: var(--text-muted);
 }
 
-.calendarCell {
-    background-color: var(--bg-surface);
-    padding: 0.5rem;
-    min-height: 80px;
-    transition: all 0.2s ease;
-    position: relative;
+.doctorTabActive {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 45, 94, 0.2);
 }
 
-.clickableCell:hover {
-    background-color: #f1f5f9;
+/* Calendar Grid */
+.calendarWrapper {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    background-color: var(--border);
+    gap: 1px;
+}
+
+.dayHeader {
+    background-color: #fafafa;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+}
+
+.dayName {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.25rem;
+}
+
+.dayDate {
+    font-size: 1.25rem;
+    font-weight: 850;
+    color: var(--primary);
+}
+
+.timeLabelCell {
+    background-color: #fafafa;
+    border-bottom: 2px solid var(--border);
+}
+
+/* Rows & Cells */
+.row {
+    display: contents;
+}
+
+.timeLabel {
+    background-color: #fafafa;
+    padding: 1.25rem 0.75rem;
+    text-align: right;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.cell {
+    background-color: #fff;
+    min-height: 100px;
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+    position: relative;
     cursor: pointer;
 }
 
-.clickableCell:hover::after {
-    content: '+';
+.cell:hover {
+    background-color: #f8fafc;
+}
+
+.cell:hover .plusIcon {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.plusIcon {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 1.5rem;
     color: var(--primary);
-    opacity: 0.3;
+    opacity: 0;
+    font-weight: 300;
+    transition: all 0.2s ease;
+    pointer-events: none;
 }
 
+/* Appointment Style */
 .appointment {
     height: 100%;
-    background-color: rgba(0, 45, 94, 0.05);
+    background: linear-gradient(135deg, rgba(0, 45, 94, 0.03) 0%, rgba(0, 45, 94, 0.08) 100%);
     border-left: 4px solid var(--primary);
-    padding: 0.5rem;
-    border-radius: 4px;
+    padding: 0.75rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.appointment:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, rgba(0, 45, 94, 0.05) 0%, rgba(0, 45, 94, 0.12) 100%);
 }
 
 .patientName {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 0.875rem;
     color: var(--primary);
-    display: block;
-    margin-bottom: 0.25rem;
 }
 
-.statusText {
-    font-size: 0.75rem;
-    font-weight: 600;
+.apptStatus {
+    font-size: 0.65rem;
+    font-weight: 800;
     text-transform: uppercase;
     color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    width: fit-content;
+    letter-spacing: 0.05em;
+}
+
+/* Modal Improvements (Class-based instead of inline) */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 45, 94, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalCard {
+    width: 480px !important;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.slotInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #001f41 100%);
+    color: #fff;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.slotIcon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.patientSelector {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.patientResults {
+    margin-top: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    box-shadow: var(--shadow-md);
+}
+
+.searchItem {
+    padding: 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.searchItem:last-child {
+    border-bottom: none;
+}
+
+.searchItem:hover {
+    background-color: var(--bg-main);
+}
+
+.searchItem strong {
+    display: block;
+    color: var(--primary);
+    font-size: 0.9375rem;
+}
+
+.searchItem small {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.selectedPatient {
+    padding: 1.25rem;
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px dashed var(--success);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.successState {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.successIcon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
 }

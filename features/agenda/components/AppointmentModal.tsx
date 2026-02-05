@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import styles from '../styles/Agenda.module.css';
+import { Calendar as CalendarIcon, Clock, Check, Search, User, X } from 'lucide-react';
 
 export default function AppointmentModal({
     doctorId,
@@ -37,11 +38,13 @@ export default function AppointmentModal({
 
     if (state?.success) {
         return (
-            <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
-                <Card padding="lg" style={{ width: '350px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
-                    <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>Agendamento Confirmado!</h3>
-                    <p style={{ color: 'var(--text-muted)' }}>Atualizando calendário...</p>
+            <div className={styles.modalOverlay}>
+                <Card className={styles.modalCard}>
+                    <div className={styles.successState}>
+                        <div className={styles.successIcon}>✅</div>
+                        <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem', fontWeight: 800 }}>Agendamento Confirmado!</h3>
+                        <p style={{ color: 'var(--text-muted)' }}>O calendário será atualizado em instantes.</p>
+                    </div>
                 </Card>
             </div>
         )
@@ -56,99 +59,98 @@ export default function AppointmentModal({
     };
 
     return (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+        <div className={styles.modalOverlay}>
             <Card
                 className={styles.modalCard}
-                header="Novo Agendamento"
-                style={{ width: '450px', animation: 'slideUp 0.3s ease-out' }}
+                style={{ border: 'none' }}
                 footer={
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <Button variant="secondary" onClick={onClose} fullWidth>Cancelar</Button>
+                    <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', paddingTop: 0 }}>
+                        <Button variant="secondary" onClick={onClose} fullWidth style={{ borderRadius: '12px' }}>Cancelar</Button>
                         <Button
                             variant="primary"
                             disabled={!selectedPatient || isPending}
                             onClick={() => (document.getElementById('appointment-form') as HTMLFormElement)?.requestSubmit()}
                             fullWidth
+                            style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 45, 94, 0.2)' }}
                         >
-                            {isPending ? 'Agendando...' : 'Confirmar'}
+                            {isPending ? 'Agendando...' : 'Confirmar Agendamento'}
                         </Button>
                     </div>
                 }
             >
-                <div style={{ padding: '1.5rem' }}>
-                    <div style={{ marginBottom: '1.5rem', padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: '8px', borderLeft: '4px solid var(--accent)' }}>
-                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Horário Selecionado</div>
-                        <div style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                <div className={styles.slotInfo}>
+                    <div className={styles.slotIcon}>
+                        <CalendarIcon size={24} />
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em' }}>Horário Selecionado</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>
                             {date && new Date(date).toLocaleDateString('pt-BR')} às {time}
                         </div>
                     </div>
+                </div>
 
+                <div style={{ padding: '0 1.5rem 1.5rem 1.5rem' }}>
                     <form id="appointment-form" action={formAction}>
                         <input type="hidden" name="doctorId" value={doctorId} />
                         <input type="hidden" name="date" value={date} />
                         <input type="hidden" name="time" value={time} />
 
                         {!selectedPatient ? (
-                            <div>
-                                <Input
-                                    label="Buscar Paciente"
-                                    value={searchQuery}
-                                    onChange={(e) => handleSearch(e.target.value)}
-                                    placeholder="Nome ou CPF do paciente..."
-                                    autoFocus
-                                />
+                            <div className={styles.patientSelector}>
+                                <div style={{ position: 'relative' }}>
+                                    <Input
+                                        label="Buscar Paciente"
+                                        value={searchQuery}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                        placeholder="Nome ou CPF do paciente..."
+                                        autoFocus
+                                        style={{ paddingRight: '3rem', borderRadius: '12px' }}
+                                    />
+                                    <div style={{ position: 'absolute', right: '1rem', top: '2.4rem', color: 'var(--text-muted)' }}>
+                                        <Search size={18} />
+                                    </div>
+                                </div>
+
                                 {searchQuery.length > 2 && (
-                                    <ul style={{
-                                        marginTop: '0.5rem',
-                                        border: '1px solid var(--border)',
-                                        borderRadius: '8px',
-                                        maxHeight: '150px',
-                                        overflowY: 'auto',
-                                        listStyle: 'none',
-                                        padding: 0,
-                                        boxShadow: 'var(--shadow-sm)'
-                                    }}>
+                                    <div className={styles.patientResults}>
                                         {searchResults.map(p => (
-                                            <li
+                                            <div
                                                 key={p.id}
+                                                className={styles.searchItem}
                                                 onClick={() => setSelectedPatient(p)}
-                                                style={{
-                                                    padding: '0.75rem 1rem',
-                                                    cursor: 'pointer',
-                                                    borderBottom: '1px solid var(--border)',
-                                                    transition: 'all 0.2s ease',
-                                                    fontSize: '0.9375rem'
-                                                }}
-                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                                             >
                                                 <strong>{p.name}</strong>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.document}</div>
-                                            </li>
+                                                <small>{p.document}</small>
+                                            </div>
                                         ))}
-                                        {searchResults.length === 0 && searchQuery.length > 2 && (
-                                            <li style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                                        {searchResults.length === 0 && (
+                                            <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                                                 Nenhum paciente encontrado
-                                            </li>
+                                            </div>
                                         )}
-                                    </ul>
+                                    </div>
                                 )}
                             </div>
                         ) : (
-                            <div style={{
-                                padding: '1rem',
-                                backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                border: '1px solid rgba(59, 130, 246, 0.2)'
-                            }}>
-                                <div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Paciente Selecionado</div>
-                                    <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{selectedPatient.name}</div>
+                            <div className={styles.selectedPatient}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--success)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <User size={20} />
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Paciente Selecionado</div>
+                                        <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>{selectedPatient.name}</div>
+                                    </div>
                                 </div>
-                                <Button variant="ghost" size="sm" onClick={() => setSelectedPatient(null)} style={{ color: 'var(--danger)' }}>Alterar</Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedPatient(null)}
+                                    style={{ color: 'var(--danger)', fontWeight: 700 }}
+                                >
+                                    Alterar
+                                </Button>
                                 <input type="hidden" name="patientId" value={selectedPatient.id} />
                                 <input type="hidden" name="patientName" value={selectedPatient.name} />
                             </div>
@@ -156,14 +158,19 @@ export default function AppointmentModal({
 
                         {state?.error && (
                             <div style={{
-                                marginTop: '1rem',
-                                padding: '0.75rem',
-                                backgroundColor: '#fee2e2',
-                                color: '#991b1b',
-                                borderRadius: '8px',
+                                marginTop: '1.25rem',
+                                padding: '1rem',
+                                backgroundColor: '#fff1f2',
+                                color: '#be123c',
+                                borderRadius: '12px',
                                 fontSize: '0.875rem',
-                                border: '1px solid #fecaca'
+                                border: '1px solid #fecdd3',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem',
+                                fontWeight: 500
                             }}>
+                                <X size={18} />
                                 {state.error}
                             </div>
                         )}
