@@ -296,3 +296,69 @@
     font-size: 4rem;
     margin-bottom: 1.5rem;
 }
+
+/* Registration Form */
+.registerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: slideUp 0.3s ease-out;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.formHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.formTitle {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.searchLink {
+    font-size: 0.8125rem;
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.searchLink:hover {
+    color: var(--accent-hover);
+}
+
+.noResults {
+    padding: 1.5rem;
+    text-align: center;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    margin-top: 1rem;
+}
+
+.registerButton {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.registerButton:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+}
