@@ -42,6 +42,9 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
             .insert([{
                 name: input.name,
                 specialty: input.specialty,
+                crm: input.crm,
+                phone: input.phone,
+                email: input.email,
                 profile_id: input.profileId,
                 clinic_id: this.clinicId,
                 active: true
@@ -55,12 +58,15 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
 
     async update(id: string, input: Partial<Doctor>): Promise<Doctor | null> {
         // Ensure we don't accidentally wipe clinic_id
-        const { profileId, name, specialty, active } = input;
+        const { profileId, name, specialty, active, crm, phone, email } = input;
         const updateData: any = { updated_at: new Date().toISOString() };
         if (profileId !== undefined) updateData.profile_id = profileId;
         if (name !== undefined) updateData.name = name;
         if (specialty !== undefined) updateData.specialty = specialty;
         if (active !== undefined) updateData.active = active;
+        if (crm !== undefined) updateData.crm = crm;
+        if (phone !== undefined) updateData.phone = phone;
+        if (email !== undefined) updateData.email = email;
 
         const { data, error } = await this.supabase
             .from('doctors')
@@ -80,6 +86,9 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
             profileId: row.profile_id,
             name: row.name,
             specialty: row.specialty,
+            crm: row.crm,
+            phone: row.phone,
+            email: row.email,
             active: row.active,
             createdAt: row.created_at,
             updatedAt: row.updated_at

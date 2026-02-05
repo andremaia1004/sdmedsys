@@ -3,6 +3,9 @@ export interface Doctor {
     profileId?: string;
     name: string;
     specialty?: string;
+    crm?: string;
+    phone?: string;
+    email?: string;
     active: boolean;
     createdAt: string;
     updatedAt: string;
