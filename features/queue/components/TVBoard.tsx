@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { QueueItemWithPatient } from '../types';
 import styles from '../styles/Queue.module.css';
+import { Clock, Building2, Activity, ArrowRight } from 'lucide-react';
 
 export default function TVBoard({
     items = [],
@@ -48,32 +49,41 @@ export default function TVBoard({
     return (
         <div className={styles.tvContainer}>
             <div className={styles.mainDisplay}>
-                <div className={styles.callingLabel}>CHAMANDO AGORA</div>
+                <div className={styles.callingLabel}>
+                    <Activity size={32} />
+                    Chamando Agora
+                </div>
                 <div className={`${styles.ticketCard} ${calling ? styles.pulse : ''}`}>
                     <div className={styles.ticketNumber}>{currentCalled?.ticketCode || '---'}</div>
-                    <div className={styles.patientName}>{currentCalled?.patientName || 'Aguardando próxima chamada'}</div>
+                    <div className={styles.patientName}>{currentCalled?.patientName || 'Aguardando...'}</div>
                 </div>
             </div>
 
             <aside className={styles.sideDisplay}>
-                <div className={styles.nextLabel}>PRÓXIMOS</div>
+                <div className={styles.nextLabel}>Próximos</div>
                 <div className={styles.nextList}>
                     {waiting.map(item => (
                         <div key={item.id} className={styles.nextItem}>
                             <span className={styles.nextTicket}>{item.ticketCode}</span>
-                            <span className={styles.nextName}>{item.patientName}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <span className={styles.nextName}>{item.patientName}</span>
+                                <ArrowRight size={20} color="rgba(255,255,255,0.2)" />
+                            </div>
                         </div>
                     ))}
                     {waiting.length === 0 && (
-                        <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5 }}>
-                            Ninguém na fila
+                        <div style={{ padding: '4rem 2rem', textAlign: 'center', opacity: 0.3, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '16px' }}>
+                            Fila vazia
                         </div>
                     )}
                 </div>
             </aside>
 
             <footer className={styles.tvFooter}>
-                <div className={styles.clinicName}>{clinicName}</div>
+                <div className={styles.clinicName}>
+                    <Building2 size={24} color="var(--accent)" />
+                    {clinicName}
+                </div>
                 <div className={styles.clock}>
                     {mounted && new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </div>
