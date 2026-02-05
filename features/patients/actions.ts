@@ -19,6 +19,12 @@ export async function createPatientAction(prevState: ActionState, formData: Form
         name: formData.get('name') as string,
         document: formData.get('document') as string,
         phone: formData.get('phone') as string,
+        email: formData.get('email') as string || undefined,
+        address: formData.get('address') as string || undefined,
+        guardian_name: formData.get('guardian_name') as string || undefined,
+        insurance: formData.get('insurance') as string || undefined,
+        main_complaint: formData.get('main_complaint') as string || undefined,
+        emergency_contact: formData.get('emergency_contact') as string || undefined,
         birthDate: formData.get('birthDate') as string || '',
     };
 
