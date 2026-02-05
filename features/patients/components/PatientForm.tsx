@@ -7,9 +7,17 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import styles from '../styles/Patients.module.css';
 
-export default function PatientForm() {
+import { useEffect } from 'react';
+
+export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
     // @ts-ignore
     const [state, formAction, isPending] = useActionState(createPatientAction, { error: '' });
+
+    useEffect(() => {
+        if (state?.success && onSuccess) {
+            onSuccess();
+        }
+    }, [state?.success, onSuccess]);
 
     return (
         <div className={styles.formContainer}>

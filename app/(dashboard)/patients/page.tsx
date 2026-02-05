@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import PatientList from '@/features/patients/components/PatientList';
-import PatientForm from '@/features/patients/components/PatientForm';
+import PatientModalWrapper from '@/features/patients/components/PatientModalWrapper';
 import { PatientService } from '@/features/patients/service';
 import { requireRole } from '@/lib/session';
 import { Patient } from '@/features/patients/types';
@@ -19,20 +19,14 @@ export default async function SharedPatientsPageResource() {
 
     return (
         <div>
-            <h1 style={{ marginBottom: '2rem' }}>Cadastro de Pacientes</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h1 style={{ margin: 0 }}>Cadastro de Pacientes</h1>
+                <PatientModalWrapper canCreate={canManagePatients} />
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: canManagePatients ? '1fr 300px' : '1fr', gap: '2rem' }}>
-                <div>
-                    <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Lista de Pacientes</h2>
-                    <PatientList patients={patients} canEdit={canManagePatients} />
-                </div>
-
-                {canManagePatients && (
-                    <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px', height: 'fit-content' }}>
-                        <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Novo Paciente</h2>
-                        <PatientForm />
-                    </div>
-                )}
+            <div>
+                <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Lista de Pacientes</h2>
+                <PatientList patients={patients} canEdit={canManagePatients} />
             </div>
         </div>
     );
