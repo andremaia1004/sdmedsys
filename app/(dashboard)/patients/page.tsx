@@ -15,19 +15,19 @@ export default async function SharedPatientsPageResource() {
         console.error('SharedPatientsPage: Failed to fetch patients', e);
     }
 
-    const isAdmin = user.role === 'ADMIN';
+    const canManagePatients = user.role === 'ADMIN' || user.role === 'SECRETARY';
 
     return (
         <div>
             <h1 style={{ marginBottom: '2rem' }}>Cadastro de Pacientes</h1>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isAdmin ? '1fr 300px' : '1fr', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: canManagePatients ? '1fr 300px' : '1fr', gap: '2rem' }}>
                 <div>
                     <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Lista de Pacientes</h2>
-                    <PatientList patients={patients} canEdit={isAdmin} />
+                    <PatientList patients={patients} canEdit={canManagePatients} />
                 </div>
 
-                {isAdmin && (
+                {canManagePatients && (
                     <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px', height: 'fit-content' }}>
                         <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Novo Paciente</h2>
                         <PatientForm />
