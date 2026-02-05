@@ -23,85 +23,153 @@
     align-items: flex-end;
 }
 
-/* TV Board Specifics */
+/* TV Board Specifics - Cinematic Experience */
 .tvContainer {
     height: 100vh;
     display: grid;
-    grid-template-columns: 2fr 1.2fr;
-    gap: 3rem;
-    padding: 3rem;
-    background-color: var(--primary);
+    grid-template-columns: 1fr 400px;
+    gap: 0;
+    background-color: #000c1a;
     color: white;
+    font-family: sans-serif;
+    overflow: hidden;
+    position: relative;
 }
 
-.callingSection {
+.mainDisplay {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-}
-
-.tvHeader {
-    font-size: 2.5rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    border-bottom: 4px solid var(--accent);
-    padding-bottom: 1rem;
-}
-
-.calledCard {
+    justify-content: center;
+    align-items: center;
     padding: 4rem;
-    background-color: white;
-    color: var(--primary);
-    border-radius: 24px;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-    animation: pulse 2s infinite;
+    position: relative;
+    background: radial-gradient(circle at center, #001e3c 0%, #000c1a 100%);
 }
 
-.calledTicket {
-    font-size: 8rem;
+.callingLabel {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+.ticketCard {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6rem 4rem;
+    border-radius: 40px;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    transition: all 0.5s ease;
+}
+
+.pulse {
+    animation: tvPulse 2s infinite ease-in-out;
+    background: rgba(211, 47, 47, 0.1);
+    border-color: rgba(211, 47, 47, 0.3);
+}
+
+.ticketNumber {
+    font-size: 14rem;
     font-weight: 900;
     line-height: 1;
+    letter-spacing: -0.05em;
+    color: #fff;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.calledRoom {
-    font-size: 2.5rem;
-    margin-top: 1.5rem;
+.patientName {
+    font-size: 3.5rem;
+    margin-top: 2rem;
     font-weight: 600;
-    color: var(--accent);
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.nextSection {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    padding: 2.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.sideDisplay {
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 3rem 2rem;
 }
 
-.nextTitle {
-    font-size: 1.5rem;
+.nextLabel {
+    font-size: 1.25rem;
+    font-weight: 800;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.2rem;
+    color: rgba(255, 255, 255, 0.4);
     margin-bottom: 2rem;
+    padding-left: 1rem;
 }
 
 .nextList {
-    list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .nextItem {
-    padding: 2rem;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    font-size: 3rem;
-    font-weight: 700;
-    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@keyframes pulse {
+.nextTicket {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.nextName {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tvFooter {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4rem;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.clinicName {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.1rem;
+}
+
+.clock {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes tvPulse {
     0% {
         transform: scale(1);
     }

@@ -7,27 +7,8 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const authMode = process.env.AUTH_MODE || 'stub';
 
-    // 1. TV Protection (Pin based)
-    if (pathname.startsWith('/tv')) {
-        const tvPin = process.env.TV_PIN;
-        if (!tvPin) return NextResponse.redirect(new URL('/unauthorized', request.url));
-
-        const authCookie = request.cookies.get('tv_pin_ok');
-        if (authCookie && authCookie.value === '1') return NextResponse.next();
-
-        const pin = request.nextUrl.searchParams.get('pin');
-        if (pin === tvPin) {
-            const response = NextResponse.redirect(new URL('/tv', request.url));
-            response.cookies.set('tv_pin_ok', '1', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 60 * 60 * 12
-            });
-            return response;
-        }
-        return NextResponse.redirect(new URL('/unauthorized', request.url));
-    }
+    // 1. TV Protection (Removed for public access)
+    // No longer required as per user request
 
     // 2. Auth Session Refresh & RBAC
     let supabaseResponse = NextResponse.next({ request });
