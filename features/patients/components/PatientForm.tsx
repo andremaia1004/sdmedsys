@@ -116,17 +116,26 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
         <div className={styles.formContainer}>
             {renderStepIndicator()}
 
-            <form action={formAction}
+            <form
                 autoComplete="off"
                 onClick={(e) => e.stopPropagation()}
                 onSubmit={(e) => {
-                    // Prevent submission if not in the final step
-                    if (currentStep !== 3) {
-                        e.preventDefault();
-                        return;
+                    e.preventDefault(); // ALWAYS prevent default browser submission
+
+                    // Only invoke server action if we are in Step 3
+                    if (currentStep === 3) {
+                        const formData = new FormData(e.currentTarget);
+                        const submitButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+
+                        // If triggered by a button that isn't the final submit button (though we only have one), ignore?
+                        // Actually, just calling startTransition/formAction is safer.
+
+                        console.log('Manual submission triggered in Step 3');
+                        // @ts-ignore
+                        formAction(formData);
+                    } else {
+                        console.log('Submission blocked: Not in Step 3');
                     }
-                    // Prevent submission if validation fails
-                    // (Optional: Re-run validation here to be safe)
                 }}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
