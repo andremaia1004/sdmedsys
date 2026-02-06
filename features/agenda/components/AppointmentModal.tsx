@@ -181,8 +181,9 @@ export default function AppointmentModal({
                 className={styles.modalCard}
                 style={{
                     border: 'none',
-                    maxWidth: mode === 'register' ? '800px' : '500px', // Expand for wizard
-                    transition: 'max-width 0.3s ease'
+                    maxWidth: mode === 'register' ? '900px' : '500px', // Expand significantly for wizard
+                    width: '100%',
+                    transition: 'max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
                 footer={mode === 'search' ? (
                     <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', paddingTop: 0 }}>
