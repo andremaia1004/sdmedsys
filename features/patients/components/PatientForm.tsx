@@ -33,10 +33,13 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
     });
 
     useEffect(() => {
-        if (state?.success && onSuccess) {
-            onSuccess();
+        if (state?.success) {
+            console.log('FORM SUBMISSION SUCCESSFUL (Auto-close disabled for debugging)');
+            // if (onSuccess) onSuccess(); 
+            // DISABLE AUTO CLOSE TO DIAGNOSE CRASH VS SUBMISSION
+            alert('Cadastro realizado com sucesso! (Janela mantida aberta para teste)');
         }
-    }, [state?.success, onSuccess]);
+    }, [state?.success]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
