@@ -271,22 +271,23 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                             <Button type="button" variant="primary" onClick={handleNext}>
                                 Próximo &gt;
                             </Button>
-                        ) : <Button
-                            id="btn-finish-registration"
-                            type="submit"
-                            variant="primary"
-                            disabled={isPending || !isSubmissionReady}
-                            style={{
-                                paddingLeft: '2rem',
-                                paddingRight: '2rem',
-                                backgroundColor: isSubmissionReady ? 'var(--success)' : '#ccc',
-                                borderColor: isSubmissionReady ? 'var(--success)' : '#ccc',
-                                cursor: isSubmissionReady ? 'pointer' : 'not-allowed'
-                            }}
-                        >
-                            {isPending ? 'Finalizando...' : 'Concluir Cadastro'}
-                        </Button>
-                    )}
+                        ) : (
+                            <Button
+                                id="btn-finish-registration"
+                                type="submit"
+                                variant="primary"
+                                disabled={isPending || !isSubmissionReady}
+                                style={{
+                                    paddingLeft: '2rem',
+                                    paddingRight: '2rem',
+                                    backgroundColor: isSubmissionReady ? 'var(--success)' : '#ccc',
+                                    borderColor: isSubmissionReady ? 'var(--success)' : '#ccc',
+                                    cursor: isSubmissionReady ? 'pointer' : 'not-allowed'
+                                }}
+                            >
+                                {isPending ? 'Finalizando...' : 'Concluir Cadastro'}
+                            </Button>
+                        )}
                     </div>
 
                     {state?.error && (
