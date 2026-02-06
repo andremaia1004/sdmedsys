@@ -6,7 +6,8 @@ import styles from '@/features/agenda/styles/Agenda.module.css';
 
 export const dynamic = 'force-dynamic';
 
-export default async function DoctorAgendaPage() {
+export default async function DoctorAgendaPage(props: { searchParams: Promise<{ date?: string }> }) {
+    const searchParams = await props.searchParams;
     const user = await requireRole(['DOCTOR', 'ADMIN']);
 
     let doctors: any[] = [];
@@ -20,9 +21,28 @@ export default async function DoctorAgendaPage() {
     const myDoctor = doctors.find((d: any) => d.profileId === user?.id);
     const doctorId = myDoctor?.id || 'doc'; // Fallback to 'doc' if not linked yet
 
+    // Date calculation
+    const currentParamDate = searchParams.date ? new Date(searchParams.date) : new Date();
+    if (isNaN(currentParamDate.getTime())) {
+        currentParamDate.setTime(new Date().getTime());
+    }
+
+    const day = currentParamDate.getDay();
+    const diffToMonday = currentParamDate.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(currentParamDate);
+    monday.setDate(diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    const startStr = monday.toISOString();
+    const endStr = sunday.toISOString();
+
     let appointments: any[] = [];
     try {
-        appointments = await AppointmentService.list(doctorId);
+        appointments = await AppointmentService.list(doctorId, startStr, endStr);
     } catch (e) {
         console.error('DoctorAgendaPage: Failed to fetch appointments', e);
     }
@@ -43,6 +63,7 @@ export default async function DoctorAgendaPage() {
             <WeeklyCalendar
                 doctorId={doctorId}
                 appointments={appointments}
+                baseDate={monday.toISOString().split('T')[0]}
             />
         </div>
     );

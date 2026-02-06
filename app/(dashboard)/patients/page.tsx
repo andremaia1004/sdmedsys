@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import PatientList from '@/features/patients/components/PatientList';
 import PatientModalWrapper from '@/features/patients/components/PatientModalWrapper';
-import { PatientService } from '@/features/patients/service';
+import { fetchPatientsAction } from '@/features/patients/actions';
 import { requireRole } from '@/lib/session';
 import { Patient } from '@/features/patients/types';
 
@@ -10,7 +10,7 @@ export default async function SharedPatientsPageResource() {
     const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
     let patients: Patient[] = [];
     try {
-        patients = await PatientService.list();
+        patients = await fetchPatientsAction();
     } catch (e) {
         console.error('SharedPatientsPage: Failed to fetch patients', e);
     }

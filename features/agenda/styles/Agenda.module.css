@@ -64,7 +64,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: 80px repeat(5, 1fr);
+    grid-template-columns: 80px repeat(7, 1fr);
     background-color: var(--border);
     gap: 1px;
 }
@@ -362,4 +362,26 @@
     background: var(--accent-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+}
+
+.navButton {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--primary);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.navButton:hover {
+    background: var(--bg-main);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: var(--accent);
 }

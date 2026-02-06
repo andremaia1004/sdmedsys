@@ -12,7 +12,8 @@ export default function PatientList({ patients, canEdit = false }: { patients: P
 
     const filtered = (patients || []).filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.document.includes(search)
+        (p.document && p.document.includes(search)) ||
+        (p.phone && p.phone.includes(search))
     );
 
     return (

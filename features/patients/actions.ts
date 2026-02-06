@@ -49,6 +49,7 @@ export async function createPatientAction(prevState: ActionState, formData: Form
 
         await logAudit('CREATE', 'PATIENT', patient.id, { name: patient.name });
 
+        revalidatePath('/patients');
         revalidatePath('/secretary/patients');
         revalidatePath('/admin/patients');
         return { success: true, patient };
@@ -70,6 +71,7 @@ export async function updatePatientAction(id: string, input: PatientInput): Prom
             await logAudit('UPDATE', 'PATIENT', id, { name: patient.name });
         }
 
+        revalidatePath('/patients');
         revalidatePath('/secretary/patients');
         revalidatePath('/admin/patients');
         return patient;

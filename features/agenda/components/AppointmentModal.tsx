@@ -12,6 +12,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import styles from '../styles/Agenda.module.css';
+import { useRouter } from 'next/navigation';
 import { Calendar as CalendarIcon, Clock, Check, Search, User, X, UserPlus, ArrowLeft, Stethoscope, ChevronDown } from 'lucide-react';
 
 export default function AppointmentModal({
@@ -25,6 +26,7 @@ export default function AppointmentModal({
     time: string,
     onClose: () => void
 }) {
+    const router = useRouter();
     const [mode, setMode] = useState<'search' | 'register'>('search');
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -195,6 +197,7 @@ export default function AppointmentModal({
                 onSuccess={(patient) => {
                     setSelectedPatient(patient);
                     setMode('search');
+                    router.refresh();
                 }}
             />
         </div>
