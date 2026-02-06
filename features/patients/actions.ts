@@ -28,6 +28,12 @@ export async function createPatientAction(prevState: ActionState, formData: Form
         birthDate: formData.get('birthDate') as string || '',
     };
 
+    // Server-side validation
+    if (!rawInput.name || !rawInput.document || !rawInput.phone || !rawInput.birthDate) {
+        console.error('Create Patient Error: Missing required fields', rawInput);
+        return { error: 'Campos obrigatórios faltando (Nome, Documento, Telefone, Nascimento).', success: false };
+    }
+
     try {
         const patient = await PatientService.create(rawInput);
 

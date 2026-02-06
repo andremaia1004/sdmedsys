@@ -122,19 +122,28 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                 onSubmit={(e) => {
                     e.preventDefault(); // ALWAYS prevent default browser submission
 
-                    // Only invoke server action if we are in Step 3
-                    if (currentStep === 3) {
+                    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+                    const isFinishButton = submitter?.id === 'btn-finish-registration';
+
+                    console.log('Submission Attempt:', {
+                        submitterId: submitter?.id,
+                        isFinishButton,
+                        currentStep
+                    });
+
+                    // Only allow submission IF:
+                    // 1. We are in Step 3 matches
+                    // 2. The submitter is explicitly the "Finish" button
+                    if (currentStep === 3 && isFinishButton) {
+                        console.log('Valid submission allowed.');
                         const formData = new FormData(e.currentTarget);
-                        const submitButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-
-                        // If triggered by a button that isn't the final submit button (though we only have one), ignore?
-                        // Actually, just calling startTransition/formAction is safer.
-
-                        console.log('Manual submission triggered in Step 3');
                         // @ts-ignore
                         formAction(formData);
                     } else {
-                        console.log('Submission blocked: Not in Step 3');
+                        console.warn('Submission BLOCKED: Implicit submit or wrong step detected.');
+                        if (!isFinishButton) {
+                            console.warn('Reason: Submitter was not the finish button (likely implicit Enter or browser autofill).');
+                        }
                     }
                 }}
                 onKeyDown={(e) => {
@@ -248,7 +257,13 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                                 Próximo &gt;
                             </Button>
                         ) : (
-                            <Button type="submit" variant="primary" disabled={isPending} style={{ paddingLeft: '2rem', paddingRight: '2rem', backgroundColor: 'var(--success)', borderColor: 'var(--success)' }}>
+                            <Button
+                                id="btn-finish-registration"
+                                type="submit"
+                                variant="primary"
+                                disabled={isPending}
+                                style={{ paddingLeft: '2rem', paddingRight: '2rem', backgroundColor: 'var(--success)', borderColor: 'var(--success)' }}
+                            >
                                 {isPending ? 'Finalizando...' : 'Concluir Cadastro'}
                             </Button>
                         )}
