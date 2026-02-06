@@ -146,8 +146,23 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                                 <Input label="Telefone / WhatsApp *" name="phone" value={formData.phone} onChange={handleChange} placeholder="(00) 00000-0000" fullWidth required />
                                 <Input label="E-mail" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="exemplo@email.com" fullWidth />
                             </div>
-                            <div style={{ marginTop: '1.5rem' }}>
-                                <Input label="Endereço Completo" name="address" value={formData.address} onChange={handleChange} placeholder="Rua, Número, Bairro, Cidade - UF" fullWidth />
+
+                            <div style={{ marginTop: '1.5rem', borderTop: '1px dashed #eee', paddingTop: '1.5rem' }}>
+                                <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: '#666', textTransform: 'uppercase' }}>Endereço Residencial</h4>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <Input label="CEP" name="address_zip" value={formData.address_zip} onChange={handleChange} placeholder="00000-000" fullWidth />
+                                    <Input label="Cidade / UF" name="address_city" value={formData.address_city} onChange={handleChange} placeholder="Ex: São Paulo - SP" fullWidth />
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <Input label="Rua / Logradouro" name="address_street" value={formData.address_street} onChange={handleChange} placeholder="Ex: Av. Paulista" fullWidth />
+                                    <Input label="Número" name="address_number" value={formData.address_number} onChange={handleChange} placeholder="123" fullWidth />
+                                </div>
+
+                                <div>
+                                    <Input label="Bairro" name="address_neighborhood" value={formData.address_neighborhood} onChange={handleChange} placeholder="Ex: Bela Vista" fullWidth />
+                                </div>
                             </div>
                         </div>
                     )}
