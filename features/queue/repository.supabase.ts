@@ -33,7 +33,7 @@ export class SupabaseQueueRepository implements IQueueRepository {
     async getTVList(): Promise<Partial<QueueItemWithPatient>[]> {
         const { data, error } = await this.supabase
             .from('queue_items')
-            .select('ticket_code, status, doctor_id')
+            .select('ticket_code, status, doctor_id, patient_id, patients(name)')
             .eq('clinic_id', this.clinicId)
             .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
             .order('updated_at', { ascending: false });
@@ -44,9 +44,12 @@ export class SupabaseQueueRepository implements IQueueRepository {
         }
 
         return data.map((row: any) => ({
+            id: row.id,
             ticketCode: row.ticket_code,
             status: row.status as QueueStatus,
             doctorId: row.doctor_id,
+            patientId: row.patient_id,
+            patientName: row.patients?.name || '---'
         }));
     }
 

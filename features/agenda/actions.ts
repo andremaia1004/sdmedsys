@@ -1,6 +1,7 @@
 'use server';
 
 import { AppointmentService } from './service';
+import { QueueService } from '../queue/service';
 import { AppointmentInput, Appointment, AppointmentStatus } from './types';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
@@ -62,6 +63,35 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
 
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
+
+        // Logic to auto-add to queue if appointment is today
+        try {
+            // Get today's date in local time (Brasil/BRT) using 'en-CA' for YYYY-MM-DD
+            const todayLocal = new Date().toLocaleDateString('en-CA');
+
+            console.log('[createAppointmentAction] Comparing date:', date, 'with todayLocal:', todayLocal);
+
+            if (date === todayLocal) {
+                console.log('[createAppointmentAction] Auto-adding to queue for today...');
+                const user = await import('@/lib/session').then(m => m.getCurrentUser());
+                const role = user?.role || 'SECRETARY';
+
+                await QueueService.add({
+                    patientId: appointment.patientId,
+                    doctorId: appointment.doctorId,
+                    appointmentId: appointment.id,
+                    status: 'WAITING'
+                }, role);
+
+                revalidatePath('/queue');
+                revalidatePath('/tv');
+                revalidatePath('/secretary/queue');
+                revalidatePath('/doctor/queue');
+            }
+        } catch (queueErr) {
+            console.error('Failed to auto-add to queue:', queueErr);
+        }
+
         return { success: true, appointment };
     } catch (err: any) {
         console.error('Create Appointment Error:', err);
