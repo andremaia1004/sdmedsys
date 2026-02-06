@@ -69,8 +69,19 @@ export async function createDoctorAction(formData: FormData) {
         const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
         const { logAudit } = await import('@/lib/audit');
 
-        // Critical Check for Service Role Key
-        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        // Critical Check for Service Role Key and URL
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        if (!supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co') {
+            console.error('CRITICAL: NEXT_PUBLIC_SUPABASE_URL is missing or invalid');
+            return {
+                success: false,
+                error: 'Erro de Configuração: URL do Supabase inválida ou não definida. Verifique as configurações do projeto.'
+            };
+        }
+
+        if (!serviceKey) {
             console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY missing in environment variables');
             return {
                 success: false,
