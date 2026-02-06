@@ -33,6 +33,7 @@ export default function AppointmentModal({
     // Doctor Selection State
     const [availableDoctors, setAvailableDoctors] = useState<Doctor[]>([]);
     const [selectedDoctorId, setSelectedDoctorId] = useState(doctorId);
+    const [isLoadingDoctors, setIsLoadingDoctors] = useState(true);
 
     // Appointment Action
     // @ts-ignore
@@ -40,11 +41,23 @@ export default function AppointmentModal({
 
     // Fetch Doctors for selection
     useEffect(() => {
-        listDoctorsAction(true).then(docs => {
+        setIsLoadingDoctors(true);
+        Promise.all([
+            listDoctorsAction(true),
+            getDoctorAction(doctorId)
+        ]).then(([allDocs, currentDoc]) => {
+            let docs = allDocs || [];
+            // Ensure current doctor is in the list (if exists and not already there)
+            if (currentDoc && !docs.find(d => d.id === currentDoc.id)) {
+                docs = [currentDoc, ...docs];
+            }
             setAvailableDoctors(docs);
-            // Ensure the passed doctorId is valid, otherwise fallback (optional logic)
+            setIsLoadingDoctors(false);
+        }).catch(err => {
+            console.error(err);
+            setIsLoadingDoctors(false);
         });
-    }, []);
+    }, [doctorId]); // Re-run if doctorId changes (e.g. diff slot)
 
     // Also update local state if prop changes (though usually modal unmounts)
     useEffect(() => {
@@ -188,7 +201,7 @@ export default function AppointmentModal({
                 className={styles.modalCard}
                 style={{
                     border: 'none',
-                    maxWidth: mode === 'register' ? '900px' : '500px', // Expand significantly for wizard
+                    maxWidth: mode === 'register' ? '900px' : '700px', // Wider default
                     width: '100%',
                     transition: 'max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
@@ -237,6 +250,7 @@ export default function AppointmentModal({
                                 <select
                                     value={selectedDoctorId}
                                     onChange={(e) => setSelectedDoctorId(e.target.value)}
+                                    disabled={isLoadingDoctors}
                                     style={{
                                         width: '100%',
                                         appearance: 'none',
@@ -245,9 +259,10 @@ export default function AppointmentModal({
                                         fontWeight: 800,
                                         fontSize: '1rem',
                                         color: 'var(--primary)',
-                                        cursor: 'pointer',
+                                        cursor: isLoadingDoctors ? 'wait' : 'pointer',
                                         paddingRight: '1.5rem',
-                                        outline: 'none'
+                                        outline: 'none',
+                                        opacity: isLoadingDoctors ? 0.7 : 1
                                     }}
                                 >
                                     {availableDoctors.map(doc => (
@@ -255,7 +270,8 @@ export default function AppointmentModal({
                                             {doc.name}
                                         </option>
                                     ))}
-                                    {availableDoctors.length === 0 && <option>Carregando...</option>}
+                                    {isLoadingDoctors && <option>Carregando...</option>}
+                                    {!isLoadingDoctors && availableDoctors.length === 0 && <option value="" disabled>Nenhum médico encontrado</option>}
                                 </select>
                                 <ChevronDown size={14} style={{ position: 'absolute', right: 0, pointerEvents: 'none', color: 'var(--primary)' }} />
                             </div>
