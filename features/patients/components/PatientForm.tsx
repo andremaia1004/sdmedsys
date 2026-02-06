@@ -121,7 +121,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
 
                     {/* STEP 1: DADOS PESSOAIS */}
                     {currentStep === 1 && (
-                        <div className="animate-fade-in">
+                        <div key="step1">
                             <h3 style={{ fontSize: '1.25rem', color: 'var(--primary)', marginBottom: '1.5rem', borderBottom: '2px solid #f0f0f0', paddingBottom: '0.5rem' }}>
                                 1. Dados Pessoais
                             </h3>
@@ -138,7 +138,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
 
                     {/* STEP 2: CONTATO E ENDEREÇO */}
                     {currentStep === 2 && (
-                        <div className="animate-fade-in">
+                        <div key="step2">
                             <h3 style={{ fontSize: '1.25rem', color: 'var(--primary)', marginBottom: '1.5rem', borderBottom: '2px solid #f0f0f0', paddingBottom: '0.5rem' }}>
                                 2. Contato e Endereço
                             </h3>
@@ -169,7 +169,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
 
                     {/* STEP 3: DADOS CLÍNICOS E FINANCEIROS */}
                     {currentStep === 3 && (
-                        <div className="animate-fade-in">
+                        <div key="step3">
                             <h3 style={{ fontSize: '1.25rem', color: 'var(--primary)', marginBottom: '1.5rem', borderBottom: '2px solid #f0f0f0', paddingBottom: '0.5rem' }}>
                                 3. Dados Clínicos e Financeiros
                             </h3>
