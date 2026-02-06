@@ -6,13 +6,13 @@ import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
 import { searchPatientsAction } from '@/features/patients/actions';
 import PatientForm from '@/features/patients/components/PatientForm';
-import { getDoctorAction } from '@/features/doctors/actions';
+import { listDoctorsAction, getDoctorAction } from '@/features/doctors/actions';
 import { Doctor } from '@/features/doctors/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import styles from '../styles/Agenda.module.css';
-import { Calendar as CalendarIcon, Clock, Check, Search, User, X, UserPlus, ArrowLeft, Stethoscope } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Check, Search, User, X, UserPlus, ArrowLeft, Stethoscope, ChevronDown } from 'lucide-react';
 
 export default function AppointmentModal({
     doctorId,
@@ -29,19 +29,26 @@ export default function AppointmentModal({
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Patient[]>([]);
-    const [doctorInfo, setDoctorInfo] = useState<Doctor | null>(null);
+
+    // Doctor Selection State
+    const [availableDoctors, setAvailableDoctors] = useState<Doctor[]>([]);
+    const [selectedDoctorId, setSelectedDoctorId] = useState(doctorId);
 
     // Appointment Action
     // @ts-ignore
     const [apptState, apptFormAction, isApptPending] = useActionState(createAppointmentAction, { error: '', success: false });
 
-    // Fetch Doctor Info
+    // Fetch Doctors for selection
     useEffect(() => {
-        if (doctorId) {
-            getDoctorAction(doctorId).then(doc => {
-                if (doc) setDoctorInfo(doc);
-            });
-        }
+        listDoctorsAction(true).then(docs => {
+            setAvailableDoctors(docs);
+            // Ensure the passed doctorId is valid, otherwise fallback (optional logic)
+        });
+    }, []);
+
+    // Also update local state if prop changes (though usually modal unmounts)
+    useEffect(() => {
+        setSelectedDoctorId(doctorId);
     }, [doctorId]);
 
     // Handle Appointment Success
@@ -202,13 +209,13 @@ export default function AppointmentModal({
             >
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: doctorInfo ? '1fr 1fr' : '1fr',
+                    gridTemplateColumns: '1fr 1fr',
                     gap: '1rem',
                     padding: '1.5rem',
                     background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                     borderBottom: '1px solid #e2e8f0'
                 }}>
-                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none' }}>
+                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none', marginBottom: 0 }}>
                         <div className={styles.slotIcon}>
                             <CalendarIcon size={24} />
                         </div>
@@ -220,19 +227,40 @@ export default function AppointmentModal({
                         </div>
                     </div>
 
-                    {doctorInfo && (
-                        <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none' }}>
-                            <div className={styles.slotIcon} style={{ background: 'var(--accent)', color: '#fff' }}>
-                                <Stethoscope size={24} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Profissional</div>
-                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--primary)' }}>
-                                    {doctorInfo.name}
-                                </div>
+                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none', marginBottom: 0 }}>
+                        <div className={styles.slotIcon} style={{ background: 'var(--accent)', color: '#fff' }}>
+                            <Stethoscope size={24} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Profissional</div>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                <select
+                                    value={selectedDoctorId}
+                                    onChange={(e) => setSelectedDoctorId(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        appearance: 'none',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        fontWeight: 800,
+                                        fontSize: '1rem',
+                                        color: 'var(--primary)',
+                                        cursor: 'pointer',
+                                        paddingRight: '1.5rem',
+                                        outline: 'none'
+                                    }}
+                                >
+                                    {availableDoctors.map(doc => (
+                                        <option key={doc.id} value={doc.id}>
+                                            {doc.name}
+                                        </option>
+                                    ))}
+                                    {availableDoctors.length === 0 && <option>Carregando...</option>}
+                                </select>
+                                <ChevronDown size={14} style={{ position: 'absolute', right: 0, pointerEvents: 'none', color: 'var(--primary)' }} />
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 <div style={{ padding: '0 1.5rem 1.5rem 1.5rem' }}>
@@ -242,7 +270,7 @@ export default function AppointmentModal({
                                 {renderSearchMode()}
                             </div>
                             <form id="appointment-form" action={apptFormAction}>
-                                <input type="hidden" name="doctorId" value={doctorId} />
+                                <input type="hidden" name="doctorId" value={selectedDoctorId} />
                                 <input type="hidden" name="date" value={date} />
                                 <input type="hidden" name="time" value={time} />
                                 {selectedPatient && (
