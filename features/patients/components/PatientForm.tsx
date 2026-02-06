@@ -117,6 +117,8 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
             {renderStepIndicator()}
 
             <form action={formAction}
+                autoComplete="off"
+                onClick={(e) => e.stopPropagation()}
                 onSubmit={(e) => {
                     // Prevent submission if not in the final step
                     if (currentStep !== 3) {

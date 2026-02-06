@@ -27,8 +27,11 @@ export default function PatientModalWrapper({ canCreate }: PatientModalWrapperPr
             </Button>
 
             {isOpen && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalCard}>
+                <div className={styles.modalOverlay} onClick={() => setIsOpen(false)}>
+                    <div
+                        className={styles.modalCard}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className={styles.modalHeader}>
                             <h2 className={styles.modalTitle}>Cadastrar Novo Paciente</h2>
                             <button
