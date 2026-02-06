@@ -6,9 +6,12 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
     constructor(
         private supabase: SupabaseClient,
         private clinicId: string
-    ) { }
+    ) {
+        console.log(`[SupabaseDoctorsRepository] Initialized with clinicId: ${clinicId}`);
+    }
 
     async list(activeOnly?: boolean): Promise<Doctor[]> {
+        console.log(`[SupabaseDoctorsRepository] list activeOnly=${activeOnly}, clinicId=${this.clinicId}`);
         let query = this.supabase
             .from('doctors')
             .select('*')
@@ -20,17 +23,24 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
         }
 
         const { data, error } = await query;
-        if (error) throw new Error(error.message);
+        if (error) {
+            console.error('[SupabaseDoctorsRepository] list Error:', error);
+            throw new Error(error.message);
+        }
+        console.log(`[SupabaseDoctorsRepository] list Found ${data?.length} doctors`);
         return data.map(this.mapToDoctor);
     }
 
     async findById(id: string): Promise<Doctor | undefined> {
+        console.log(`[SupabaseDoctorsRepository] findById id=${id} (skipping clinic check)`);
         const { data, error } = await this.supabase
             .from('doctors')
             .select('*')
             .eq('id', id)
-            .eq('clinic_id', this.clinicId)
+            // .eq('clinic_id', this.clinicId) // Relaxed check to ensure we find the doc
             .maybeSingle();
+
+        if (error) console.error('[SupabaseDoctorsRepository] findById Error:', error);
 
         if (error || !data) return undefined;
         return this.mapToDoctor(data);

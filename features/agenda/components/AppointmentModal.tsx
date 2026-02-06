@@ -42,19 +42,24 @@ export default function AppointmentModal({
     // Fetch Doctors for selection
     useEffect(() => {
         setIsLoadingDoctors(true);
+        console.log('[AppointmentModal] Fetching doctors for doctorId:', doctorId);
+
         Promise.all([
-            listDoctorsAction(true),
+            listDoctorsAction(false), // Fetch ALL doctors to debug
             getDoctorAction(doctorId)
         ]).then(([allDocs, currentDoc]) => {
+            console.log('[AppointmentModal] Fetched docs:', allDocs.length, 'Current doc:', currentDoc);
+
             let docs = allDocs || [];
             // Ensure current doctor is in the list (if exists and not already there)
             if (currentDoc && !docs.find(d => d.id === currentDoc.id)) {
+                console.log('[AppointmentModal] Adding current doctor manually to list');
                 docs = [currentDoc, ...docs];
             }
             setAvailableDoctors(docs);
             setIsLoadingDoctors(false);
         }).catch(err => {
-            console.error(err);
+            console.error('[AppointmentModal] Error fetching doctors:', err);
             setIsLoadingDoctors(false);
         });
     }, [doctorId]); // Re-run if doctorId changes (e.g. diff slot)
