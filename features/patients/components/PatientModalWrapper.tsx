@@ -29,8 +29,7 @@ export default function PatientModalWrapper({ canCreate }: PatientModalWrapperPr
             {isOpen && (
                 <div className={styles.modalOverlay} onClick={() => {
                     console.log('Overlay clicked');
-                    // TEMPORARY DEBUG: Disable close on overlay click to isolate bug
-                    // setIsOpen(false);
+                    setIsOpen(false);
                 }}>
                     <div
                         className={styles.modalCard}

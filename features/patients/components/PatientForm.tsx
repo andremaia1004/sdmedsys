@@ -32,14 +32,26 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
         main_complaint: ''
     });
 
+    // Safety state to prevent double-click "Next" -> "Finish" race condition
+    const [isSubmissionReady, setIsSubmissionReady] = useState(false);
+
+    useEffect(() => {
+        if (currentStep === 3) {
+            setIsSubmissionReady(false);
+            const timer = setTimeout(() => setIsSubmissionReady(true), 800);
+            return () => clearTimeout(timer);
+        }
+    }, [currentStep]);
+
     useEffect(() => {
         if (state?.success) {
-            console.log('FORM SUBMISSION SUCCESSFUL (Auto-close disabled for debugging)');
-            // if (onSuccess) onSuccess(); 
-            // DISABLE AUTO CLOSE TO DIAGNOSE CRASH VS SUBMISSION
-            alert('Cadastro realizado com sucesso! (Janela mantida aberta para teste)');
+            // Re-enable auto-close
+            if (onSuccess) onSuccess();
         }
-    }, [state?.success]);
+    }, [state?.success, onSuccess]);
+
+    // Reverted debug alert: This useEffect block was redundant and contained a debug alert.
+    // The first useEffect block already handles the success state correctly by calling onSuccess.
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -259,17 +271,22 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                             <Button type="button" variant="primary" onClick={handleNext}>
                                 Próximo &gt;
                             </Button>
-                        ) : (
-                            <Button
-                                id="btn-finish-registration"
-                                type="submit"
-                                variant="primary"
-                                disabled={isPending}
-                                style={{ paddingLeft: '2rem', paddingRight: '2rem', backgroundColor: 'var(--success)', borderColor: 'var(--success)' }}
-                            >
-                                {isPending ? 'Finalizando...' : 'Concluir Cadastro'}
-                            </Button>
-                        )}
+                        ) : <Button
+                            id="btn-finish-registration"
+                            type="submit"
+                            variant="primary"
+                            disabled={isPending || !isSubmissionReady}
+                            style={{
+                                paddingLeft: '2rem',
+                                paddingRight: '2rem',
+                                backgroundColor: isSubmissionReady ? 'var(--success)' : '#ccc',
+                                borderColor: isSubmissionReady ? 'var(--success)' : '#ccc',
+                                cursor: isSubmissionReady ? 'pointer' : 'not-allowed'
+                            }}
+                        >
+                            {isPending ? 'Finalizando...' : 'Concluir Cadastro'}
+                        </Button>
+                    )}
                     </div>
 
                     {state?.error && (
