@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { createPatientAction } from '../actions';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -185,7 +185,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                                 Próximo &gt;
                             </Button>
                         ) : (
-                            <Button type="submit" variant="success" disabled={isPending} style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
+                            <Button type="submit" variant="primary" disabled={isPending} style={{ paddingLeft: '2rem', paddingRight: '2rem', backgroundColor: 'var(--success)', borderColor: 'var(--success)' }}>
                                 {isPending ? 'Finalizando...' : 'Concluir Cadastro'}
                             </Button>
                         )}
@@ -211,5 +211,4 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
     );
 }
 
-// Simple useState import if not already there
-import { useState } from 'react';
+
