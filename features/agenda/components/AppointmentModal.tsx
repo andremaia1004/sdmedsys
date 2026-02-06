@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
-import { searchPatientsAction, createPatientAction } from '@/features/patients/actions';
+import { searchPatientsAction } from '@/features/patients/actions';
+import PatientForm from '@/features/patients/components/PatientForm';
+import { getDoctorAction } from '@/features/doctors/actions';
+import { Doctor } from '@/features/doctors/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import styles from '../styles/Agenda.module.css';
-import { Calendar as CalendarIcon, Clock, Check, Search, User, X, UserPlus, ArrowLeft } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Check, Search, User, X, UserPlus, ArrowLeft, Stethoscope } from 'lucide-react';
 
 export default function AppointmentModal({
     doctorId,
@@ -26,14 +29,20 @@ export default function AppointmentModal({
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Patient[]>([]);
+    const [doctorInfo, setDoctorInfo] = useState<Doctor | null>(null);
 
     // Appointment Action
     // @ts-ignore
     const [apptState, apptFormAction, isApptPending] = useActionState(createAppointmentAction, { error: '', success: false });
 
-    // Patient Action
-    // @ts-ignore
-    const [patientState, patientFormAction, isPatientPending] = useActionState(createPatientAction, { error: '', success: false });
+    // Fetch Doctor Info
+    useEffect(() => {
+        if (doctorId) {
+            getDoctorAction(doctorId).then(doc => {
+                if (doc) setDoctorInfo(doc);
+            });
+        }
+    }, [doctorId]);
 
     // Handle Appointment Success
     useEffect(() => {
@@ -42,14 +51,6 @@ export default function AppointmentModal({
             return () => clearTimeout(timer);
         }
     }, [apptState?.success, onClose]);
-
-    // Handle Patient Registration Success
-    useEffect(() => {
-        if (patientState?.success && patientState.patient) {
-            setSelectedPatient(patientState.patient);
-            setMode('search');
-        }
-    }, [patientState?.success, patientState?.patient]);
 
     if (apptState?.success) {
         return (
@@ -152,8 +153,8 @@ export default function AppointmentModal({
     );
 
     const renderRegisterMode = () => (
-        <form action={patientFormAction} className={styles.registerForm}>
-            <div className={styles.formHeader}>
+        <div className={styles.registerForm} style={{ padding: 0 }}>
+            <div className={styles.formHeader} style={{ marginBottom: '1rem' }}>
                 <div className={styles.formTitle}>Cadastrar Novo Paciente</div>
                 <div
                     className={styles.searchLink}
@@ -165,37 +166,24 @@ export default function AppointmentModal({
                 </div>
             </div>
 
-            <Input name="name" label="Nome Completo" required placeholder="Ex: João da Silva" />
-
-            <div className={styles.formGrid}>
-                <Input name="document" label="CPF" required placeholder="000.000.000-00" />
-                <Input name="phone" label="Celular" required placeholder="(11) 99999-9999" />
-            </div>
-
-            <Input name="birthDate" label="Data de Nascimento" type="date" />
-
-            {patientState?.error && (
-                <div style={{ color: 'var(--danger)', fontSize: '0.875rem', fontWeight: 600 }}>
-                    {patientState.error}
-                </div>
-            )}
-
-            <Button
-                type="submit"
-                variant="accent"
-                disabled={isPatientPending}
-                style={{ borderRadius: '12px', marginTop: '0.5rem' }}
-            >
-                {isPatientPending ? 'Cadastrando...' : 'Finalizar Cadastro'}
-            </Button>
-        </form>
+            <PatientForm
+                onSuccess={(patient) => {
+                    setSelectedPatient(patient);
+                    setMode('search');
+                }}
+            />
+        </div>
     );
 
     return (
         <div className={styles.modalOverlay}>
             <Card
                 className={styles.modalCard}
-                style={{ border: 'none' }}
+                style={{
+                    border: 'none',
+                    maxWidth: mode === 'register' ? '800px' : '500px', // Expand for wizard
+                    transition: 'max-width 0.3s ease'
+                }}
                 footer={mode === 'search' ? (
                     <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', paddingTop: 0 }}>
                         <Button variant="secondary" onClick={onClose} fullWidth style={{ borderRadius: '12px' }}>Cancelar</Button>
@@ -211,22 +199,47 @@ export default function AppointmentModal({
                     </div>
                 ) : null}
             >
-                <div className={styles.slotInfo}>
-                    <div className={styles.slotIcon}>
-                        <CalendarIcon size={24} />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em' }}>Horário Selecionado</div>
-                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>
-                            {date && new Date(date).toLocaleDateString('pt-BR')} às {time}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: doctorInfo ? '1fr 1fr' : '1fr',
+                    gap: '1rem',
+                    padding: '1.5rem',
+                    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                    borderBottom: '1px solid #e2e8f0'
+                }}>
+                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none' }}>
+                        <div className={styles.slotIcon}>
+                            <CalendarIcon size={24} />
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Horário Selecionado</div>
+                            <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--primary)' }}>
+                                {date && new Date(date).toLocaleDateString('pt-BR')} às {time}
+                            </div>
                         </div>
                     </div>
+
+                    {doctorInfo && (
+                        <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none' }}>
+                            <div className={styles.slotIcon} style={{ background: 'var(--accent)', color: '#fff' }}>
+                                <Stethoscope size={24} />
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Profissional</div>
+                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--primary)' }}>
+                                    {doctorInfo.name}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ padding: '0 1.5rem 1.5rem 1.5rem' }}>
                     {mode === 'search' ? (
                         <>
-                            {renderSearchMode()}
+                            <div style={{ marginTop: '1.5rem' }}>
+                                {renderSearchMode()}
+                            </div>
                             <form id="appointment-form" action={apptFormAction}>
                                 <input type="hidden" name="doctorId" value={doctorId} />
                                 <input type="hidden" name="date" value={date} />
@@ -240,7 +253,9 @@ export default function AppointmentModal({
                             </form>
                         </>
                     ) : (
-                        renderRegisterMode()
+                        <div style={{ marginTop: '1.5rem' }}>
+                            {renderRegisterMode()}
+                        </div>
                     )}
 
                     {apptState?.error && (

@@ -5,9 +5,10 @@ import { createPatientAction } from '../actions';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { Patient } from '../types';
 import styles from '../styles/Patients.module.css';
 
-export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
+export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patient) => void }) {
     // @ts-ignore
     const [state, formAction, isPending] = useActionState(createPatientAction, { error: '' });
 
@@ -44,11 +45,10 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
     }, [currentStep]);
 
     useEffect(() => {
-        if (state?.success) {
-            // Re-enable auto-close
-            if (onSuccess) onSuccess();
+        if (state?.success && state?.patient) {
+            if (onSuccess) onSuccess(state.patient);
         }
-    }, [state?.success, onSuccess]);
+    }, [state?.success, state?.patient, onSuccess]);
 
     // Reverted debug alert: This useEffect block was redundant and contained a debug alert.
     // The first useEffect block already handles the success state correctly by calling onSuccess.
