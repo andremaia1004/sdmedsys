@@ -27,10 +27,17 @@ export default function PatientModalWrapper({ canCreate }: PatientModalWrapperPr
             </Button>
 
             {isOpen && (
-                <div className={styles.modalOverlay} onClick={() => setIsOpen(false)}>
+                <div className={styles.modalOverlay} onClick={() => {
+                    console.log('Overlay clicked');
+                    // TEMPORARY DEBUG: Disable close on overlay click to isolate bug
+                    // setIsOpen(false);
+                }}>
                     <div
                         className={styles.modalCard}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                            console.log('Card clicked');
+                            e.stopPropagation();
+                        }}
                     >
                         <div className={styles.modalHeader}>
                             <h2 className={styles.modalTitle}>Cadastrar Novo Paciente</h2>
@@ -43,7 +50,10 @@ export default function PatientModalWrapper({ canCreate }: PatientModalWrapperPr
                             </button>
                         </div>
                         <div className={styles.modalContent}>
-                            <PatientForm onSuccess={() => setIsOpen(false)} />
+                            <PatientForm onSuccess={() => {
+                                console.log('PatientForm triggered onSuccess');
+                                setIsOpen(false)
+                            }} />
                         </div>
                     </div>
                 </div>
