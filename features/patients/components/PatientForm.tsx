@@ -20,7 +20,13 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
         guardian_name: '',
         phone: '',
         email: '',
-        address: '',
+        // Address parts
+        address_zip: '',
+        address_street: '',
+        address_number: '',
+        address_neighborhood: '',
+        address_city: '',
+        // Clinical
         insurance: '',
         emergency_contact: '',
         main_complaint: ''
@@ -44,10 +50,13 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                 return false;
             }
         }
-        // Step 2 and 3 can be optional depending on strictness, but let's enforce Phone for Contact
         if (step === 2) {
             if (!formData.phone) {
                 alert('Por favor, informe ao menos um telefone de contato.');
+                return false;
+            }
+            if (formData.address_street && (!formData.address_city || !formData.address_neighborhood)) {
+                alert('Se preencher o endereço, informe ao menos a Rua, Bairro e Cidade.');
                 return false;
             }
         }
@@ -64,6 +73,15 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
     const handleBack = () => {
         setCurrentStep(prev => prev - 1);
     };
+
+    // Helper to construct the full address for hidden input
+    const fullAddress = [
+        formData.address_street,
+        formData.address_number ? `nº ${formData.address_number}` : '',
+        formData.address_neighborhood ? `- ${formData.address_neighborhood}` : '',
+        formData.address_city ? `- ${formData.address_city}` : '',
+        formData.address_zip ? `(${formData.address_zip})` : ''
+    ].filter(Boolean).join(' ');
 
     // Render helper for Steps
     const renderStepIndicator = () => (
@@ -151,15 +169,20 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
                     )}
 
                     {/* HIDDEN INPUTS FOR PERSISTENCE across steps */}
+                    {/* Ensure 'address' is sent as a concatenated string */}
+                    <input type="hidden" name="address" value={fullAddress} />
+
                     {Object.entries(formData).map(([key, value]) => {
                         // Only render hidden input if the field is NOT in the current step logic
-                        // Actually, easier: Render hidden for ALL, but disable the ones that are currently visible to avoid duplicates?
-                        // Or just use the fact that if a visible input has the same name, it might conflict.
-                        // STRATEGY: Only render hidden inputs for fields NOT present in the current step.
+                        // Strategy: Render hidden for fields NOT present in the current step.
 
                         const step1Fields = ['name', 'document', 'birthDate', 'guardian_name'];
-                        const step2Fields = ['phone', 'email', 'address'];
+                        const step2Fields = ['phone', 'email', 'address_zip', 'address_street', 'address_number', 'address_neighborhood', 'address_city'];
                         const step3Fields = ['insurance', 'emergency_contact', 'main_complaint'];
+
+                        // We also skip individual address parts because we send the combined 'address' field
+                        const addressParts = ['address_zip', 'address_street', 'address_number', 'address_neighborhood', 'address_city'];
+                        if (addressParts.includes(key)) return null;
 
                         let isVisible = false;
                         if (currentStep === 1 && step1Fields.includes(key)) isVisible = true;
