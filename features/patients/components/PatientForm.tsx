@@ -116,11 +116,21 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
         <div className={styles.formContainer}>
             {renderStepIndicator()}
 
-            <form action={formAction} onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-                    e.preventDefault();
-                }
-            }}>
+            <form action={formAction}
+                onSubmit={(e) => {
+                    // Prevent submission if not in the final step
+                    if (currentStep !== 3) {
+                        e.preventDefault();
+                        return;
+                    }
+                    // Prevent submission if validation fails
+                    // (Optional: Re-run validation here to be safe)
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+                        e.preventDefault();
+                    }
+                }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                     {/* STEP 1: DADOS PESSOAIS */}
