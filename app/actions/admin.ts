@@ -64,83 +64,96 @@ export async function fetchDoctorsAction(activeOnly: boolean = false) {
 }
 
 export async function createDoctorAction(formData: FormData) {
-    const user = await requireRole(['ADMIN']);
-    const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
-    const { logAudit } = await import('@/lib/audit');
+    try {
+        const user = await requireRole(['ADMIN']);
+        const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+        const { logAudit } = await import('@/lib/audit');
 
-    const name = formData.get('name') as string;
-    const specialty = formData.get('specialty') as string;
-    const crm = formData.get('crm') as string || undefined;
-    const phone = formData.get('phone') as string || undefined;
-    const email = formData.get('email') as string || undefined;
-    const password = formData.get('password') as string || undefined;
-    const createAuth = formData.get('createAuth') === 'true';
-
-    let profileId: string | undefined = undefined;
-
-    // 1. Create Auth User if requested
-    if (createAuth && email && password) {
-        // Create user via Admin API (ignores confirmation)
-        const { data: authData, error: authError } = await supabaseServer.auth.admin.createUser({
-            email,
-            password,
-            email_confirm: true,
-            user_metadata: { name }
-        });
-
-        if (authError) {
-            console.error('Auth Error during doctor creation:', authError);
-            throw new Error(`Erro ao criar conta de acesso: ${authError.message}`);
+        // Critical Check for Service Role Key
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY missing in environment variables');
+            return {
+                success: false,
+                error: 'Erro de Configuração: Chave de Serviço do Supabase não encontrada. Verifique as variáveis de ambiente no Vercel.'
+            };
         }
 
-        profileId = authData.user.id;
+        const name = formData.get('name') as string;
+        const specialty = formData.get('specialty') as string;
+        const crm = formData.get('crm') as string || undefined;
+        const phone = formData.get('phone') as string || undefined;
+        const email = formData.get('email') as string || undefined;
+        const password = formData.get('password') as string || undefined;
+        const createAuth = formData.get('createAuth') === 'true';
 
-        // 2. Create Profile
-        const { error: profileError } = await supabaseServer
-            .from('profiles')
-            .upsert({
-                id: profileId,
-                email: email,
-                role: 'DOCTOR',
-                clinic_id: user.clinicId,
-                updated_at: new Date().toISOString()
+        let profileId: string | undefined = undefined;
+
+        // 1. Create Auth User if requested
+        if (createAuth && email && password) {
+            // Create user via Admin API (ignores confirmation)
+            const { data: authData, error: authError } = await supabaseServer.auth.admin.createUser({
+                email,
+                password,
+                email_confirm: true,
+                user_metadata: { name }
             });
 
-        if (profileError) {
-            // Rollback Auth user
-            await supabaseServer.auth.admin.deleteUser(profileId);
-            throw new Error(`Erro ao criar perfil de acesso: ${profileError.message}`);
+            if (authError) {
+                console.error('Auth Error during doctor creation:', authError);
+                return { success: false, error: `Erro ao criar conta de acesso: ${authError.message}` };
+            }
+
+            profileId = authData.user.id;
+
+            // 2. Create Profile
+            const { error: profileError } = await supabaseServer
+                .from('profiles')
+                .upsert({
+                    id: profileId,
+                    email: email,
+                    role: 'DOCTOR',
+                    clinic_id: user.clinicId,
+                    updated_at: new Date().toISOString()
+                });
+
+            if (profileError) {
+                // Rollback Auth user
+                await supabaseServer.auth.admin.deleteUser(profileId);
+                return { success: false, error: `Erro ao criar perfil de acesso: ${profileError.message}` };
+            }
         }
-    }
 
-    // 3. Create Doctor Record
-    try {
-        const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000'; // Fallback to default clinic if undefined
-        const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
-        const doctor = await repo.create({
-            name,
-            specialty,
-            crm,
-            phone,
-            email,
-            profileId
-        });
+        // 3. Create Doctor Record
+        try {
+            const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+            const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
+            const doctor = await repo.create({
+                name,
+                specialty,
+                crm,
+                phone,
+                email,
+                profileId
+            });
 
-        await logAudit('CREATE', 'DOCTOR', doctor.id, { name, specialty, crm });
+            await logAudit('CREATE', 'DOCTOR', doctor.id, { name, specialty, crm });
 
-        revalidatePath('/admin/doctors');
-        revalidatePath('/doctor/agenda');
-        revalidatePath('/secretary/agenda');
+            revalidatePath('/admin/doctors');
+            revalidatePath('/doctor/agenda');
+            revalidatePath('/secretary/agenda');
 
-        return { success: true, doctor };
-    } catch (dbError: any) {
-        // Rollback Auth user if it was created
-        if (profileId) {
-            await supabaseServer.auth.admin.deleteUser(profileId);
-            // Profile will be orphaned but doesn't point to anything, or we can delete it too
-            await supabaseServer.from('profiles').delete().eq('id', profileId);
+            return { success: true, doctor };
+        } catch (dbError: any) {
+            // Rollback Auth user if it was created
+            if (profileId) {
+                await supabaseServer.auth.admin.deleteUser(profileId);
+                await supabaseServer.from('profiles').delete().eq('id', profileId);
+            }
+            return { success: false, error: `Erro ao salvar dados do médico: ${dbError.message}` };
         }
-        throw new Error(`Erro ao salvar dados do médico: ${dbError.message}`);
+    } catch (err: any) {
+        console.error('Unexpected error in createDoctorAction:', err);
+        return { success: false, error: `Erro inesperado: ${err.message || 'Erro desconhecido'}` };
     }
 }
 

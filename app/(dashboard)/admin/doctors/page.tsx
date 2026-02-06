@@ -56,12 +56,16 @@ export default function DoctorsAdminPage() {
             formData.append('createAuth', createAuth.toString());
 
             const res = await createDoctorAction(formData);
+
             if (res.success) {
                 resetForm();
                 await loadDoctors();
+            } else {
+                alert(res.error || 'Erro ao criar médico (sem detalhes)');
             }
         } catch (err: any) {
-            alert(err.message || 'Erro ao criar médico');
+            console.error(err);
+            alert(err.message || 'Erro inesperado na comunicação com o servidor');
         } finally {
             setIsSaving(false);
         }
