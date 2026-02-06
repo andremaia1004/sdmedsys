@@ -64,8 +64,8 @@ export async function fetchDoctorsAction(activeOnly: boolean = false) {
 }
 
 export async function createDoctorAction(formData: FormData) {
-    await requireRole(['ADMIN']);
-    const { DoctorService } = await import('@/features/doctors/service');
+    const user = await requireRole(['ADMIN']);
+    const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
     const { logAudit } = await import('@/lib/audit');
 
     const name = formData.get('name') as string;
@@ -96,7 +96,6 @@ export async function createDoctorAction(formData: FormData) {
         profileId = authData.user.id;
 
         // 2. Create Profile
-        const user = await requireRole(['ADMIN']);
         const { error: profileError } = await supabaseServer
             .from('profiles')
             .upsert({
@@ -116,7 +115,9 @@ export async function createDoctorAction(formData: FormData) {
 
     // 3. Create Doctor Record
     try {
-        const doctor = await DoctorService.create({
+        const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000'; // Fallback to default clinic if undefined
+        const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
+        const doctor = await repo.create({
             name,
             specialty,
             crm,
