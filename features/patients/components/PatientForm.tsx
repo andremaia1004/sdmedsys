@@ -116,7 +116,11 @@ export default function PatientForm({ onSuccess }: { onSuccess?: () => void }) {
         <div className={styles.formContainer}>
             {renderStepIndicator()}
 
-            <form action={formAction}>
+            <form action={formAction} onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+                    e.preventDefault();
+                }
+            }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                     {/* STEP 1: DADOS PESSOAIS */}
