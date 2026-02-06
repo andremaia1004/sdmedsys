@@ -174,17 +174,64 @@ export async function createDoctorAction(formData: FormData) {
 }
 
 export async function updateDoctorAction(id: string, data: any) {
-    await requireRole(['ADMIN']);
-    const { DoctorService } = await import('@/features/doctors/service');
-    const { logAudit } = await import('@/lib/audit');
+    try {
+        const user = await requireRole(['ADMIN']);
+        const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+        const { logAudit } = await import('@/lib/audit');
 
-    const doctor = await DoctorService.update(id, data);
-    await logAudit('UPDATE', 'DOCTOR', id, { active: data.active });
+        // Critical Check for Service Role Key
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            return {
+                success: false,
+                error: 'Erro de Configuração: Chave de Serviço ausente.'
+            };
+        }
 
-    revalidatePath('/admin/doctors');
-    revalidatePath('/doctor/agenda');
-    revalidatePath('/secretary/agenda');
-    return { success: true, doctor };
+        // 1. Check if we need to update password
+        if (data.password && data.password.length > 0) {
+            // We need the profileId. If it's not in 'data', we fetch the doctor first
+            let profileId = data.profileId;
+
+            if (!profileId) {
+                // Fetch doctor to get profileId
+                const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+                const tempRepo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
+                const doctor = await tempRepo.findById(id);
+                profileId = doctor?.profileId;
+            }
+
+            if (profileId) {
+                const { error: authError } = await supabaseServer.auth.admin.updateUserById(
+                    profileId,
+                    { password: data.password }
+                );
+
+                if (authError) {
+                    console.error('Error updating password:', authError);
+                    return { success: false, error: `Erro ao atualizar senha: ${authError.message}` };
+                }
+            }
+        }
+
+        // 2. Update Doctor Record using Service Role
+        const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+        const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
+
+        // Remove password from data before passing to repository as it's not a doctor field
+        const { password, ...doctorData } = data;
+
+        const doctor = await repo.update(id, doctorData);
+
+        await logAudit('UPDATE', 'DOCTOR', id, { active: data.active });
+
+        revalidatePath('/admin/doctors');
+        revalidatePath('/doctor/agenda');
+        revalidatePath('/secretary/agenda');
+        return { success: true, doctor };
+    } catch (err: any) {
+        console.error('Error in updateDoctorAction:', err);
+        return { success: false, error: err.message || 'Erro ao atualizar médico' };
+    }
 }
 
 // --- Clinic Settings ---

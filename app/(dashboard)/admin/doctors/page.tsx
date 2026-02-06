@@ -42,6 +42,11 @@ export default function DoctorsAdminPage() {
         }
     };
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    // ... (existing useEffect) ...
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
@@ -52,16 +57,28 @@ export default function DoctorsAdminPage() {
             formData.append('crm', crm);
             formData.append('phone', phone);
             formData.append('email', email);
-            formData.append('password', password);
+            if (password) formData.append('password', password);
             formData.append('createAuth', createAuth.toString());
 
-            const res = await createDoctorAction(formData);
+            let res;
+            if (isEditing && editingId) {
+                res = await updateDoctorAction(editingId, {
+                    name,
+                    specialty,
+                    crm,
+                    phone,
+                    email,
+                    password: password || undefined
+                });
+            } else {
+                res = await createDoctorAction(formData);
+            }
 
             if (res.success) {
                 resetForm();
                 await loadDoctors();
             } else {
-                alert(res.error || 'Erro ao criar médico (sem detalhes)');
+                alert(res.error || 'Erro ao processar (sem detalhes)');
             }
         } catch (err: any) {
             console.error(err);
@@ -78,7 +95,25 @@ export default function DoctorsAdminPage() {
         setPhone('');
         setEmail('');
         setPassword('');
+        setIsEditing(false);
+        setEditingId(null);
         setShowForm(false);
+        setCreateAuth(true);
+    };
+
+    const handleEdit = (doctor: Doctor) => {
+        setName(doctor.name);
+        setSpecialty(doctor.specialty || '');
+        setCrm(doctor.crm || '');
+        setPhone(doctor.phone || '');
+        setEmail(doctor.email || '');
+        setPassword(''); // Always blank for security, user enters only if changing
+        setCreateAuth(!!doctor.profileId);
+
+        setIsEditing(true);
+        setEditingId(doctor.id);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const toggleActive = async (doctor: Doctor) => {
@@ -117,7 +152,10 @@ export default function DoctorsAdminPage() {
                 </div>
                 <Button
                     variant={showForm ? 'secondary' : 'primary'}
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={() => {
+                        if (showForm) resetForm();
+                        else setShowForm(true);
+                    }}
                     style={{ borderRadius: '12px', padding: '0.75rem 1.5rem', fontWeight: 700, boxShadow: showForm ? 'none' : '0 4px 12px rgba(0, 45, 94, 0.2)' }}
                 >
                     {showForm ? 'Cancelar' : (
@@ -140,11 +178,16 @@ export default function DoctorsAdminPage() {
                     }}
                 >
                     <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #001f41 100%)', padding: '1.5rem 2rem', color: '#fff' }}>
-                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Cadastrar Novo Médico</h3>
-                        <p style={{ margin: '0.25rem 0 0 0', opacity: 0.8, fontSize: '0.875rem' }}>Preencha os dados e configure as credenciais de acesso</p>
+                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>
+                            {isEditing ? 'Editar Médico' : 'Cadastrar Novo Médico'}
+                        </h3>
+                        <p style={{ margin: '0.25rem 0 0 0', opacity: 0.8, fontSize: '0.875rem' }}>
+                            {isEditing ? 'Atualize os dados ou altere a senha de acesso' : 'Preencha os dados e configure as credenciais de acesso'}
+                        </p>
                     </div>
 
                     <form onSubmit={handleSubmit} style={{ padding: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        {/* ... (First column: Personal Data - remains same) ... */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
                                 <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dados Pessoais</h4>
@@ -157,6 +200,7 @@ export default function DoctorsAdminPage() {
                             <Input label="Celular" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(00) 00000-0000" />
                         </div>
 
+                        {/* ... (Second column: Credentials) ... */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
                                 <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Credenciais de Acesso</h4>
@@ -168,24 +212,33 @@ export default function DoctorsAdminPage() {
                                     checked={createAuth}
                                     onChange={e => setCreateAuth(e.target.checked)}
                                     id="createAuth"
+                                    disabled={isEditing && !!email} // Prevent unchecking if already has account
                                     style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                                 />
                                 <label htmlFor="createAuth" style={{ fontWeight: 700, color: 'var(--primary)', cursor: 'pointer', fontSize: '0.9375rem' }}>
-                                    Criar conta de acesso para este médico
+                                    {isEditing ? 'Manter conta de acesso ativa' : 'Criar conta de acesso para este médico'}
                                 </label>
                             </div>
 
                             {createAuth && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', animation: 'fadeIn 0.2s ease-out' }}>
-                                    <Input label="E-mail de Login" value={email} onChange={e => setEmail(e.target.value)} required type="email" placeholder="medico@exemplo.com" />
+                                    <Input
+                                        label="E-mail de Login"
+                                        value={email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        required
+                                        type="email"
+                                        placeholder="medico@exemplo.com"
+                                        disabled={isEditing} // Email is hard to change due to Auth linking
+                                    />
                                     <div style={{ position: 'relative' }}>
                                         <Input
-                                            label="Senha de Acesso"
+                                            label={isEditing ? "Nova Senha (deixe em branco para manter)" : "Senha de Acesso"}
                                             value={password}
                                             onChange={e => setPassword(e.target.value)}
-                                            required
+                                            required={!isEditing}
                                             type={showPassword ? 'text' : 'password'}
-                                            placeholder="Mínimo 6 caracteres"
+                                            placeholder={isEditing ? "Nova senha..." : "Mínimo 6 caracteres"}
                                         />
                                         <div style={{ position: 'absolute', right: '0.75rem', top: '2.3rem', display: 'flex', gap: '0.5rem' }}>
                                             <button
@@ -205,7 +258,7 @@ export default function DoctorsAdminPage() {
                                         </div>
                                     </div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: '#fffbeb', padding: '0.75rem', borderRadius: '8px', border: '1px solid #fef3c7' }}>
-                                        <strong>Atenção:</strong> Ao clicar em cadastrar, as credenciais serão ativadas imediatamente.
+                                        <strong>Atenção:</strong> {isEditing ? 'Se preenchida, a nova senha valerá imediatamente.' : 'Ao clicar em cadastrar, as credenciais serão ativadas imediatamente.'}
                                     </div>
                                 </div>
                             )}
@@ -218,7 +271,7 @@ export default function DoctorsAdminPage() {
                                 disabled={isSaving}
                                 style={{ padding: '0.85rem 3rem', borderRadius: '12px', fontSize: '1rem', fontWeight: 800, background: 'var(--accent)' }}
                             >
-                                {isSaving ? 'Processando...' : 'Finalizar Cadastro Master'}
+                                {isSaving ? 'Processando...' : (isEditing ? 'Salvar Alterações' : 'Finalizar Cadastro Master')}
                             </Button>
                         </div>
                     </form>
@@ -276,6 +329,14 @@ export default function DoctorsAdminPage() {
                             </td>
                             <td>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => handleEdit(doc)}
+                                        style={{ borderRadius: '8px', fontWeight: 700 }}
+                                    >
+                                        Editar
+                                    </Button>
                                     <Button
                                         variant={doc.active ? 'outline' : 'primary'}
                                         size="sm"
