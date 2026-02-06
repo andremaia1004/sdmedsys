@@ -58,9 +58,14 @@ export async function fetchAuditLogsAction(page: number = 1, limit: number = 20)
 // --- Doctors Management ---
 
 export async function fetchDoctorsAction(activeOnly: boolean = false) {
-    await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
-    const { DoctorService } = await import('@/features/doctors/service');
-    return DoctorService.list(activeOnly);
+    const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+    const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+
+    // Use Service Role to ensure we can read all doctors for the clinic, avoiding partial RLS visibility
+    const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+    const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
+
+    return repo.list(activeOnly);
 }
 
 export async function createDoctorAction(formData: FormData) {
