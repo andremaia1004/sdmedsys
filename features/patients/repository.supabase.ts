@@ -56,7 +56,6 @@ export class SupabasePatientsRepository implements IPatientsRepository {
 
     async create(input: PatientInput): Promise<Patient> {
         const normalizedPhone = input.phone.replace(/\D/g, '');
-        console.log('[SupabasePatientsRepository] Creating patient:', { ...input, phone: normalizedPhone, clinicId: this.clinicId });
 
         const { data, error } = await this.supabase
             .from('patients')

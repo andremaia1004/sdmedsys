@@ -37,15 +37,12 @@ export async function createPatientAction(prevState: ActionState, formData: Form
     }
 
     try {
-        console.log('[createPatientAction] Starting creation for:', rawInput.name);
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
-        console.log('[createPatientAction] User:', user.id, 'Clinic:', clinicId);
 
         const repo = new SupabasePatientsRepository(supabaseServer, clinicId);
 
         const patient = await repo.create(rawInput);
-        console.log('[createPatientAction] Success:', patient.id);
 
         await logAudit('CREATE', 'PATIENT', patient.id, { name: patient.name });
 

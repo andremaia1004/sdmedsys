@@ -54,43 +54,30 @@ export class SupabaseQueueRepository implements IQueueRepository {
     }
 
     async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string, prefix: string = 'A'): Promise<QueueItem> {
-        const today = new Date().toISOString().split('T')[0];
-        const startOfDay = `${today}T00:00:00.000Z`;
-        const endOfDay = `${today}T23:59:59.999Z`;
+        const { data: newId, error: rpcError } = await this.supabase.rpc('generate_queue_ticket', {
+            p_clinic_id: this.clinicId,
+            p_patient_id: item.patientId,
+            p_doctor_id: item.doctorId,
+            p_appointment_id: item.appointmentId,
+            p_status: item.status,
+            p_prefix: prefix
+        });
 
-        const { count, error: countError } = await this.supabase
-            .from('queue_items')
-            .select('*', { count: 'exact', head: true })
-            .eq('clinic_id', this.clinicId)
-            .gte('created_at', startOfDay)
-            .lte('created_at', endOfDay);
-
-        if (countError) {
-            console.error('Supabase Error (count queue):', countError);
-            throw new Error('Failed to generate ticket code');
+        if (rpcError) {
+            console.error('Supabase RPC Error (add queue):', rpcError);
+            throw new Error('Failed to add queue item: ' + rpcError.message);
         }
 
-        const nextNum = (count || 0) + 1;
-        const code = `${prefix}${nextNum.toString().padStart(3, '0')}`;
-
+        // Fetch the newly created record to return the full QueueItem
         const { data, error } = await this.supabase
             .from('queue_items')
-            .insert([{
-                patient_id: item.patientId,
-                doctor_id: item.doctorId,
-                appointment_id: item.appointmentId,
-                status: item.status,
-                ticket_code: code,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                clinic_id: this.clinicId
-            }])
-            .select()
+            .select('*')
+            .eq('id', newId)
             .single();
 
         if (error) {
-            console.error('Supabase Error (add queue):', error);
-            throw new Error('Failed to add queue item');
+            console.error('Supabase Error (fetch new queue item):', error);
+            throw new Error('Failed to retrieve newly created queue item');
         }
 
         return this.mapToQueueItem(data);

@@ -6,12 +6,9 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
     constructor(
         private supabase: SupabaseClient,
         private clinicId: string
-    ) {
-        console.log(`[SupabaseDoctorsRepository] Initialized with clinicId: ${clinicId}`);
-    }
+    ) { }
 
     async list(activeOnly?: boolean): Promise<Doctor[]> {
-        console.log(`[SupabaseDoctorsRepository] list activeOnly=${activeOnly}, clinicId=${this.clinicId}`);
         let query = this.supabase
             .from('doctors')
             .select('*')
@@ -27,17 +24,15 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
             console.error('[SupabaseDoctorsRepository] list Error:', error);
             throw new Error(error.message);
         }
-        console.log(`[SupabaseDoctorsRepository] list Found ${data?.length} doctors`);
-        return data.map(this.mapToDoctor);
+        return (data || []).map(this.mapToDoctor);
     }
 
     async findById(id: string): Promise<Doctor | undefined> {
-        console.log(`[SupabaseDoctorsRepository] findById id=${id} (skipping clinic check)`);
         const { data, error } = await this.supabase
             .from('doctors')
             .select('*')
             .eq('id', id)
-            // .eq('clinic_id', this.clinicId) // Relaxed check to ensure we find the doc
+            .eq('clinic_id', this.clinicId)
             .maybeSingle();
 
         if (error) console.error('[SupabaseDoctorsRepository] findById Error:', error);
@@ -62,12 +57,14 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
             .select()
             .single();
 
-        if (error) throw new Error(error.message);
+        if (error) {
+            console.error('[SupabaseDoctorsRepository] create Error:', error);
+            throw new Error(error.message);
+        }
         return this.mapToDoctor(data);
     }
 
     async update(id: string, input: Partial<Doctor>): Promise<Doctor | null> {
-        // Ensure we don't accidentally wipe clinic_id
         const { profileId, name, specialty, active, crm, phone, email } = input;
         const updateData: any = { updated_at: new Date().toISOString() };
         if (profileId !== undefined) updateData.profile_id = profileId;
@@ -86,7 +83,10 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
             .select()
             .single();
 
-        if (error) throw new Error(error.message);
+        if (error) {
+            console.error('[SupabaseDoctorsRepository] update Error:', error);
+            throw new Error(error.message);
+        }
         return this.mapToDoctor(data);
     }
 
