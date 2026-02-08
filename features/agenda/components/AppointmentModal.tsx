@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useActionState } from 'react';
 import { createAppointmentAction } from '../actions';
 import { Patient } from '@/features/patients/types';
@@ -32,10 +32,25 @@ export default function AppointmentModal({
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Patient[]>([]);
 
+    // Selection State (Interactive overrides)
+    const [selectedDate, setSelectedDate] = useState(date);
+    const [selectedTime, setSelectedTime] = useState(time);
+    const [selectedDoctorId, setSelectedDoctorId] = useState(doctorId);
+
     // Doctor Selection State
     const [availableDoctors, setAvailableDoctors] = useState<Doctor[]>([]);
-    const [selectedDoctorId, setSelectedDoctorId] = useState(doctorId);
     const [isLoadingDoctors, setIsLoadingDoctors] = useState(true);
+
+    // Dynamic slots from 07:00 to 20:00 with 30-minute intervals (Matches Calendar)
+    const timeSlots = useMemo(() => {
+        const slots = [];
+        for (let h = 7; h <= 20; h++) {
+            const hour = h.toString().padStart(2, '0');
+            slots.push(`${hour}:00`);
+            if (h < 20) slots.push(`${hour}:30`);
+        }
+        return slots;
+    }, []);
 
     // Appointment Action
     // @ts-ignore
@@ -44,14 +59,11 @@ export default function AppointmentModal({
     // Fetch Doctors for selection
     useEffect(() => {
         setIsLoadingDoctors(true);
-
         Promise.all([
-            listDoctorsAction(false), // Fetch ALL doctors to debug
+            listDoctorsAction(false),
             getDoctorAction(doctorId)
         ]).then(([allDocs, currentDoc]) => {
-
             let docs = allDocs || [];
-            // Ensure current doctor is in the list (if exists and not already there)
             if (currentDoc && !docs.find(d => d.id === currentDoc.id)) {
                 docs = [currentDoc, ...docs];
             }
@@ -61,11 +73,6 @@ export default function AppointmentModal({
             console.error('[AppointmentModal] Error fetching doctors:', err);
             setIsLoadingDoctors(false);
         });
-    }, [doctorId]); // Re-run if doctorId changes (e.g. diff slot)
-
-    // Also update local state if prop changes (though usually modal unmounts)
-    useEffect(() => {
-        setSelectedDoctorId(doctorId);
     }, [doctorId]);
 
     // Handle Appointment Success
@@ -122,7 +129,7 @@ export default function AppointmentModal({
                         autoFocus
                         style={{ paddingRight: '3rem', borderRadius: '12px' }}
                     />
-                    <div style={{ position: 'absolute', right: '1rem', top: '2.4rem', color: 'var(--text-muted)' }}>
+                    <div style={{ position: 'absolute', right: '1rem', top: '0.8rem', color: 'var(--text-muted)' }}>
                         <Search size={18} />
                     </div>
 
@@ -207,7 +214,7 @@ export default function AppointmentModal({
                 className={styles.modalCard}
                 style={{
                     border: 'none',
-                    maxWidth: mode === 'register' ? '900px' : '700px', // Wider default
+                    maxWidth: mode === 'register' ? '900px' : '750px',
                     width: '100%',
                     transition: 'max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
@@ -228,31 +235,70 @@ export default function AppointmentModal({
             >
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateColumns: 'minmax(250px, 1fr) 1fr',
                     gap: '1rem',
                     padding: '1.5rem',
                     background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                     borderBottom: '1px solid #e2e8f0'
                 }}>
-                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none', marginBottom: 0 }}>
-                        <div className={styles.slotIcon}>
-                            <CalendarIcon size={24} />
+                    {/* Date/Time Selector Area */}
+                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none', marginBottom: 0, gap: '0.75rem' }}>
+                        <div className={styles.slotIcon} style={{ flexShrink: 0 }}>
+                            <CalendarIcon size={22} />
                         </div>
-                        <div>
+                        <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Horário Selecionado</div>
-                            <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--primary)' }}>
-                                {date && new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')} às {time}
+                            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.15rem' }}>
+                                <input
+                                    type="date"
+                                    value={selectedDate}
+                                    onChange={(e) => setSelectedDate(e.target.value)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        fontWeight: 800,
+                                        fontSize: '0.95rem',
+                                        color: 'var(--primary)',
+                                        outline: 'none',
+                                        padding: 0,
+                                        width: '125px',
+                                        cursor: 'pointer'
+                                    }}
+                                />
+                                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                    <select
+                                        value={selectedTime}
+                                        onChange={(e) => setSelectedTime(e.target.value)}
+                                        style={{
+                                            appearance: 'none',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            fontWeight: 800,
+                                            fontSize: '0.95rem',
+                                            color: 'var(--primary)',
+                                            outline: 'none',
+                                            cursor: 'pointer',
+                                            paddingRight: '1rem'
+                                        }}
+                                    >
+                                        {timeSlots.map(t => (
+                                            <option key={t} value={t}>{t}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown size={12} style={{ position: 'absolute', right: 0, pointerEvents: 'none', color: 'var(--primary)' }} />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none', marginBottom: 0 }}>
-                        <div className={styles.slotIcon} style={{ background: 'var(--accent)', color: '#fff' }}>
-                            <Stethoscope size={24} />
+                    {/* Professional Selector Area */}
+                    <div className={styles.slotInfo} style={{ padding: 0, background: 'none', border: 'none', marginBottom: 0, gap: '0.75rem' }}>
+                        <div className={styles.slotIcon} style={{ background: 'var(--accent)', color: '#fff', flexShrink: 0 }}>
+                            <Stethoscope size={22} />
                         </div>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Profissional</div>
-                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginTop: '0.15rem' }}>
                                 <select
                                     value={selectedDoctorId}
                                     onChange={(e) => setSelectedDoctorId(e.target.value)}
@@ -263,10 +309,10 @@ export default function AppointmentModal({
                                         background: 'transparent',
                                         border: 'none',
                                         fontWeight: 800,
-                                        fontSize: '1rem',
+                                        fontSize: '0.95rem',
                                         color: 'var(--primary)',
                                         cursor: isLoadingDoctors ? 'wait' : 'pointer',
-                                        paddingRight: '1.5rem',
+                                        paddingRight: '1rem',
                                         outline: 'none',
                                         opacity: isLoadingDoctors ? 0.7 : 1
                                     }}
@@ -277,9 +323,8 @@ export default function AppointmentModal({
                                         </option>
                                     ))}
                                     {isLoadingDoctors && <option>Carregando...</option>}
-                                    {!isLoadingDoctors && availableDoctors.length === 0 && <option value="" disabled>Nenhum médico encontrado</option>}
                                 </select>
-                                <ChevronDown size={14} style={{ position: 'absolute', right: 0, pointerEvents: 'none', color: 'var(--primary)' }} />
+                                <ChevronDown size={12} style={{ position: 'absolute', right: 0, pointerEvents: 'none', color: 'var(--primary)' }} />
                             </div>
                         </div>
                     </div>
@@ -293,8 +338,8 @@ export default function AppointmentModal({
                             </div>
                             <form id="appointment-form" action={apptFormAction}>
                                 <input type="hidden" name="doctorId" value={selectedDoctorId} />
-                                <input type="hidden" name="date" value={date} />
-                                <input type="hidden" name="time" value={time} />
+                                <input type="hidden" name="date" value={selectedDate} />
+                                <input type="hidden" name="time" value={selectedTime} />
                                 {selectedPatient && (
                                     <>
                                         <input type="hidden" name="patientId" value={selectedPatient.id} />
