@@ -1,7 +1,7 @@
 import { supabaseServer } from './supabase-server';
 import { getCurrentUser } from './session';
 
-export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'STATUS_CHANGE' | 'LOGIN' | 'LOGOUT' | 'FINALIZE' | 'GENERATE_DOCUMENT';
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'STATUS_CHANGE' | 'LOGIN' | 'LOGOUT' | 'FINALIZE' | 'GENERATE_DOCUMENT' | 'VERIFY_SESSION';
 export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS' | 'CLINICAL_ENTRY';
 
 /**
