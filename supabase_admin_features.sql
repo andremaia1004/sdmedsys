@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS clinic_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     clinic_id UUID UNIQUE NOT NULL DEFAULT '550e8400-e29b-41d4-a716-446655440000',
     clinic_name TEXT NOT NULL DEFAULT 'SDMED Clinic',
+    clinic_address TEXT DEFAULT 'Endereço não informado',
+    clinic_phone TEXT DEFAULT 'Telefone não informado',
     working_hours JSONB DEFAULT '{
         "monday": {"start": "08:00", "end": "18:00"},
         "tuesday": {"start": "08:00", "end": "18:00"},

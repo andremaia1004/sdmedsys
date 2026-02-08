@@ -41,6 +41,8 @@ export class SettingsService {
             id: 'default',
             clinicId: 'default',
             clinicName: 'SDMED SYS',
+            clinicAddress: 'Endereço não informado',
+            clinicPhone: 'Telefone não informado',
             workingHours: {},
             appointmentDurationMinutes: 30,
             queuePrefix: 'A',

@@ -70,8 +70,8 @@ export class ClinicalDocumentService {
         return {
             header: {
                 clinicName: clinic?.clinic_name || 'SDMED Clinic',
-                clinicAddress: 'Endereço da Unidade', // TODO: Add to clinic_settings
-                clinicPhone: 'Fone: (00) 0000-0000'
+                clinicAddress: clinic?.clinic_address || 'Endereço não informado',
+                clinicPhone: clinic?.clinic_phone || 'Telefone não informado'
             },
             patient: {
                 name: patient.name,
