@@ -59,8 +59,10 @@ export default function WeeklyCalendar({
 
     const getAppointment = (date: string, time: string) => {
         return appointments.find(a => {
-            const apptDate = new Date(a.startTime).toLocaleDateString('en-CA');
-            const apptTime = new Date(a.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            // a.startTime is ISO (UTC). Convert to local for display.
+            const d = new Date(a.startTime);
+            const apptDate = d.toLocaleDateString('en-CA'); // YYYY-MM-DD local
+            const apptTime = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             return apptDate === date && apptTime === time;
         });
     };

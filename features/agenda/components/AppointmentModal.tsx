@@ -71,10 +71,11 @@ export default function AppointmentModal({
     // Handle Appointment Success
     useEffect(() => {
         if (apptState?.success) {
+            router.refresh();
             const timer = setTimeout(() => onClose(), 1500);
             return () => clearTimeout(timer);
         }
-    }, [apptState?.success, onClose]);
+    }, [apptState?.success, onClose, router]);
 
     if (apptState?.success) {
         return (

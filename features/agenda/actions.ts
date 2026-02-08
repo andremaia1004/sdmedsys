@@ -39,13 +39,15 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
             return { error: 'Missing required fields', success: false };
         }
 
-        const startTime = `${date}T${time}:00`;
-        // Parse explicitly as local to current environment (Server)
+        // Explicitly set as BRT (-03:00) to ensure database stores the intended local time
+        const startTime = `${date}T${time}:00-03:00`;
         const startDate = new Date(startTime);
         const endDate = new Date(startDate.getTime() + duration * 60000);
 
         // Convert to ISO-like format but keeping it relative to database precision
-        const endTime = endDate.toISOString().slice(0, 19);
+        // Use toISOString() which adds Z, or manually format to avoid shifts if needed.
+        // Actually, toISOString() is fine if we include the offset in the input.
+        const endTime = endDate.toISOString();
 
         const input: AppointmentInput = {
             patientId,
@@ -70,8 +72,8 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
 
         // Logic to auto-add to queue if appointment is today
         try {
-            // Get today's date in local time (Brasil/BRT) using 'en-CA' for YYYY-MM-DD
-            const todayLocal = new Date().toLocaleDateString('en-CA');
+            // Get today's date in Brazil time for accurate auto-queue logic
+            const todayLocal = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 
             console.log('[createAppointmentAction] Comparing date:', date, 'with todayLocal:', todayLocal);
 
