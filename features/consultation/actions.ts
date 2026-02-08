@@ -6,6 +6,10 @@ import { ConsultationInput, Consultation, ClinicalEntry, ClinicalEntryInput } fr
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
 import { logAudit } from '@/lib/audit';
+import { PatientInput } from '@/features/patients/types';
+import { PatientService } from '@/features/patients/service';
+import { AppointmentService } from '@/features/agenda/service';
+import { AppointmentInput } from '@/features/agenda/types';
 
 export type ActionState = {
     error?: string;
@@ -156,5 +160,79 @@ export async function getClinicalEntryAction(consultationId: string): Promise<Cl
     } catch (err) {
         console.error('Get Clinical Entry Error:', err);
         return null;
+    }
+}
+
+export async function updatePatientFromConsultationAction(patientId: string, input: PatientInput) {
+    try {
+        await requireRole(['DOCTOR']);
+        const patient = await PatientService.update(patientId, input);
+
+        if (patient) {
+            await logAudit('UPDATE', 'PATIENT', patientId, { name: patient.name });
+        }
+
+        revalidatePath(`/patients/${patientId}`);
+        revalidatePath('/patients');
+        return { success: true, patient };
+    } catch (err: any) {
+        console.error('Update Patient From Consultation Error:', err);
+        return { success: false, error: err.message || 'Falha ao atualizar paciente' };
+    }
+}
+
+export async function scheduleReturnAppointmentAction(input: {
+    patientId: string;
+    patientName: string;
+    doctorId: string;
+    date: string;
+    time: string;
+    notes?: string;
+}) {
+    try {
+        await requireRole(['DOCTOR']);
+
+        if (!input.date || !input.time || !input.patientId || !input.doctorId) {
+            return { success: false, error: 'Campos obrigatórios faltando.' };
+        }
+
+        let duration = 30;
+        try {
+            const { fetchSettingsAction } = await import('@/app/actions/admin');
+            const settings = await fetchSettingsAction();
+            duration = settings.appointmentDurationMinutes;
+        } catch (e) {
+            console.warn('scheduleReturnAppointmentAction: Using default duration 30 due to settings error');
+        }
+
+        const startTime = `${input.date}T${input.time}:00`;
+        const endDate = new Date(new Date(startTime).getTime() + duration * 60000);
+        const endTime = endDate.toISOString().slice(0, 19);
+
+        const appointmentInput: AppointmentInput = {
+            patientId: input.patientId,
+            patientName: input.patientName,
+            doctorId: input.doctorId,
+            startTime,
+            endTime,
+            status: 'SCHEDULED',
+            notes: input.notes || undefined
+        };
+
+        const appointment = await AppointmentService.create(appointmentInput);
+
+        await logAudit('CREATE', 'APPOINTMENT', appointment.id, {
+            patientName: appointment.patientName,
+            doctorId: appointment.doctorId,
+            startTime: appointment.startTime,
+            source: 'consultation'
+        });
+
+        revalidatePath('/doctor/agenda');
+        revalidatePath('/secretary/agenda');
+        return { success: true, appointment };
+    } catch (err: any) {
+        console.error('Schedule Return Appointment Error:', err);
+        return { success: false, error: err.message || 'Falha ao agendar retorno' };
     }
 }
