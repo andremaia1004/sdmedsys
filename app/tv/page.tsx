@@ -1,10 +1,12 @@
+import TVBoard from '@/features/queue/components/TVBoard';
 import { fetchTVQueueAction } from '@/app/actions/queue';
 import { fetchPublicSettingsAction } from '@/app/actions/admin';
+import { QueueItem } from '@/features/queue/types';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TVPage() {
-    let items = [];
+    let items: any[] = [];
     let settings = null;
 
     try {
