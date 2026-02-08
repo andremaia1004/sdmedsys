@@ -30,11 +30,13 @@ npm run dev
 Access the dashboard at `http://localhost:3000`.
 
 ### Roles (Mock)
-To simulate roles, the system currently mocks the session in `src/lib/session.ts`.
+To simulate roles, the system currently mocks the session in `src/lib/session.ts`. This is for local development only and should not be used in production environments.
 - **Admin**: Access `/admin`
 - **Secretary**: Access `/secretary`
 - **Doctor**: Access `/doctor`
 - **TV**: Access `/tv`
+
+> **Security note:** the mock role is read from a `mock_role` cookie. In production, set `AUTH_MODE=supabase` and ensure mock mode is disabled.
 
 ### Testing
 Run unit tests with Vitest:

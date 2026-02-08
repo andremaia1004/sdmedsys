@@ -11,9 +11,11 @@ export default async function ConsultationPage({ params }: { params: Promise<{ i
         redirect('/doctor/queue');
     }
 
-    // Fetch Patient Name for display
+    // Fetch Patient Data for display
     const patient = await PatientService.findById(consultation.patientId);
-    const patientName = patient ? patient.name : 'Unknown Patient';
+    if (!patient) {
+        redirect('/doctor/queue');
+    }
 
     // Fetch existing clinical entry if any
     const entry = await getClinicalEntryAction(id);
@@ -24,7 +26,7 @@ export default async function ConsultationPage({ params }: { params: Promise<{ i
     return (
         <ConsultationWorkspace
             consultation={consultation}
-            patientName={patientName}
+            patient={patient}
             initialEntry={entry || undefined}
             timeline={timeline}
         />

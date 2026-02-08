@@ -59,6 +59,16 @@ export default function SettingsAdminPage() {
                             value={settings.clinicName}
                             onChange={e => setSettings({ ...settings, clinicName: e.target.value })}
                         />
+                        <Input
+                            label="Endereço da Clínica"
+                            value={settings.clinicAddress}
+                            onChange={e => setSettings({ ...settings, clinicAddress: e.target.value })}
+                        />
+                        <Input
+                            label="Telefone da Clínica"
+                            value={settings.clinicPhone}
+                            onChange={e => setSettings({ ...settings, clinicPhone: e.target.value })}
+                        />
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <Input
                                 label="Duração Padrão da Consulta (minutos)"

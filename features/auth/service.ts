@@ -1,3 +1,4 @@
+import { logAudit } from '@/lib/audit';
 import { User, Role } from './types';
 
 // Mock database
@@ -11,17 +12,20 @@ export class AuthService {
     // TODO: Audit Log - Inject logger here
 
     static async login(username: string): Promise<{ user: User; token: string } | null> {
-        // TODO: Audit Log - Log login attempt
-
         // Simulate DB delay
         await new Promise(resolve => setTimeout(resolve, 500));
 
         const user = MOCK_USERS[username];
-        if (!user) return null;
+        if (!user) {
+            await logAudit('LOGIN', 'AUTH', undefined, { username, success: false });
+            return null;
+        }
 
         // In a real app, this would be a JWT signed by the server
         // For stub, we'll just base64 encode the role for simple middleware decoding
         const token = btoa(JSON.stringify({ id: user.id, role: user.role }));
+
+        await logAudit('LOGIN', 'AUTH', user.id, { username, success: true });
 
         return { user, token };
     }
@@ -29,7 +33,7 @@ export class AuthService {
     static async getUser(token: string): Promise<User | null> {
         try {
             const payload = JSON.parse(atob(token));
-            // TODO: Audit Log - Log user retrieval verify
+            await logAudit('VERIFY_SESSION', 'AUTH', payload.id, { tokenValid: true });
 
             // In real app, verify DB validity
             return {
@@ -39,12 +43,13 @@ export class AuthService {
                 role: payload.role as Role
             };
         } catch {
+            await logAudit('VERIFY_SESSION', 'AUTH', undefined, { tokenValid: false });
             return null;
         }
     }
 
     static async logout(): Promise<void> {
-        // TODO: Audit Log - Log logout
+        await logAudit('LOGOUT', 'AUTH');
         await new Promise(resolve => setTimeout(resolve, 200));
     }
 }

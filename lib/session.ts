@@ -11,8 +11,16 @@ async function getStubUser(): Promise<UserSession | null> {
     try {
         const cookieStore = await cookies();
         const mockRole = cookieStore.get('mock_role')?.value as Role | undefined;
+        const validRoles: Role[] = ['ADMIN', 'DOCTOR', 'SECRETARY'];
+        const roleFromCookie = validRoles.includes(mockRole ?? ('UNKNOWN' as Role))
+            ? (mockRole as Role)
+            : undefined;
 
-        const role: Role = mockRole || 'SECRETARY';
+        if (!roleFromCookie && process.env.NODE_ENV === 'production') {
+            return null;
+        }
+
+        const role: Role = roleFromCookie || 'SECRETARY';
         let id = 'u1';
         let name = 'User';
 

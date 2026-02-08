@@ -75,7 +75,7 @@ describe('ClinicalDocumentService (RBAC)', () => {
                     clinic_id: 'c1',
                     clinical_entries: [{ conduct: 'Prescription text' }],
                     patients: { name: 'Patient X' },
-                    clinic_settings: { clinic_name: 'SDMED' }
+                    clinic_settings: { clinic_name: 'SDMED', clinic_address: 'Rua A, 123', clinic_phone: '(11) 1111-1111' }
                 },
                 error: null
             })
@@ -86,5 +86,7 @@ describe('ClinicalDocumentService (RBAC)', () => {
         const data = await ClinicalDocumentService.getDocumentData('cons-1');
         expect(data).not.toBeNull();
         expect(data?.patient.name).toBe('Patient X');
+        expect(data?.header.clinicAddress).toBe('Rua A, 123');
+        expect(data?.header.clinicPhone).toBe('(11) 1111-1111');
     });
 });
