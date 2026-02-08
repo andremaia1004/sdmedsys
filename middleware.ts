@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-import { isPathAuthorized, getAuthorizedHome } from '@/lib/rbac-rules';
+import { isPathAuthorized, getAuthorizedHome, RBAC_RULES } from '@/lib/rbac-rules';
 import { Role } from '@/lib/types/auth';
 
 export async function middleware(request: NextRequest) {
@@ -46,8 +46,19 @@ export async function middleware(request: NextRequest) {
         }
     } else {
         // Stub Mode
-        userId = 'stub-id';
-        userRole = request.cookies.get('mock_role')?.value;
+        const rawRole = request.cookies.get('mock_role')?.value;
+        const validRoles = RBAC_RULES.flatMap(rule => rule.allowedRoles);
+        const isValidRole = validRoles.includes(rawRole as Role);
+        userRole = isValidRole ? rawRole : undefined;
+
+        if (!userRole && process.env.NODE_ENV === 'production') {
+            userId = undefined;
+        } else {
+            userId = 'stub-id';
+            if (!userRole) {
+                userRole = 'SECRETARY';
+            }
+        }
     }
 
     // 3. Legacy Patient Redirects & Forwarding
@@ -67,7 +78,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // 4. Routing Protection (Primary Gate)
-    const protectedPaths = ['/admin', '/secretary', '/doctor', '/patients'];
+    const protectedPaths = RBAC_RULES.map(rule => rule.pathPrefix);
     const currentPathIsProtected = protectedPaths.some(prefix => pathname.startsWith(prefix));
 
     if (currentPathIsProtected) {
