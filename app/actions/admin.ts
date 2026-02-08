@@ -236,10 +236,28 @@ export async function updateDoctorAction(id: string, data: any) {
 
 // --- Clinic Settings ---
 
+import { SupabaseSettingsRepository } from '@/features/admin/settings/repository.supabase';
+
 export async function fetchSettingsAction() {
-    await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
-    const { SettingsService } = await import('@/features/admin/settings/service');
-    return SettingsService.get();
+    const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+    const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+    const repo = new SupabaseSettingsRepository(supabaseServer, clinicId);
+    const settings = await repo.get();
+
+    if (settings) return settings;
+
+    // Default fallback if no settings in DB
+    return {
+        id: 'default',
+        clinicId,
+        clinicName: 'SDMED SYS',
+        workingHours: {},
+        appointmentDurationMinutes: 30,
+        queuePrefix: 'A',
+        tvRefreshSeconds: 30,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
 }
 
 export async function updateSettingsAction(data: any) {
@@ -260,7 +278,22 @@ export async function updateSettingsAction(data: any) {
  * Protected by PIN in middleware, but doesn't need a full User role.
  */
 export async function fetchPublicSettingsAction() {
-    const { SettingsService } = await import('@/features/admin/settings/service');
-    // We return only non-sensitive data if needed, but here all clinic settings are safe for TV
-    return SettingsService.get();
+    // TV panel uses default clinic for now
+    const clinicId = '550e8400-e29b-41d4-a716-446655440000';
+    const repo = new SupabaseSettingsRepository(supabaseServer, clinicId);
+    const settings = await repo.get();
+
+    if (settings) return settings;
+
+    return {
+        id: 'default',
+        clinicId,
+        clinicName: 'SDMED SYS',
+        workingHours: {},
+        appointmentDurationMinutes: 30,
+        queuePrefix: 'A',
+        tvRefreshSeconds: 30,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
 }

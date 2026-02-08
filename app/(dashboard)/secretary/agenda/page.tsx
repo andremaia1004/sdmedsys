@@ -1,6 +1,6 @@
 import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
-import { DoctorService } from '@/features/doctors/service';
-import { AppointmentService } from '@/features/agenda/service';
+import { listDoctorsAction } from '@/features/doctors/actions';
+import { fetchAppointmentsAction } from '@/features/agenda/actions';
 import Link from 'next/link';
 import { requireRole } from '@/lib/session';
 import styles from '@/features/agenda/styles/Agenda.module.css';
@@ -11,10 +11,10 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     await requireRole(['SECRETARY', 'ADMIN']);
     const searchParams = await props.searchParams;
 
-    // Call services directly for SSR stability
+    // Call actions instead of services for Service Role (bypasses RLS issues)
     let doctors: any[] = [];
     try {
-        doctors = await DoctorService.list(true); // Active only
+        doctors = await listDoctorsAction(true); // Active only
     } catch (e) {
         console.error('SecretaryAgendaPage: Failed to fetch doctors', e);
     }
@@ -45,7 +45,7 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
 
     let appointments: any[] = [];
     try {
-        appointments = await AppointmentService.list(selectedDoctorId, startStr, endStr);
+        appointments = await fetchAppointmentsAction(selectedDoctorId, startStr, endStr);
     } catch (e) {
         console.error('SecretaryAgendaPage: Failed to fetch appointments', e);
     }

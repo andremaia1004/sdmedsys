@@ -120,6 +120,17 @@ export async function checkConflictAction(doctorId: string, startTime: string, e
     return AppointmentService.checkConflict(doctorId, startTime, endTime);
 }
 
+import { SupabaseAppointmentsRepository } from './repository.supabase';
+import { supabaseServer } from '@/lib/supabase-server';
+
 export async function fetchAppointmentsAction(doctorId?: string, startRange?: string, endRange?: string): Promise<Appointment[]> {
-    return AppointmentService.list(doctorId, startRange, endRange);
+    try {
+        const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+        const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+        const repo = new SupabaseAppointmentsRepository(supabaseServer, clinicId);
+        return await repo.list(doctorId, startRange, endRange);
+    } catch (e) {
+        console.error('fetchAppointmentsAction: Failed to fetch appointments', e);
+        return [];
+    }
 }

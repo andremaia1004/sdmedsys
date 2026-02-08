@@ -1,7 +1,7 @@
 import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
 import { requireRole } from '@/lib/session';
-import { DoctorService } from '@/features/doctors/service';
-import { AppointmentService } from '@/features/agenda/service';
+import { listDoctorsAction } from '@/features/doctors/actions';
+import { fetchAppointmentsAction } from '@/features/agenda/actions';
 import styles from '@/features/agenda/styles/Agenda.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,7 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
 
     let doctors: any[] = [];
     try {
-        doctors = await DoctorService.list(true);
+        doctors = await listDoctorsAction(true);
     } catch (e) {
         console.error('DoctorAgendaPage: Failed to fetch doctors', e);
     }
@@ -42,7 +42,7 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
 
     let appointments: any[] = [];
     try {
-        appointments = await AppointmentService.list(doctorId, startStr, endStr);
+        appointments = await fetchAppointmentsAction(doctorId, startStr, endStr);
     } catch (e) {
         console.error('DoctorAgendaPage: Failed to fetch appointments', e);
     }

@@ -78,10 +78,30 @@ export async function changeQueueStatusAction(id: string, newStatus: QueueStatus
     }
 }
 
+import { SupabaseQueueRepository } from '@/features/queue/repository.supabase';
+import { supabaseServer } from '@/lib/supabase-server';
+
 export async function fetchQueueAction(doctorId?: string) {
-    return await QueueService.list(doctorId);
+    try {
+        const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+        const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+        const repo = new SupabaseQueueRepository(supabaseServer, clinicId);
+        return await repo.list(doctorId);
+    } catch (e) {
+        console.error('fetchQueueAction Error:', e);
+        return [];
+    }
 }
 
 export async function fetchTVQueueAction() {
-    return await QueueService.getTVList();
+    try {
+        // TV is public, use default clinic or extract from config?
+        // For now using default clinic
+        const clinicId = '550e8400-e29b-41d4-a716-446655440000';
+        const repo = new SupabaseQueueRepository(supabaseServer, clinicId);
+        return await repo.getTVList();
+    } catch (e) {
+        console.error('fetchTVQueueAction Error:', e);
+        return [];
+    }
 }
