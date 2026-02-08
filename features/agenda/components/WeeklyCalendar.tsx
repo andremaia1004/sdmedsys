@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Appointment } from '../types';
 import AppointmentModal from './AppointmentModal';
 import styles from '../styles/Agenda.module.css';
@@ -21,23 +21,36 @@ export default function WeeklyCalendar({
     const searchParams = useSearchParams();
     const [selectedSlot, setSelectedSlot] = useState<{ date: string, time: string } | null>(null);
 
-    const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-    const times = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+    // Days starting on Sunday (Standard in BR)
+    const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-    // Use provided baseDate or today
-    const currentBase = baseDate ? new Date(baseDate) : new Date();
+    // Dynamic slots from 07:00 to 20:00 with 30-minute intervals
+    const times = useMemo(() => {
+        const slots = [];
+        for (let h = 7; h <= 20; h++) {
+            const hour = h.toString().padStart(2, '0');
+            slots.push(`${hour}:00`);
+            if (h < 20) slots.push(`${hour}:30`);
+        }
+        return slots;
+    }, []);
 
-    const currentWeekDates = days.map((_, i) => {
-        const d = new Date(currentBase);
-        // If navigation is handled via baseDate from parent, we just offset from it
-        d.setDate(d.getDate() + i);
-        return d.toISOString().split('T')[0];
-    });
+    // Calculate current week dates based on baseDate (which should be a Sunday)
+    const currentWeekDates = useMemo(() => {
+        const start = baseDate ? new Date(baseDate + 'T00:00:00') : new Date();
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(start);
+            d.setDate(start.getDate() + i);
+            dates.push(d.toLocaleDateString('en-CA')); // YYYY-MM-DD local
+        }
+        return dates;
+    }, [baseDate]);
 
     const handleNavigate = (weeks: number) => {
-        const newDate = new Date(currentBase);
-        newDate.setDate(newDate.getDate() + (weeks * 7));
-        const dateStr = newDate.toISOString().split('T')[0];
+        const start = new Date((baseDate || currentWeekDates[0]) + 'T00:00:00');
+        start.setDate(start.getDate() + (weeks * 7));
+        const dateStr = start.toLocaleDateString('en-CA');
 
         const params = new URLSearchParams(searchParams.toString());
         params.set('date', dateStr);
@@ -46,7 +59,7 @@ export default function WeeklyCalendar({
 
     const getAppointment = (date: string, time: string) => {
         return appointments.find(a => {
-            const apptDate = new Date(a.startTime).toISOString().split('T')[0];
+            const apptDate = new Date(a.startTime).toLocaleDateString('en-CA');
             const apptTime = new Date(a.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             return apptDate === date && apptTime === time;
         });
@@ -62,8 +75,8 @@ export default function WeeklyCalendar({
                 >
                     <ChevronLeft size={20} />
                 </button>
-                <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--primary)' }}>
-                    {new Date(currentWeekDates[0]).toLocaleDateString('pt-BR')} - {new Date(currentWeekDates[6]).toLocaleDateString('pt-BR')}
+                <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--primary)', letterSpacing: '-0.01em' }}>
+                    {new Date(currentWeekDates[0] + 'T00:00:00').toLocaleDateString('pt-BR')} - {new Date(currentWeekDates[6] + 'T00:00:00').toLocaleDateString('pt-BR')}
                 </div>
                 <button
                     onClick={() => handleNavigate(1)}
@@ -75,13 +88,13 @@ export default function WeeklyCalendar({
             </div>
 
             <div className={styles.calendarWrapper}>
-                <div className={styles.grid} style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
+                <div className={styles.grid} style={{ gridTemplateColumns: '70px repeat(7, 1fr)' }}>
                     <div className={styles.timeLabelCell}></div>
                     {days.map((day, i) => (
                         <div key={day} className={styles.dayHeader}>
                             <div className={styles.dayName}>{day}</div>
                             <div className={styles.dayDate}>
-                                {new Date(currentWeekDates[i]).getDate()}
+                                {new Date(currentWeekDates[i] + 'T00:00:00').getDate()}
                             </div>
                         </div>
                     ))}
@@ -95,16 +108,19 @@ export default function WeeklyCalendar({
                                     <div
                                         key={`${date}-${time}`}
                                         className={styles.cell}
+                                        style={{ minHeight: '60px' }}
                                         onClick={() => !appt && setSelectedSlot({ date, time })}
                                     >
                                         {appt ? (
                                             <div className={styles.appointment}>
-                                                <div className={styles.patientName}>{appt.patientName}</div>
-                                                <div className={styles.apptStatus}>{appt.status}</div>
+                                                <div className={styles.patientName} title={appt.patientName}>
+                                                    {appt.patientName.split(' ')[0]}
+                                                </div>
+                                                <div className={styles.apptStatus}>{appt.status === 'SCHEDULED' ? 'Agendado' : appt.status}</div>
                                             </div>
                                         ) : (
                                             <div className={styles.plusIcon}>
-                                                <Plus size={24} />
+                                                <Plus size={18} />
                                             </div>
                                         )}
                                     </div>

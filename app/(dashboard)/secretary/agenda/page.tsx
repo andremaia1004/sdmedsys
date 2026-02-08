@@ -22,26 +22,24 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     const selectedDoctorId = searchParams.doctorId || doctors[0]?.id || 'doc';
     const selectedDoctor = doctors.find((d: any) => d.id === selectedDoctorId);
 
-    // Date calculation
-    const currentParamDate = searchParams.date ? new Date(searchParams.date) : new Date();
+    // Date calculation - Find Sunday of the week
+    const currentParamDate = searchParams.date ? new Date(searchParams.date + 'T00:00:00') : new Date();
     if (isNaN(currentParamDate.getTime())) {
-        // Fallback if invalid date
         currentParamDate.setTime(new Date().getTime());
     }
 
-    // Find the Monday of the week containing currentParamDate
     const day = currentParamDate.getDay();
-    const diffToMonday = currentParamDate.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(currentParamDate);
-    monday.setDate(diffToMonday);
-    monday.setHours(0, 0, 0, 0);
+    const diffToSunday = currentParamDate.getDate() - day;
+    const sundayDate = new Date(currentParamDate);
+    sundayDate.setDate(diffToSunday);
+    sundayDate.setHours(0, 0, 0, 0);
 
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
+    const saturdayDate = new Date(sundayDate);
+    saturdayDate.setDate(sundayDate.getDate() + 6);
+    saturdayDate.setHours(23, 59, 59, 999);
 
-    const startStr = monday.toISOString();
-    const endStr = sunday.toISOString();
+    const startStr = sundayDate.toISOString();
+    const endStr = saturdayDate.toISOString();
 
     let appointments: any[] = [];
     try {
@@ -83,7 +81,7 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
             <WeeklyCalendar
                 doctorId={selectedDoctorId}
                 appointments={appointments}
-                baseDate={monday.toISOString().split('T')[0]}
+                baseDate={sundayDate.toLocaleDateString('en-CA')}
             />
         </div>
     );

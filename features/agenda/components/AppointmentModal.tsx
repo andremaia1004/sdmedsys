@@ -240,7 +240,7 @@ export default function AppointmentModal({
                         <div>
                             <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8, fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Horário Selecionado</div>
                             <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--primary)' }}>
-                                {date && new Date(date).toLocaleDateString('pt-BR')} às {time}
+                                {date && new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')} às {time}
                             </div>
                         </div>
                     </div>

@@ -21,24 +21,24 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
     const myDoctor = doctors.find((d: any) => d.profileId === user?.id);
     const doctorId = myDoctor?.id || 'doc'; // Fallback to 'doc' if not linked yet
 
-    // Date calculation
-    const currentParamDate = searchParams.date ? new Date(searchParams.date) : new Date();
+    // Date calculation - Find Sunday of the week
+    const currentParamDate = searchParams.date ? new Date(searchParams.date + 'T00:00:00') : new Date();
     if (isNaN(currentParamDate.getTime())) {
         currentParamDate.setTime(new Date().getTime());
     }
 
-    const day = currentParamDate.getDay();
-    const diffToMonday = currentParamDate.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(currentParamDate);
-    monday.setDate(diffToMonday);
-    monday.setHours(0, 0, 0, 0);
+    const day = currentParamDate.getDay(); // 0 (Sun) to 6 (Sat)
+    const diffToSunday = currentParamDate.getDate() - day;
+    const sundayDate = new Date(currentParamDate);
+    sundayDate.setDate(diffToSunday);
+    sundayDate.setHours(0, 0, 0, 0);
 
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
+    const saturdayDate = new Date(sundayDate);
+    saturdayDate.setDate(sundayDate.getDate() + 6);
+    saturdayDate.setHours(23, 59, 59, 999);
 
-    const startStr = monday.toISOString();
-    const endStr = sunday.toISOString();
+    const startStr = sundayDate.toISOString();
+    const endStr = saturdayDate.toISOString();
 
     let appointments: any[] = [];
     try {
@@ -63,7 +63,7 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
             <WeeklyCalendar
                 doctorId={doctorId}
                 appointments={appointments}
-                baseDate={monday.toISOString().split('T')[0]}
+                baseDate={sundayDate.toLocaleDateString('en-CA')}
             />
         </div>
     );

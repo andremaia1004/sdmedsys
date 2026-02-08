@@ -40,7 +40,11 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         }
 
         const startTime = `${date}T${time}:00`;
-        const endDate = new Date(new Date(startTime).getTime() + duration * 60000);
+        // Parse explicitly as local to current environment (Server)
+        const startDate = new Date(startTime);
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        // Convert to ISO-like format but keeping it relative to database precision
         const endTime = endDate.toISOString().slice(0, 19);
 
         const input: AppointmentInput = {
