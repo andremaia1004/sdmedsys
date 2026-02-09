@@ -1,96 +1,161 @@
 'use client';
 
-import { QueueItemWithPatient } from '@/features/queue/types';
-import { changeQueueStatusAction } from '@/app/actions/queue';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Table } from '@/components/ui/Table';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
+import { QueueItemWithPatient } from '../types';
+import {
+    fetchOperationalQueueAction,
+    callNextAction,
+    quickStartAction,
+    quickNoShowAction
+} from '../actions';
+import { startConsultationFromQueueAction } from '../../consultation/actions';
+import styles from '../styles/Queue.module.css';
+import { PhoneOutgoing, Play, UserX, RefreshCcw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-export default function DoctorQueue({ items }: { items: QueueItemWithPatient[] }) {
-    const currentPatient = items.find(i => i.status === 'IN_SERVICE');
+interface Props {
+    doctorId: string;
+}
+
+export default function DoctorQueue({ doctorId }: Props) {
+    const router = useRouter();
+    const [items, setItems] = useState<QueueItemWithPatient[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const queueData = await fetchOperationalQueueAction(doctorId);
+            setItems(queueData || []);
+        } catch (error) {
+            console.error('DoctorQueue Load Error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [doctorId]);
+
+    const handleCallNext = async () => {
+        const result = await callNextAction(doctorId);
+        if (result.success) {
+            loadData();
+        } else {
+            alert(result.error);
+        }
+    };
+
+    const handleAction = async (promise: Promise<{ success: boolean; error?: string }>, redirectPath?: string) => {
+        const res = await promise;
+        if (res.success) {
+            if (redirectPath) {
+                router.push(redirectPath);
+            } else {
+                loadData();
+            }
+        } else {
+            alert(res.error);
+        }
+    };
+
+    const handleStartConsultation = async (queueItemId: string, patientId: string) => {
+        setLoading(true);
+        const res = await startConsultationFromQueueAction(queueItemId, patientId);
+        if (res.success && res.consultationId) {
+            router.push(`/doctor/consultations/${res.consultationId}`);
+        } else {
+            alert(res.error || 'Erro ao iniciar consulta');
+            setLoading(false);
+            loadData();
+        }
+    };
+
+    // Derived state
     const calledPatient = items.find(i => i.status === 'CALLED');
-    const waitingList = items.filter(i => i.status === 'WAITING');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {currentPatient && (
-                <Card
-                    header="Atendimento em Curso"
-                    style={{ borderLeft: '8px solid var(--primary)', backgroundColor: 'rgba(0, 45, 94, 0.02)' }}
-                    footer={
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <Link href={`/doctor/consultation/${currentPatient.id}`} style={{ flex: 1 }}>
-                                <Button fullWidth variant="primary" size="lg">Abrir Prontuário</Button>
-                            </Link>
-                            <Button onClick={() => changeQueueStatusAction(currentPatient.id, 'DONE')} variant="secondary" size="lg">
-                                Concluir Atendimento
-                            </Button>
-                        </div>
-                    }
-                >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                            <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Paciente em Sala</div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)' }}>{currentPatient.patientName}</div>
-                            <div style={{ marginTop: '0.5rem' }}>
-                                <Badge variant="in_service">SENHA: {currentPatient.ticketCode}</Badge>
+        <div className={styles.opsView}>
+            <div className={styles.topBar}>
+                <h2 style={{ fontSize: '1.2rem', color: 'var(--primary)', margin: 0 }}>Fila de Atendimento</h2>
+
+                <div className={styles.controls}>
+                    <button onClick={loadData} className={styles.secondaryAction} title="Atualizar">
+                        <RefreshCcw size={18} />
+                    </button>
+                    {!calledPatient && (
+                        <button onClick={handleCallNext} className={styles.mainAction}>
+                            <PhoneOutgoing size={18} />
+                            Chamar Próximo
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className={styles.opsList}>
+                {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Carregando fila...</div>}
+
+                {!loading && items.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
+                        Nenhum paciente na fila.
+                    </div>
+                )}
+
+                {items.map(item => {
+                    const isCalled = item.status === 'CALLED';
+                    const isLate = item.sourceType === 'SCHEDULED' && item.startTime && new Date(item.startTime) < new Date();
+
+                    return (
+                        <div key={item.id} className={`${styles.opsCard} ${isCalled ? styles.called : ''}`}>
+                            <div className={styles.ticketBadge}>{item.ticketCode}</div>
+
+                            <div className={styles.patientInfo}>
+                                <strong>{item.patientName}</strong>
+                            </div>
+
+                            <div>
+                                <span className={`${styles.sourceTag} ${item.sourceType === 'SCHEDULED' ? styles.tagS : styles.tagW}`}>
+                                    {item.sourceType === 'SCHEDULED' ? '📅 Agendado' : '🏃 Encaixe'}
+                                </span>
+                            </div>
+
+                            <div className={`${styles.timeInfo} ${isLate ? styles.late : ''}`}>
+                                {item.startTime ? new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                {isLate && ' (Atrasado)'}
+                            </div>
+
+                            <div className={styles.inlineActions}>
+                                {item.status === 'WAITING' && !calledPatient && (
+                                    <button
+                                        onClick={() => handleAction(callNextAction(doctorId))}
+                                        className={`${styles.inlineBtn} ${styles.btnCall}`}
+                                    >
+                                        Chamar
+                                    </button>
+                                )}
+                                {item.status === 'CALLED' && (
+                                    <button
+                                        onClick={() => handleStartConsultation(item.id, item.patientId)}
+                                        className={`${styles.inlineBtn} ${styles.btnStart}`}
+                                        title="Iniciar Consulta"
+                                    >
+                                        <Play size={14} style={{ marginRight: '4px' }} />
+                                        Atender
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => handleAction(quickNoShowAction(item.id))}
+                                    className={`${styles.inlineBtn} ${styles.btnCancel}`}
+                                >
+                                    <UserX size={14} style={{ marginRight: '4px' }} />
+                                    Faltou
+                                </button>
                             </div>
                         </div>
-                    </div>
-                </Card>
-            )}
-
-            {calledPatient && !currentPatient && (
-                <Card
-                    header="Aguardando Chegada"
-                    style={{ borderLeft: '8px solid var(--warning)' }}
-                    footer={
-                        <Button onClick={() => changeQueueStatusAction(calledPatient.id, 'IN_SERVICE')} variant="primary" size="lg" fullWidth>
-                            Iniciar Atendimento
-                        </Button>
-                    }
-                >
-                    <div style={{ textAlign: 'center', padding: '1rem' }}>
-                        <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>Paciente Chamado</div>
-                        <div style={{ fontSize: '2rem', fontWeight: 700 }}>{calledPatient.patientName}</div>
-                        <div style={{ marginTop: '1rem' }}>
-                            <Badge variant="called">SENHA: {calledPatient.ticketCode}</Badge>
-                        </div>
-                    </div>
-                </Card>
-            )}
-
-            <Card header={`Pacientes na Fila (${waitingList.length})`} padding="none">
-                <Table headers={['Senha', 'Paciente', 'Status', 'Ações']}>
-                    {waitingList.map(item => (
-                        <tr key={item.id}>
-                            <td><strong>{item.ticketCode}</strong></td>
-                            <td>{item.patientName}</td>
-                            <td><Badge variant="waiting">AGUARDANDO</Badge></td>
-                            <td>
-                                {!calledPatient && !currentPatient && (
-                                    <form action={async () => {
-                                        await changeQueueStatusAction(item.id, 'CALLED');
-                                    }}>
-                                        <Button type="submit" size="sm">
-                                            Chamar Próximo
-                                        </Button>
-                                    </form>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                    {waitingList.length === 0 && (
-                        <tr>
-                            <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                Nenhum paciente aguardando.
-                            </td>
-                        </tr>
-                    )}
-                </Table>
-            </Card>
+                    );
+                })}
+            </div>
         </div>
     );
 }

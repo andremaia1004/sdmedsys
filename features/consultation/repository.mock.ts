@@ -27,6 +27,10 @@ export class MockConsultationRepository implements IConsultationRepository {
         return MOCK_CONSULTATIONS.find(c => c.id === id);
     }
 
+    async listByPatient(patientId: string): Promise<Consultation[]> {
+        return MOCK_CONSULTATIONS.filter(c => c.patientId === patientId);
+    }
+
     async updateNotes(id: string, notes: string): Promise<void> {
         const index = MOCK_CONSULTATIONS.findIndex(c => c.id === id);
         if (index !== -1) {

@@ -1,205 +1,177 @@
 'use client';
 
-import { useState } from 'react';
-import { Consultation, ClinicalEntry, ClinicalEntryInput } from '@/features/consultation/types';
-import { upsertClinicalEntryAction, finishConsultationAction } from '../actions';
-import PatientTimeline from '@/features/patients/components/PatientTimeline';
-import { Button } from '@/components/ui/Button';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useFormStatus } from 'react-dom';
+import { Consultation } from '../types';
+import { Patient } from '@/features/patients/types';
+import { saveConsultationNotesAction, finishConsultationAction } from '../actions';
 import { Card } from '@/components/ui/Card';
-import styles from '../styles/Consultation.module.css';
+import { Button } from '@/components/ui/Button'; // Assuming Button exists
+import { CheckCircle, AlertTriangle, FileText, User, FilePlus } from 'lucide-react';
+import { ClinicalDocumentModal } from '@/features/documents/components/ClinicalDocumentModal';
+import styles from '../styles/Consultation.module.css'; // I need to create this CSS or use inline
 
 interface Props {
     consultation: Consultation;
-    patientName: string;
-    initialEntry?: ClinicalEntry;
-    timeline: ClinicalEntry[];
+    patient: Patient;
 }
 
-export default function ConsultationWorkspace({ consultation, patientName, initialEntry, timeline }: Props) {
-    const [entry, setEntry] = useState<Partial<ClinicalEntry>>(initialEntry || {
-        consultationId: consultation.id,
-        patientId: consultation.patientId,
-        chiefComplaint: '',
-        diagnosis: '',
-        conduct: '',
-        observations: '',
-        freeNotes: '',
-        isFinal: false
-    });
-    const [saving, setSaving] = useState(false);
-    const [lastSaved, setLastSaved] = useState<Date | null>(null);
+export default function ConsultationWorkspace({ consultation, patient }: Props) {
+    const router = useRouter();
+    const [notes, setNotes] = useState(consultation.clinicalNotes || '');
+    const [status, setStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
+    const [isFinished, setIsFinished] = useState(!!consultation.finishedAt);
+    const [finishError, setFinishError] = useState<string | null>(null);
+    const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
 
-    const handleSave = async (isFinal = false) => {
-        if (entry.isFinal && !isFinal) return; // Locked
+    // Auto-save Logic
+    useEffect(() => {
+        if (isFinished) return;
 
-        setSaving(true);
-        try {
-            // entry is Partial<ClinicalEntry>, but upsert needs ClinicalEntryInput
-            // We cast to ClinicalEntryInput based on fields we have. 
-            // Warning: mandatory fields must be present or handled by Service/DB default.
-            const payload = {
-                ...entry,
-                isFinal: isFinal
-            } as ClinicalEntryInput & { id?: string };
-
-            const res = await upsertClinicalEntryAction(payload);
-            if (res.success && res.entry) {
-                setEntry(res.entry);
-                setLastSaved(new Date());
+        const timer = setTimeout(async () => {
+            if (notes !== consultation.clinicalNotes && status === 'unsaved') {
+                setStatus('saving');
+                const res = await saveConsultationNotesAction(consultation.id, notes);
+                if (res.success) {
+                    setStatus('saved');
+                } else {
+                    setStatus('unsaved'); // Retry logic could be added
+                    console.error('Failed to save notes:', res.error);
+                }
             }
-        } catch (err) {
-            console.error('Save failed:', err);
-        } finally {
-            setSaving(false);
+        }, 2000); // 2 seconds debounce
+
+        return () => clearTimeout(timer);
+    }, [notes, consultation.id, status, isFinished]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        if (isFinished) return;
+        setNotes(e.target.value);
+        setStatus('unsaved');
+    };
+
+    const handleFinish = async () => {
+        if (!confirm('Tem certeza que deseja finalizar o atendimento? Esta ação não pode ser desfeita.')) return;
+
+        setFinishError(null);
+        setStatus('saving'); // Block UI
+
+        // Ensure notes are saved first
+        await saveConsultationNotesAction(consultation.id, notes);
+
+        const res = await finishConsultationAction(consultation.id);
+        if (res.success) {
+            setIsFinished(true);
+            router.push('/doctor/queue'); // Redirect back to queue
+        } else {
+            setFinishError(res.error || 'Erro ao finalizar consulta.');
+            setStatus('saved'); // Re-enable UI
         }
     };
 
-    const updateField = <K extends keyof ClinicalEntry>(field: K, value: ClinicalEntry[K]) => {
-        setEntry(prev => ({ ...prev, [field]: value }));
-    };
-
     return (
-        <div className={styles.container}>
-            <header className={styles.header}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-                    <div>
-                        <h1 className={styles.patientName}>{patientName}</h1>
-                        <div className={styles.meta}>
-                            <div className={styles.metaItem}>
-                                <span>📅</span> {new Date(consultation.startedAt).toLocaleDateString('pt-BR')}
-                            </div>
-                            <div className={styles.metaItem}>
-                                <span>🕒</span> Iniciado às {new Date(consultation.startedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', height: 'calc(100vh - 100px)' }}>
+
+            {/* Left Panel: Patient Info & History (Placeholder for now) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Card>
+                    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', color: '#64748b' }}>
+                            <User size={40} />
                         </div>
-                    </div>
-                    <div className={styles.saveStatus}>
-                        {saving ? (
-                            <span style={{ color: 'var(--primary)' }}>◌ Salvando...</span>
-                        ) : lastSaved ? (
-                            <span style={{ color: 'var(--success)' }}>✓ Salvo {lastSaved.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
-                        ) : null}
-                    </div>
-                </div>
-            </header>
-
-            <div className={styles.workspaceGrid}>
-                <Card header="Atendimento Estruturado">
-                    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-                            <label className={styles.label}>Queixa Principal</label>
-                            <textarea
-                                className={styles.smallTextarea}
-                                value={entry.chiefComplaint || ''}
-                                onChange={(e) => updateField('chiefComplaint', e.target.value)}
-                                onBlur={() => handleSave()}
-                                placeholder="Relato do paciente..."
-                            />
-
-                            <label className={styles.label}>Diagnóstico / Hipótese</label>
-                            <textarea
-                                className={styles.smallTextarea}
-                                value={entry.diagnosis || ''}
-                                onChange={(e) => updateField('diagnosis', e.target.value)}
-                                onBlur={() => handleSave()}
-                                placeholder="CID ou descrição clínica..."
-                            />
-
-                            <label className={styles.label}>Conduta / Prescrição</label>
-                            <textarea
-                                className={styles.smallTextarea}
-                                value={entry.conduct || ''}
-                                onChange={(e) => updateField('conduct', e.target.value)}
-                                onBlur={() => handleSave()}
-                                placeholder="Medicamentos, exames, orientações..."
-                            />
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{patient.name}</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+                            {new Date().getFullYear() - new Date(patient.birthDate).getFullYear()} anos
+                        </p>
+                        <div style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#dbeafe', color: '#1e40af', borderRadius: '99px', fontSize: '0.8rem', fontWeight: 600 }}>
+                            {patient.document}
                         </div>
                     </div>
                 </Card>
 
-                <div className={styles.sideNotes}>
-                    <Card header="Histórico do Paciente">
-                        <div style={{ padding: '0.5rem', maxHeight: '400px', overflowY: 'auto' }}>
-                            <PatientTimeline entries={timeline.filter(e => e.id !== entry.id)} />
-                        </div>
-                    </Card>
-
-                    <div style={{ marginTop: '1.5rem' }}>
-                        <Card header="Notas Livres & Evolução">
-                            <div style={{ padding: '1rem' }}>
-                                <textarea
-                                    className={styles.mainTextarea}
-                                    value={entry.freeNotes || ''}
-                                    onChange={(e) => updateField('freeNotes', e.target.value)}
-                                    onBlur={() => handleSave()}
-                                    placeholder="Outras informações relevantes..."
-                                />
-                            </div>
-                        </Card>
+                {/* Future: Patient Timeline Component */}
+                <Card header="Histórico Recente">
+                    <div style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center' }}>
+                        Visualização de histórico em breve.
                     </div>
-                </div>
+                </Card>
             </div>
 
-            <footer className={styles.footer}>
-                <Button
-                    variant="ghost"
-                    onClick={() => handleSave()}
-                    disabled={saving || entry.isFinal}
-                >
-                    Salvar Rascunho
-                </Button>
+            {/* Right Panel: Clinical Notes */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Card className="flex-1" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div style={{ padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, color: 'var(--primary)' }}>
+                            <FileText size={18} />
+                            Prontuário Eletrônico
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: status === 'saving' ? '#ea580c' : status === 'saved' ? '#16a34a' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            {status === 'saving' && 'Salvando...'}
+                            {status === 'saved' && <><CheckCircle size={14} /> Salvo</>}
+                            {status === 'unsaved' && <span style={{ color: '#ea580c' }}>Não salvo</span>}
+                        </div>
+                    </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <a
-                        href={`/api/documents/prescription/${consultation.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={styles.pdfLink}
-                    >
-                        📄 Receita (PDF)
-                    </a>
-                    <a
-                        href={`/api/documents/certificate/${consultation.id}?days=1`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={styles.pdfLink}
-                    >
-                        📜 Atestado (PDF)
-                    </a>
-                </div>
+                    <div style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+                        <textarea
+                            value={notes}
+                            onChange={handleChange}
+                            disabled={isFinished}
+                            placeholder="Descreva a anamnese, exame físico, diagnóstico e conduta..."
+                            style={{
+                                flex: 1,
+                                width: '100%',
+                                resize: 'none',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '8px',
+                                padding: '1rem',
+                                fontSize: '1rem',
+                                lineHeight: '1.6',
+                                outline: 'none',
+                                fontFamily: 'inherit',
+                                backgroundColor: isFinished ? '#f1f5f9' : '#fff'
+                            }}
+                        />
+                    </div>
 
-                <form action={async () => {
-                    if (confirm('Deseja FINALIZAR o prontuário? Após finalizado, o registro não poderá mais ser editado.')) {
-                        await handleSave(true);
-                        await finishConsultationAction(consultation.id);
-                    }
-                }}>
-                    <Button
-                        type="submit"
-                        variant="accent"
-                        size="lg"
-                        disabled={saving || entry.isFinal}
-                    >
-                        {entry.isFinal ? 'Atendimento Finalizado' : 'Finalizar Atendimento'}
-                    </Button>
-                </form>
-            </footer>
+                    <div style={{ padding: '1rem', borderTop: '1px solid var(--border)', background: '#f8fafc', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                        {finishError && <div style={{ color: '#dc2626', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}><AlertTriangle size={16} style={{ marginRight: '4px' }} /> {finishError}</div>}
 
-            {entry.isFinal && (
-                <div style={{
-                    position: 'fixed',
-                    top: '1rem',
-                    right: '1rem',
-                    backgroundColor: 'var(--success)',
-                    color: 'white',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '20px',
-                    fontWeight: 'bold',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-                }}>
-                    🔒 REGISTRO FINALIZADO
-                </div>
-            )}
+                        {!isFinished && (
+                            <>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setIsPrescriptionOpen(true)}
+                                    title="Gerar Documento"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                                >
+                                    <FilePlus size={18} />
+                                    Documentos
+                                </Button>
+
+                                <Button
+                                    variant="primary"
+                                    onClick={handleFinish}
+                                    disabled={status === 'saving'}
+                                    style={{ background: 'var(--success)', borderColor: 'var(--success)' }}
+                                >
+                                    <CheckCircle size={18} style={{ marginRight: '8px' }} />
+                                    Finalizar Atendimento
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                </Card>
+            </div>
+
+            <ClinicalDocumentModal
+                isOpen={isPrescriptionOpen}
+                onClose={() => setIsPrescriptionOpen(false)}
+                patientId={patient.id}
+                consultationId={consultation.id}
+                patientName={patient.name}
+            />
         </div>
     );
 }

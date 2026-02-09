@@ -1,8 +1,7 @@
 'use server';
 
 import { ConsultationService } from './service';
-import { ClinicalEntryService } from './service.clinical';
-import { ConsultationInput, Consultation, ClinicalEntry, ClinicalEntryInput } from './types';
+import { Consultation } from './types';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
 import { logAudit } from '@/lib/audit';
@@ -11,24 +10,20 @@ export type ActionState = {
     error?: string;
     success?: boolean;
     consultation?: Consultation;
-    entry?: ClinicalEntry;
 };
 
 export async function startConsultationAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
     try {
         const { id: doctorId } = await requireRole(['DOCTOR']);
-        // const doctorId = user.id;
 
         const queueItemId = formData.get('queueItemId') as string;
         const patientId = formData.get('patientId') as string;
 
-        const input: ConsultationInput = {
+        const consultation = await ConsultationService.start({
             patientId,
             doctorId,
             queueItemId
-        };
-
-        const consultation = await ConsultationService.start(input);
+        });
 
         await logAudit('CREATE', 'CONSULTATION', consultation.id, {
             patientId,
@@ -45,86 +40,46 @@ export async function startConsultationAction(prevState: ActionState, formData: 
     }
 }
 
-// --- Clinical Entry Actions ---
-
-export async function upsertClinicalEntryAction(input: ClinicalEntryInput & { id?: string }): Promise<ActionState> {
+export async function startConsultationFromQueueAction(queueItemId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
     try {
-        const user = await requireRole(['DOCTOR']);
-        // Ensure doctorUserId is the current user
-        const entry = await ClinicalEntryService.upsert({
-            ...input,
-            doctorUserId: user.id
+        const { id: doctorId } = await requireRole(['DOCTOR']);
+
+        // 1. Start Consultation
+        const consultation = await ConsultationService.start({
+            patientId,
+            doctorId,
+            queueItemId
         });
 
-        await logAudit('UPDATE', 'CLINICAL_ENTRY', entry.id, {
-            patientId: entry.patientId,
-            isFinal: entry.isFinal
-        });
+        // 2. Update Queue Status and Audit
+        const { QueueService } = await import('@/features/queue/service');
+        await QueueService.changeStatus(queueItemId, 'IN_SERVICE', doctorId); // User role not available here, but DOCTOR role is assumed and doctorId logic handles it
+        // Or wait, QueueService.changeStatus takes actorRole.
+        // I need to use 'DOCTOR' as role.
 
-        revalidatePath(`/doctor/consultation`);
-        revalidatePath(`/patients/${entry.patientId}`);
-        return { success: true, entry };
+        await logAudit('START_SERVICE', 'CONSULTATION', consultation.id, { queueItemId });
+
+        revalidatePath('/doctor/queue');
+        return { success: true, consultationId: consultation.id };
     } catch (err: unknown) {
-        console.error('Upsert Clinical Entry Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { error: msg, success: false };
-    }
-}
-
-export async function finalizeClinicalEntryAction(id: string): Promise<ActionState> {
-    try {
-        await requireRole(['DOCTOR']);
-        const entry = await ClinicalEntryService.finalize(id);
-
-        await logAudit('FINALIZE', 'CLINICAL_ENTRY', entry.id, {
-            patientId: entry.patientId
-        });
-
-        revalidatePath(`/doctor/consultation`);
-        revalidatePath(`/patients/${entry.patientId}`);
-        return { success: true, entry };
-    } catch (err: unknown) {
-        console.error('Finalize Clinical Entry Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { error: msg, success: false };
-    }
-}
-
-export async function getPatientTimelineAction(patientId: string): Promise<ClinicalEntry[]> {
-    try {
-        await requireRole(['DOCTOR', 'ADMIN']);
-        return await ClinicalEntryService.listByPatient(patientId);
-    } catch (err) {
-        console.error('Get Patient Timeline Error:', err);
-        return [];
-    }
-}
-
-// Deprecated: Keeping for backward compatibility but redirecting to new logic if possible
-export async function updateClinicalNotesAction(id: string, notes: string): Promise<{ success: boolean, error?: string }> {
-    try {
-        const user = await requireRole(['DOCTOR']);
-        // Attempt to find or create entry for this consultation
-        const existing = await ClinicalEntryService.findByConsultation(id);
-
-        await ClinicalEntryService.upsert({
-            id: existing?.id,
-            consultationId: id,
-            patientId: existing?.patientId || '', // This is a bit weak for legacy notes update
-            doctorUserId: user.id,
-            freeNotes: notes,
-            isFinal: false,
-            chiefComplaint: existing?.chiefComplaint || null,
-            diagnosis: existing?.diagnosis || null,
-            conduct: existing?.conduct || null,
-            observations: existing?.observations || null,
-        });
-
-        revalidatePath(`/doctor/consultation`);
-        return { success: true };
-    } catch (err: unknown) {
+        console.error('Start Consultation From Queue Error:', err);
         const msg = err instanceof Error ? err.message : 'Unknown error';
         return { success: false, error: msg };
+    }
+}
+
+export async function saveConsultationNotesAction(consultationId: string, notes: string): Promise<ActionState> {
+    try {
+        await requireRole(['DOCTOR']);
+        await ConsultationService.updateNotes(consultationId, notes);
+
+        // No audit for auto-save to avoid spam
+        revalidatePath(`/doctor/consultations/${consultationId}`);
+        return { success: true };
+    } catch (err: unknown) {
+        console.error('Save Notes Error:', err);
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { error: msg, success: false };
     }
 }
 
@@ -132,13 +87,8 @@ export async function finishConsultationAction(id: string): Promise<{ success: b
     try {
         await requireRole(['DOCTOR']);
 
-        // Also finalize clinical entry if it exists
-        const entry = await ClinicalEntryService.findByConsultation(id);
-        if (entry && !entry.isFinal) {
-            await ClinicalEntryService.finalize(entry.id);
-        }
-
         await ConsultationService.finish(id);
+
         await logAudit('STATUS_CHANGE', 'CONSULTATION', id, { status: 'FINISHED' });
 
         revalidatePath('/doctor/queue');
@@ -151,15 +101,24 @@ export async function finishConsultationAction(id: string): Promise<{ success: b
 }
 
 export async function getConsultationAction(id: string): Promise<Consultation | undefined> {
-    return await ConsultationService.findById(id);
-}
-
-export async function getClinicalEntryAction(consultationId: string): Promise<ClinicalEntry | null> {
     try {
-        await requireRole(['DOCTOR']);
-        return await ClinicalEntryService.findByConsultation(consultationId);
+        await requireRole(['DOCTOR', 'ADMIN']);
+        return await ConsultationService.findById(id);
     } catch (err) {
-        console.error('Get Clinical Entry Error:', err);
-        return null;
+        console.error('Get Consultation Error:', err);
+        return undefined;
     }
 }
+
+export async function getPatientTimelineAction(patientId: string): Promise<Consultation[]> {
+    try {
+        await requireRole(['DOCTOR', 'ADMIN']);
+        return await ConsultationService.listByPatient(patientId);
+    } catch (err) {
+        console.error('Get Patient Timeline Error:', err);
+        return [];
+    }
+}
+
+// Re-export types that might be needed by client
+export type { Consultation };

@@ -22,7 +22,8 @@ const getRepository = async (): Promise<ISettingsRepository> => {
         return new SupabaseSettingsRepository(supabaseServer, clinicId);
     }
 
-    throw new Error('MockSettingsRepository not implemented');
+    const { MockSettingsRepository } = await import('./repository.mock');
+    return new MockSettingsRepository();
 };
 
 export class SettingsService {

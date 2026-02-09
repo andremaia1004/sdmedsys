@@ -1,7 +1,8 @@
 import { requireRole } from '@/lib/session';
 import { PatientService } from '@/features/patients/service';
 import { ClinicalSummaryService } from '@/features/consultation/service.summary';
-import { ClinicalEntryService } from '@/features/consultation/service.clinical';
+// import { ClinicalEntryService } from '@/features/consultation/service.clinical';
+import { ConsultationService } from '@/features/consultation/service';
 import PatientHub from '@/features/patients/components/PatientHub';
 import Link from 'next/link';
 
@@ -27,7 +28,27 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
     // RBAC: SECRETARY gets null for summary/timeline
     const isClinicalAllowed = user.role !== 'SECRETARY';
     const summary = isClinicalAllowed ? await ClinicalSummaryService.getLatestEntryByPatient(id) : null;
-    const timeline = isClinicalAllowed ? await ClinicalEntryService.listByPatient(id) : [];
+
+    // Fetch consultations instead of clinical entries (due to schema limitation)
+    const consultations = isClinicalAllowed ? await ConsultationService.listByPatient(id) : [];
+
+    // Map to ClinicalEntry shape for compatibility with PatientHub
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const timeline: any[] = consultations.map(c => ({
+        id: c.id,
+        consultationId: c.id,
+        patientId: c.patientId,
+        doctorUserId: c.doctorId,
+        clinicId: '', // Not needed for display
+        chiefComplaint: null,
+        diagnosis: null,
+        conduct: null,
+        observations: null,
+        freeNotes: c.clinicalNotes,
+        isFinal: !!c.finishedAt,
+        createdAt: c.startedAt,
+        updatedAt: c.updatedAt
+    }));
 
     const backLink = user.role === 'DOCTOR' ? '/doctor/agenda' :
         user.role === 'SECRETARY' ? '/secretary/agenda' : '/patients';

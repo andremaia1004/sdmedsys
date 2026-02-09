@@ -98,6 +98,22 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         }
     }
 
+    async listByPatient(patientId: string): Promise<Consultation[]> {
+        const { data, error } = await this.supabase
+            .from('consultations')
+            .select('*')
+            .eq('clinic_id', this.clinicId)
+            .eq('patient_id', patientId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Supabase Error (listByPatient):', error);
+            return [];
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data || []).map((d: any) => this.mapToConsultation(d));
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToConsultation(row: any): Consultation {
         return {

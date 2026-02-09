@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/lib/session';
 import { createClient } from '@/lib/supabase-auth';
-import { SupabaseClinicalEntryRepository } from './repository.clinical.supabase';
+import { SupabaseConsultationRepository } from './repository.supabase'; // Use Consultation Repo
+// import { SupabaseClinicalEntryRepository } from './repository.clinical.supabase'; 
 
 export interface ClinicalSummary {
     diagnosis: string | null;
@@ -20,7 +21,8 @@ export class ClinicalSummaryService {
 
         try {
             const supabase = await createClient();
-            const repository = new SupabaseClinicalEntryRepository(supabase, user.clinicId);
+            // Switched to Consultation Repository due to missing clinical_entries schema
+            const repository = new SupabaseConsultationRepository(supabase, user.clinicId);
 
             // Fetch most recent entry
             const timeline = await repository.listByPatient(patientId);
@@ -32,10 +34,10 @@ export class ClinicalSummaryService {
             const latest = timeline[0];
 
             return {
-                diagnosis: latest.diagnosis,
-                conduct: latest.conduct,
-                doctorName: 'Dr. (ID: ' + latest.doctorUserId.substring(0, 5) + ')', // Simplificado
-                date: latest.createdAt
+                diagnosis: null, // Structured diagnosis not available in consultations table yet
+                conduct: null,
+                doctorName: 'Dr. (ID: ' + (latest.doctorId || '').substring(0, 5) + ')',
+                date: latest.startedAt
             };
         } catch (error) {
             console.error('ClinicalSummaryService.getLatestEntryByPatient error:', error);

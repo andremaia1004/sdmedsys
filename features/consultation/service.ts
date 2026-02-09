@@ -42,6 +42,11 @@ export class ConsultationService {
         return repo.findById(id);
     }
 
+    static async listByPatient(patientId: string): Promise<Consultation[]> {
+        const repo = await getRepository();
+        return repo.listByPatient(patientId);
+    }
+
     static async updateNotes(id: string, notes: string): Promise<void> {
         const repo = await getRepository();
         // Repository currently doesn't take doctorId, but we pass it for future-proofing/signature match

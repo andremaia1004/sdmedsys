@@ -51,6 +51,7 @@ export async function callNextAction(doctorId?: string) {
         });
 
         revalidatePath('/secretary/queue/ops');
+        revalidatePath('/doctor/queue');
         revalidatePath('/tv');
 
         return { success: true, item: nextItem };
@@ -61,9 +62,13 @@ export async function callNextAction(doctorId?: string) {
 
 export async function quickStartAction(id: string) {
     try {
-        const user = await requireRole(['ADMIN', 'SECRETARY']);
+        const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         await QueueService.changeStatus(id, 'IN_SERVICE', user.role);
+
+        await logAudit('START_SERVICE', 'QUEUE_ITEM', id, { actor: user.id });
+
         revalidatePath('/secretary/queue/ops');
+        revalidatePath('/doctor/queue');
         return { success: true };
     } catch (error) {
         return { success: false, error: (error as Error).message };
@@ -72,9 +77,13 @@ export async function quickStartAction(id: string) {
 
 export async function quickNoShowAction(id: string) {
     try {
-        const user = await requireRole(['ADMIN', 'SECRETARY']);
+        const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         await QueueService.changeStatus(id, 'NO_SHOW', user.role);
+
+        await logAudit('NO_SHOW', 'QUEUE_ITEM', id, { actor: user.id });
+
         revalidatePath('/secretary/queue/ops');
+        revalidatePath('/doctor/queue');
         return { success: true };
     } catch (error) {
         return { success: false, error: (error as Error).message };

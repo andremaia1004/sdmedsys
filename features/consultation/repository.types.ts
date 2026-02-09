@@ -4,6 +4,7 @@ export interface IConsultationRepository {
     start(input: ConsultationInput): Promise<Consultation>;
     getActiveByDoctor(doctorId: string): Promise<Consultation | undefined>;
     findById(id: string): Promise<Consultation | undefined>;
+    listByPatient(patientId: string): Promise<Consultation[]>;
     updateNotes(id: string, notes: string): Promise<void>;
     finish(id: string): Promise<void>;
 }

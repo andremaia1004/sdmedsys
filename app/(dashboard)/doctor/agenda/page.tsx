@@ -1,71 +1,48 @@
-import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
 import { requireRole } from '@/lib/session';
-import { listDoctorsAction } from '@/features/doctors/actions';
-import { fetchAppointmentsAction } from '@/features/agenda/actions';
-import styles from '@/features/agenda/styles/Agenda.module.css';
-import { Doctor } from '@/features/doctors/types';
-import { Appointment } from '@/features/agenda/types';
+import WeeklyCalendar from '@/features/agenda/components/WeeklyCalendar';
+import { AppointmentService } from '@/features/agenda/service';
 
 export const dynamic = 'force-dynamic';
 
-export default async function DoctorAgendaPage(props: { searchParams: Promise<{ date?: string }> }) {
-    const searchParams = await props.searchParams;
+export default async function DoctorAgendaPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ date?: string }>;
+}) {
     const user = await requireRole(['DOCTOR', 'ADMIN']);
 
-    let doctors: Doctor[] = [];
-    try {
-        doctors = await listDoctorsAction(true);
-    } catch (e) {
-        console.error('DoctorAgendaPage: Failed to fetch doctors', e);
-    }
+    // Resolve searchParams
+    const { date } = await searchParams;
 
-    // Find matching doctor record for this profile
-    const myDoctor = doctors.find((d: Doctor) => d.profileId === user?.id);
-    const doctorId = myDoctor?.id || 'doc'; // Fallback to 'doc' if not linked yet
+    // Calculate start/end of the week based on 'date' or today
+    const baseDate = date ? new Date(date) : new Date();
+    // Adjust to Sunday (start of week)
+    const day = baseDate.getDay();
+    const diff = baseDate.getDate() - day; // adjust when day is sunday
+    const startOfWeek = new Date(baseDate.setDate(diff));
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-    // Date calculation - Find Sunday of the week
-    const currentParamDate = searchParams.date ? new Date(searchParams.date + 'T00:00:00') : new Date();
-    if (isNaN(currentParamDate.getTime())) {
-        currentParamDate.setTime(new Date().getTime());
-    }
+    const startStr = startOfWeek.toISOString().split('T')[0];
+    const endStr = endOfWeek.toISOString().split('T')[0];
 
-    const day = currentParamDate.getDay(); // 0 (Sun) to 6 (Sat)
-    const diffToSunday = currentParamDate.getDate() - day;
-    const sundayDate = new Date(currentParamDate);
-    sundayDate.setDate(diffToSunday);
-    sundayDate.setHours(0, 0, 0, 0);
-
-    const saturdayDate = new Date(sundayDate);
-    saturdayDate.setDate(sundayDate.getDate() + 6);
-    saturdayDate.setHours(23, 59, 59, 999);
-
-    const startStr = sundayDate.toISOString();
-    const endStr = saturdayDate.toISOString();
-
-    let appointments: Appointment[] = [];
-    try {
-        appointments = await fetchAppointmentsAction(doctorId, startStr, endStr);
-    } catch (e) {
-        console.error('DoctorAgendaPage: Failed to fetch appointments', e);
-    }
+    // Fetch appointments for this doctor only
+    const appointments = await AppointmentService.list(user.id, `${startStr}T00:00:00`, `${endStr}T23:59:59`);
 
     return (
-        <div className={styles.agendaContainer}>
-            <div className={styles.agendaHeader}>
-                <div>
-                    <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 850, color: 'var(--primary)', letterSpacing: '-0.02em' }}>
-                        Minha Agenda
-                    </h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 500, marginTop: '0.25rem' }}>
-                        Bem-vindo(a), <strong style={{ color: 'var(--primary)', fontWeight: 700 }}>Dr(a). {myDoctor?.name || user?.name || 'Médico'}</strong>
-                    </p>
-                </div>
+        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+            <div style={{ marginBottom: '2rem' }}>
+                <h1 style={{ fontSize: '1.8rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>
+                    Minha Agenda
+                </h1>
+                <p style={{ color: 'var(--text-muted)' }}>Gerencie seus horários e atendimentos.</p>
             </div>
 
             <WeeklyCalendar
-                doctorId={doctorId}
                 appointments={appointments}
-                baseDate={sundayDate.toLocaleDateString('en-CA')}
+                doctorId={user.id}
+                role={user.role}
+                baseDate={startStr}
             />
         </div>
     );
