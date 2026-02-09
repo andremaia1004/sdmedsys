@@ -57,6 +57,10 @@ export default function WeeklyCalendar({
         router.push(`?${params.toString()}`);
     };
 
+    const handleModalClose = useCallback(() => {
+        setSelectedSlot(null);
+    }, []);
+
     const getAppointment = (date: string, time: string) => {
         return appointments.find(a => {
             // a.startTime is ISO (UTC). Convert to local for display.
@@ -138,7 +142,7 @@ export default function WeeklyCalendar({
                     doctorId={doctorId}
                     date={selectedSlot.date}
                     time={selectedSlot.time}
-                    onClose={useCallback(() => setSelectedSlot(null), [])}
+                    onClose={handleModalClose}
                 />
             )}
         </div>
