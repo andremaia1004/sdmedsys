@@ -17,8 +17,8 @@ async function getStubUser(): Promise<UserSession | null> {
         let name = 'User';
 
         if (role === 'DOCTOR') {
-            id = 'doc';
-            name = 'Dr. House';
+            id = 'd5e044f1-ef68-4731-aebe-5a8afc8c15a9'; // Andre Maia (Valid UUID for testing)
+            name = 'Dr. House (Stub)';
         } else if (role === 'ADMIN') {
             id = 'admin';
             name = 'Admin User';
