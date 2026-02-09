@@ -80,17 +80,23 @@ export default function AppointmentModal({
     }, [doctorId]);
 
     // Handle Appointment Success
+    // Handle Appointment Success State
     useEffect(() => {
-        if (apptState?.success && !isSuccessfullySubmitted) {
+        if (apptState?.success) {
             setIsSuccessfullySubmitted(true);
+        }
+    }, [apptState?.success]);
+
+    // Handle Side Effects (Refresh + Close) when fully submitted
+    useEffect(() => {
+        if (isSuccessfullySubmitted) {
             router.refresh();
-            // Close modal after delay
             const timer = setTimeout(() => {
                 onClose();
             }, 1500);
             return () => clearTimeout(timer);
         }
-    }, [apptState?.success, isSuccessfullySubmitted, onClose, router]);
+    }, [isSuccessfullySubmitted, onClose, router]);
 
     if (isSuccessfullySubmitted || apptState?.success) {
         return (
