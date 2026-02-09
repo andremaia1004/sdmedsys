@@ -63,7 +63,7 @@ describe('RBAC Logic', () => {
         });
 
         it('should return correct home for DOCTOR', () => {
-            expect(getAuthorizedHome('DOCTOR')).toBe('/doctor/agenda');
+            expect(getAuthorizedHome('DOCTOR')).toBe('/doctor');
         });
 
         it('should return correct home for SECRETARY', () => {

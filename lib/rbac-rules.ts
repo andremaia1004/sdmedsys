@@ -2,7 +2,7 @@ import { Role } from './types/auth';
 
 export const ROLE_HOMES: Record<Role, string> = {
     'ADMIN': '/admin',
-    'DOCTOR': '/doctor/agenda',
+    'DOCTOR': '/doctor',
     'SECRETARY': '/secretary/agenda',
 };
 

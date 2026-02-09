@@ -120,6 +120,11 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             title: 'Atendimento',
             items: [
                 {
+                    label: 'Painel do Médico',
+                    href: '/doctor',
+                    rolesAllowed: ['ADMIN', 'DOCTOR'],
+                },
+                {
                     label: 'Minha Fila',
                     href: '/doctor/queue',
                     rolesAllowed: ['ADMIN', 'DOCTOR'],
