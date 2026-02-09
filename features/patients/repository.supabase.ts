@@ -39,6 +39,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async findById(id: string): Promise<Patient | undefined> {
+        console.log(`[SupabaseRepo] findById lookup: id=${id}, clinicId=${this.clinicId}`);
         const { data, error } = await this.supabase
             .from('patients')
             .select('*')

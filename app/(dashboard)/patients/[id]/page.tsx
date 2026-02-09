@@ -11,8 +11,17 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
     const { id } = await params;
     const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
 
+    console.log(`[SharedPatientDetailPage] Fetching patient with ID: ${id} and clinic: ${user.clinicId}`);
     const patient = await PatientService.findById(id);
-    if (!patient) return <div style={{ padding: '2rem' }}>Paciente não encontrado</div>;
+    console.log(`[SharedPatientDetailPage] Result: ${patient ? 'Found' : 'Not Found'}`);
+
+    if (!patient) return (
+        <div style={{ padding: '2rem' }}>
+            <h2>Paciente não encontrado</h2>
+            <p style={{ color: 'var(--text-muted)' }}>ID: {id}</p>
+            <p style={{ color: 'var(--text-muted)' }}>Clinic: {user.clinicId || 'default'}</p>
+        </div>
+    );
 
     // Service will return null for SECRETARY (additional guard)
     const summary = await ClinicalSummaryService.getLatestEntryByPatient(id);
