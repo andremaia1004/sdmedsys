@@ -20,13 +20,8 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             title: 'Operação (Atalhos)',
             items: [
                 {
-                    label: 'Agenda (Sec)',
-                    href: '/secretary/agenda',
-                    rolesAllowed: ['ADMIN', 'SECRETARY'],
-                },
-                {
-                    label: 'Controle de fila (Sec)',
-                    href: '/secretary/queue',
+                    label: 'Painel do dia',
+                    href: '/secretary/dashboard',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
                 },
                 {
@@ -85,13 +80,8 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             title: 'Operação',
             items: [
                 {
-                    label: 'Agenda',
-                    href: '/secretary/agenda',
-                    rolesAllowed: ['ADMIN', 'SECRETARY'],
-                },
-                {
-                    label: 'Controle de fila',
-                    href: '/secretary/queue',
+                    label: 'Painel do dia',
+                    href: '/secretary/dashboard',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
                 },
                 {

@@ -23,6 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_patient_attachments_clinic_id ON public.patient_a
 -- RLS Policies
 
 -- ADMIN/DOCTOR: Full access to everything in their clinic
+DROP POLICY IF EXISTS "Medical staff can manage all attachments" ON public.patient_attachments;
 CREATE POLICY "Medical staff can manage all attachments"
 ON public.patient_attachments
 FOR ALL
@@ -37,6 +38,7 @@ USING (
 );
 
 -- SECRETARY: Select/Insert only for ADMIN category
+DROP POLICY IF EXISTS "Secretaries can view/add admin attachments" ON public.patient_attachments;
 CREATE POLICY "Secretaries can view/add admin attachments"
 ON public.patient_attachments
 FOR SELECT
@@ -51,6 +53,7 @@ USING (
     )
 );
 
+DROP POLICY IF EXISTS "Secretaries can insert admin attachments" ON public.patient_attachments;
 CREATE POLICY "Secretaries can insert admin attachments"
 ON public.patient_attachments
 FOR INSERT

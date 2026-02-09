@@ -25,6 +25,7 @@ CREATE INDEX IF NOT EXISTS idx_clinical_documents_issued_at ON public.clinical_d
 
 -- Policy for SELECT (Read)
 -- ADMIN: Can view all documents in their clinic
+DROP POLICY IF EXISTS "Admins can view clinical documents of their clinic" ON public.clinical_documents;
 CREATE POLICY "Admins can view clinical documents of their clinic"
 ON public.clinical_documents
 FOR SELECT
@@ -41,6 +42,7 @@ USING (
 -- DOCTOR: Can view all documents in their clinic (Standard logic: Doctors share patient records in a clinic)
 -- Alternatively, restrict to 'created_by' or 'doctor_id', but usually History is shared.
 -- User requirement: "DOCTOR vê apenas registros da própria clínica"
+DROP POLICY IF EXISTS "Doctors can view clinical documents of their clinic" ON public.clinical_documents;
 CREATE POLICY "Doctors can view clinical documents of their clinic"
 ON public.clinical_documents
 FOR SELECT
@@ -58,6 +60,7 @@ USING (
 
 -- Policy for INSERT (Create)
 -- DOCTOR and ADMIN can insert
+DROP POLICY IF EXISTS "Doctors and Admins can create clinical documents" ON public.clinical_documents;
 CREATE POLICY "Doctors and Admins can create clinical documents"
 ON public.clinical_documents
 FOR INSERT

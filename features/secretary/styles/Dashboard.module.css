@@ -1,0 +1,200 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f8f9fa;
+    overflow: hidden;
+}
+
+.header {
+    background: #fff;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titleInfo h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.titleInfo p {
+    margin: 0.25rem 0 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.datePicker,
+.search {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.search {
+    width: 250px;
+}
+
+.refreshBtn {
+    background: #f1f3f5;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.loading {
+    padding: 3rem;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.kanban {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    overflow-x: auto;
+    height: 100%;
+    align-items: flex-start;
+}
+
+.column {
+    background: #e9ecef33;
+    min-width: 280px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.columnHeader {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3331;
+}
+
+.columnHeader h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #495057;
+}
+
+.counter {
+    background: #fff;
+    color: #495057;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+}
+
+.columnContent {
+    padding: 0.75rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.card {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    transition: transform 0.1s;
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.ticket {
+    background: #e7f5ff;
+    color: #1971c2;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.time {
+    font-size: 0.75rem;
+    color: #adb5bd;
+}
+
+.patientName {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    color: #212529;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.actionBtn,
+.doneBtn,
+.noShowBtn {
+    flex: 1;
+    padding: 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.actionBtn {
+    background: #10b981;
+    color: #fff;
+}
+
+.doneBtn {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.noShowBtn {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.actionBtn:hover {
+    opacity: 0.9;
+}
+
+.doneBtn:hover {
+    opacity: 0.9;
+}
+
+.noShowBtn:hover {
+    background: #e5e7eb;
+}
