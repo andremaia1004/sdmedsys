@@ -30,6 +30,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
     }
 
     async create(input: AppointmentInput): Promise<Appointment> {
+        console.log('[SupabaseRepo] Inserting appointment for clinic:', this.clinicId);
         const { data, error } = await this.supabase
             .from('appointments')
             .insert([{
@@ -44,6 +45,14 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
             }])
             .select()
             .single();
+
+        if (error) {
+            console.error('Supabase Error (create appointment):', error);
+            throw new Error('Failed to create appointment');
+        }
+
+        console.log('[SupabaseRepo] Insert success:', data);
+        return this.mapToAppointment(data);
 
         if (error) {
             console.error('Supabase Error (create appointment):', error);
