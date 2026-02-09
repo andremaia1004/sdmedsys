@@ -52,8 +52,11 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
                         {getItemsByColumn(col.id).map(item => (
                             <div key={item.id} className={styles.card}>
                                 <div className={styles.cardHeader}>
-                                    {item.ticketCode && <span className={styles.ticket}>{item.ticketCode}</span>}
-                                    <span className={styles.time}>{new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <div className={styles.cardInfo}>
+                                        {item.ticketCode && <span className={styles.ticket}>{item.ticketCode}</span>}
+                                        <span className={styles.sourceLabel}>{item.kind === 'SCHEDULED' ? '📅' : '🏃'}</span>
+                                    </div>
+                                    <span className={styles.time}>{item.startTime ? new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Hora de chegada'}</span>
                                 </div>
                                 <h4 className={styles.patientName}>{item.patientName}</h4>
 

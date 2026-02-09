@@ -8,11 +8,13 @@ export interface DashboardItem {
     patientId: string;
     patientName: string;
     doctorId: string;
-    startTime: string;
+    startTime?: string;
     appointmentStatus: AppointmentStatus;
+    kind: 'SCHEDULED' | 'WALK_IN';
     queueItemId?: string;
     ticketCode?: string;
     queueStatus?: 'WAITING' | 'CALLED' | 'IN_SERVICE' | 'DONE' | 'NO_SHOW' | 'CANCELED';
+    sourceType?: 'SCHEDULED' | 'WALK_IN';
 }
 
 export class SecretaryDashboardService {
@@ -30,10 +32,12 @@ export class SecretaryDashboardService {
                 doctor_id,
                 start_time,
                 status,
+                kind,
                 queue_items (
                     id,
                     ticket_code,
-                    status
+                    status,
+                    source_type
                 )
             `)
             .eq('clinic_id', clinicId) // Assumes clinic_id exists in appointments
@@ -53,9 +57,11 @@ export class SecretaryDashboardService {
             doctorId: row.doctor_id,
             startTime: row.start_time,
             appointmentStatus: row.status as AppointmentStatus,
+            kind: (row.kind || 'SCHEDULED') as 'SCHEDULED' | 'WALK_IN',
             queueItemId: row.queue_items?.[0]?.id,
             ticketCode: row.queue_items?.[0]?.ticket_code,
-            queueStatus: row.queue_items?.[0]?.status
+            queueStatus: row.queue_items?.[0]?.status,
+            sourceType: row.queue_items?.[0]?.source_type
         }));
     }
 
@@ -100,7 +106,8 @@ export class SecretaryDashboardService {
                 patient_id: appointment.patient_id,
                 doctor_id: appointment.doctor_id,
                 ticket_code: ticketCode,
-                status: 'WAITING'
+                status: 'WAITING',
+                source_type: 'SCHEDULED'
             }]);
 
         if (queueError) {
@@ -145,5 +152,62 @@ export class SecretaryDashboardService {
 
         await logAudit('NO_SHOW', 'APPOINTMENT', appointmentId, {});
         return !error;
+    }
+
+    static async createWalkIn(patientId: string, doctorId: string, notes?: string): Promise<boolean> {
+        const user = await getCurrentUser();
+        if (!user || !user.clinicId) return false;
+
+        const supabase = await createClient();
+
+        // 1. Generate Ticket Code
+        const dateStr = new Date().toISOString().split('T')[0];
+        const { count } = await supabase
+            .from('queue_items')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', `${dateStr}T00:00:00Z`);
+
+        const ticketSeq = (count || 0) + 1;
+        const ticketCode = `T-${ticketSeq.toString().padStart(3, '0')}`;
+
+        // 2. Create WALK_IN Appointment
+        const { data: appointment, error: appError } = await supabase
+            .from('appointments')
+            .insert([{
+                clinic_id: user.clinicId,
+                patient_id: patientId,
+                doctor_id: doctorId,
+                status: 'ARRIVED',
+                kind: 'WALK_IN',
+                notes: notes
+            }])
+            .select()
+            .single();
+
+        if (appError) {
+            console.error('DashboardService: Create WALK_IN error', appError);
+            return false;
+        }
+
+        // 3. Create Queue Item
+        const { error: queueError } = await supabase
+            .from('queue_items')
+            .insert([{
+                clinic_id: user.clinicId,
+                appointment_id: appointment.id,
+                patient_id: patientId,
+                doctor_id: doctorId,
+                ticket_code: ticketCode,
+                status: 'WAITING',
+                source_type: 'WALK_IN'
+            }]);
+
+        if (queueError) {
+            console.error('DashboardService: Create QueueItem error', queueError);
+            return false;
+        }
+
+        await logAudit('CHECK_IN', 'APPOINTMENT', appointment.id, { ticketCode, kind: 'WALK_IN' });
+        return true;
     }
 }

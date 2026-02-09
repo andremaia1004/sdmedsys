@@ -68,7 +68,9 @@ export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[
                 {waitingList.map(item => (
                     <li key={item.id} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <strong>{item.ticketCode}</strong> - {item.patientName}
+                            <strong style={{ background: '#e6f7ff', padding: '2px 6px', borderRadius: '4px' }}>{item.ticketCode}</strong>
+                            <span style={{ fontSize: '1rem', marginLeft: '4px', marginRight: '8px' }}>{item.sourceType === 'SCHEDULED' ? '📅' : '🏃'}</span>
+                            - {item.patientName}
                             <Link href={`/patients/${item.patientId}`} style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#0070f3' }}>
                                 (Ficha)
                             </Link>

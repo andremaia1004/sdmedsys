@@ -47,3 +47,14 @@ export async function markNoShowAction(appointmentId: string) {
         return { success: false, error: (error as Error).message };
     }
 }
+
+export async function createWalkInAction(patientId: string, doctorId: string, notes?: string) {
+    try {
+        await requireRole(['SECRETARY', 'ADMIN']);
+        const success = await SecretaryDashboardService.createWalkIn(patientId, doctorId, notes);
+        revalidatePath('/secretary/dashboard');
+        return { success };
+    } catch (error) {
+        return { success: false, error: (error as Error).message };
+    }
+}

@@ -7,6 +7,7 @@ export interface QueueItem {
     patientId: string; // Required now, reference to Patient
     doctorId?: string; // Optional if general queue, but keeping linked for MVP
     status: QueueStatus;
+    sourceType?: 'SCHEDULED' | 'WALK_IN';
     createdAt: string;
     updatedAt: string;
 }

@@ -11,12 +11,12 @@ export default function TVBoard({
     clinicName = 'SDMED SYS',
     refreshSeconds = 30
 }: {
-    items?: Partial<QueueItemWithPatient>[],
+    items?: QueueItemWithPatient[],
     clinicName?: string,
     refreshSeconds?: number
 }) {
     const router = useRouter();
-    const [calling, setCalling] = useState<Partial<QueueItemWithPatient> | null>(null);
+    const [calling, setCalling] = useState<QueueItemWithPatient | null>(null);
     const [mounted, setMounted] = useState(false);
 
     // Identify CALLED item to ring/blink
@@ -59,7 +59,14 @@ export default function TVBoard({
                     Chamando Agora
                 </div>
                 <div className={`${styles.ticketCard} ${calling ? styles.pulse : ''}`}>
-                    <div className={styles.ticketNumber}>{currentCalled?.ticketCode || '---'}</div>
+                    <div className={styles.ticketNumber}>
+                        {currentCalled?.ticketCode || '---'}
+                        {currentCalled?.sourceType && (
+                            <span style={{ fontSize: '1.5rem', marginLeft: '1rem', verticalAlign: 'middle' }}>
+                                {currentCalled.sourceType === 'SCHEDULED' ? '📅' : '🏃'}
+                            </span>
+                        )}
+                    </div>
                     <div className={styles.patientName}>{currentCalled?.patientName || 'Aguardando...'}</div>
                 </div>
             </div>
@@ -69,7 +76,10 @@ export default function TVBoard({
                 <div className={styles.nextList}>
                     {waiting.map(item => (
                         <div key={item.id} className={styles.nextItem}>
-                            <span className={styles.nextTicket}>{item.ticketCode}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span className={styles.nextTicket}>{item.ticketCode}</span>
+                                <span style={{ fontSize: '0.9rem' }}>{item.sourceType === 'SCHEDULED' ? '📅' : '🏃'}</span>
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <span className={styles.nextName}>{item.patientName}</span>
                                 <ArrowRight size={20} color="rgba(255,255,255,0.2)" />

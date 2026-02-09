@@ -50,6 +50,28 @@ export class ConsultationService {
 
     static async finish(id: string): Promise<void> {
         const repo = await getRepository();
+
+        // 1. Fetch consultation to get queue_item_id
+        const consultation = await repo.findById(id);
+        if (consultation && consultation.queueItemId) {
+            const supabase = await createClient();
+
+            // 2. Get appointment_id from queue_item
+            const { data: queueItem } = await supabase
+                .from('queue_items')
+                .select('appointment_id')
+                .eq('id', consultation.queueItemId)
+                .single();
+
+            if (queueItem?.appointment_id) {
+                // 3. Update appointment status
+                await supabase
+                    .from('appointments')
+                    .update({ status: 'COMPLETED' })
+                    .eq('id', queueItem.appointment_id);
+            }
+        }
+
         return repo.finish(id);
     }
 }
