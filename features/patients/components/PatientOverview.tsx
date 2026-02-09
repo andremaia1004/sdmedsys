@@ -6,9 +6,10 @@ interface PatientOverviewProps {
     patient: Patient;
     summary: ClinicalSummary | null;
     role: string;
+    onViewTimeline?: () => void;
 }
 
-export default function PatientOverview({ patient, summary, role }: PatientOverviewProps) {
+export default function PatientOverview({ patient, summary, role, onViewTimeline }: PatientOverviewProps) {
     const isClinicalAllowed = role === 'ADMIN' || role === 'DOCTOR';
 
     return (
@@ -97,7 +98,13 @@ export default function PatientOverview({ patient, summary, role }: PatientOverv
                                 <p>Responsável: <strong>{summary.doctorName}</strong></p>
                             </div>
                             <div className={styles.viewTimeline}>
-                                <a href="#" className={styles.timelineLink}>Ver Linha do Tempo Completa →</a>
+                                <button
+                                    onClick={(e) => { e.preventDefault(); onViewTimeline?.(); }}
+                                    className={styles.timelineLink}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                >
+                                    Ver Linha do Tempo Completa →
+                                </button>
                             </div>
                         </div>
                     ) : (

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ClinicalDocumentService } from '@/features/consultation/service.documents';
-import { ClinicalDocumentsRegistryService } from '@/features/documents/service.registry';
-import { generatePrescription, generateCertificate } from '@/lib/pdf/templates';
+import { generatePrescription, generateCertificate, generateReport } from '@/lib/pdf/templates';
 import { getCurrentUser } from '@/lib/session';
+import { logAudit } from '@/lib/audit';
 
 export const runtime = 'nodejs';
 
@@ -25,19 +25,8 @@ export async function GET(
                 return new NextResponse('Unauthorized or Not Found', { status: 403 });
             }
 
-            // Record emission
-            if (data.metadata) {
-                await ClinicalDocumentsRegistryService.createRecord({
-                    clinicId: data.metadata.clinicId,
-                    patientId: data.metadata.patientId,
-                    consultationId: data.metadata.consultationId,
-                    doctorId: data.metadata.doctorId,
-                    type: 'prescription',
-                    issuedAt: new Date().toISOString(),
-                    meta: { observations: data.observations },
-                    createdBy: user.id
-                });
-            }
+            // Audit Download
+            await logAudit('GENERATE_PRESCRIPTION_PDF', 'CONSULTATION', consultationId, { action: 'DOWNLOAD' });
 
             const pdfBuffer = await generatePrescription(data);
 
@@ -58,19 +47,8 @@ export async function GET(
                 return new NextResponse('Unauthorized or Not Found', { status: 403 });
             }
 
-            // Record emission
-            if (data.metadata) {
-                await ClinicalDocumentsRegistryService.createRecord({
-                    clinicId: data.metadata.clinicId,
-                    patientId: data.metadata.patientId,
-                    consultationId: data.metadata.consultationId,
-                    doctorId: data.metadata.doctorId,
-                    type: 'certificate',
-                    issuedAt: new Date().toISOString(),
-                    meta: { days, cid },
-                    createdBy: user.id
-                });
-            }
+            // Audit Download
+            await logAudit('GENERATE_CERTIFICATE_PDF', 'CONSULTATION', consultationId, { action: 'DOWNLOAD' });
 
             const pdfBuffer = await generateCertificate(data);
 
@@ -78,6 +56,25 @@ export async function GET(
                 headers: {
                     'Content-Type': 'application/pdf',
                     'Content-Disposition': `attachment; filename="Atestado_${consultationId.substring(0, 8)}.pdf"`
+                }
+            });
+        }
+
+        if (type === 'report') {
+            const data = await ClinicalDocumentService.getReportData(consultationId);
+            if (!data) {
+                return new NextResponse('Unauthorized or Not Found (Entry must be finalized)', { status: 403 });
+            }
+
+            // Audit Download
+            await logAudit('GENERATE_DOCUMENT', 'CONSULTATION', consultationId, { action: 'DOWNLOAD', type: 'report' });
+
+            const pdfBuffer = await generateReport(data);
+
+            return new NextResponse(new Uint8Array(pdfBuffer), {
+                headers: {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': `attachment; filename="Laudo_${consultationId.substring(0, 8)}.pdf"`
                 }
             });
         }

@@ -1,7 +1,8 @@
 import { getCurrentUser } from '@/lib/session';
 import { createClient } from '@/lib/supabase-auth';
-import { PrescriptionData, CertificateData } from '@/lib/pdf/templates';
+import { PrescriptionData, CertificateData, ReportData } from '@/lib/pdf/templates';
 import { logAudit } from '@/lib/audit';
+import { ClinicalDocumentsRegistryService } from '@/features/documents/service.registry';
 
 export class ClinicalDocumentService {
     static async getDocumentData(consultationId: string): Promise<PrescriptionData | null> {
@@ -45,14 +46,12 @@ export class ClinicalDocumentService {
         }
 
         // 3. Fetch Doctor details (Name + CRM)
-        // We try to find the doctor in the 'doctors' table using the doctor_user_id (which is a profile_id)
-        // or if it's a legacy ID. The consultation.doctor_user_id is usually the auth user id (profile).
         let doctorName = user.name;
         let doctorCrm = '';
 
         const { data: doctorRecord } = await supabase
             .from('doctors')
-            .select('name, crm')
+            .select('id, name, crm')
             .eq('profile_id', consultation.doctor_user_id)
             .single();
 
@@ -81,7 +80,7 @@ export class ClinicalDocumentService {
             }
         );
 
-        return {
+        const data: PrescriptionData = {
             header: {
                 clinicName: clinic?.clinic_name || 'SDMED Clinic',
                 clinicAddress: 'Endereço da Unidade', // TODO: Add to clinic_settings
@@ -106,6 +105,13 @@ export class ClinicalDocumentService {
                 clinicId: consultation.clinic_id
             }
         };
+
+        // 5. Persist in Registry
+        if (doctorRecord?.id) {
+            await this.saveDocumentRecord(data, 'prescription', doctorRecord.id);
+        }
+
+        return data;
     }
 
     static async getCertificateData(consultationId: string, days: number = 0, cid?: string): Promise<CertificateData | null> {
@@ -127,12 +133,131 @@ export class ClinicalDocumentService {
             );
         }
 
-        return {
+        const result: CertificateData = {
             ...base,
             days,
             cid,
             startTime: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             metadata: base.metadata
         };
+
+        // Persist in Registry
+        const supabase = await createClient();
+        const { data: doctorRecord } = await supabase
+            .from('doctors')
+            .select('id')
+            .eq('profile_id', base.metadata?.doctorId)
+            .single();
+
+        if (doctorRecord?.id) {
+            await this.saveDocumentRecord(result, 'certificate', doctorRecord.id);
+        }
+
+        return result;
+    }
+
+    static async getReportData(consultationId: string): Promise<ReportData | null> {
+        const user = await getCurrentUser();
+        if (!user || user.role === 'SECRETARY' || !user.clinicId) {
+            return null;
+        }
+
+        const supabase = await createClient();
+
+        // 1. Fetch Consultation with FINAL clinical entry
+        const { data: consultation, error: consultationError } = await supabase
+            .from('consultations')
+            .select(`
+                *,
+                clinical_entries!inner (*),
+                patients!inner (*),
+                clinic_settings:clinic_id (*)
+            `)
+            .eq('id', consultationId)
+            .eq('clinic_id', user.clinicId)
+            .eq('clinical_entries.is_final', true)
+            .single();
+
+        if (consultationError || !consultation || !consultation.clinical_entries?.[0]) {
+            console.error('DocumentService: Finalized entry not found for report', consultationError);
+            return null;
+        }
+
+        const clinicalEntry = consultation.clinical_entries[0];
+        const patient = consultation.patients;
+        const clinic = consultation.clinic_settings;
+
+        const { data: doctorRecord } = await supabase
+            .from('doctors')
+            .select('id, name, crm')
+            .eq('profile_id', consultation.doctor_user_id)
+            .single();
+
+        const doctorName = doctorRecord?.name || user.name;
+        const doctorCrm = doctorRecord?.crm || '';
+
+        await logAudit(
+            'GENERATE_DOCUMENT',
+            'CONSULTATION',
+            consultationId,
+            {
+                patientId: consultation.patient_id,
+                documentType: 'report'
+            }
+        );
+
+        const data: ReportData = {
+            header: {
+                clinicName: clinic?.clinic_name || 'SDMED Clinic',
+                clinicAddress: 'Endereço da Unidade',
+                clinicPhone: 'Fone: (00) 0000-0000'
+            },
+            patient: {
+                name: patient.name,
+                document: patient.document,
+                birthDate: patient.birth_date
+            },
+            doctor: {
+                name: doctorName,
+                crm: doctorCrm
+            },
+            content: `DIAGNÓSTICO: ${clinicalEntry.diagnosis || 'Não informado'}\n\nCONDUTA: ${clinicalEntry.conduct || 'Não informado'}\n\nNOTAS: ${clinicalEntry.free_notes || ''}`,
+            date: new Date().toLocaleDateString('pt-BR'),
+            metadata: {
+                consultationId: consultation.id,
+                patientId: consultation.patient_id,
+                doctorId: consultation.doctor_user_id,
+                clinicId: consultation.clinic_id
+            }
+        };
+
+        if (doctorRecord?.id) {
+            await this.saveDocumentRecord(data, 'report', doctorRecord.id);
+        }
+
+        return data;
+    }
+
+    private static async saveDocumentRecord(
+        data: PrescriptionData | CertificateData | ReportData,
+        type: 'prescription' | 'certificate' | 'report',
+        doctorId: string
+    ) {
+        const user = await getCurrentUser();
+        if (!user || !data.metadata) return;
+
+        await ClinicalDocumentsRegistryService.createRecord({
+            clinicId: data.metadata.clinicId,
+            patientId: data.metadata.patientId,
+            consultationId: data.metadata.consultationId,
+            doctorId: doctorId,
+            type,
+            issuedAt: new Date().toISOString(),
+            meta: {
+                ...('days' in data ? { days: data.days, cid: data.cid } : {}),
+                ...('observations' in data ? { observations: (data as PrescriptionData).observations } : {}),
+            },
+            createdBy: user.id
+        });
     }
 }

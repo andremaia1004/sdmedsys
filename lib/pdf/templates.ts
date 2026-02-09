@@ -31,6 +31,20 @@ export interface CertificateData {
     };
 }
 
+export interface ReportData {
+    header: DocumentHeader;
+    patient: PatientInfo;
+    doctor: DoctorInfo;
+    content: string; // Detailed clinical report
+    date: string;
+    metadata?: {
+        consultationId: string;
+        patientId: string;
+        doctorId: string;
+        clinicId: string;
+    };
+}
+
 export async function generatePrescription(data: PrescriptionData): Promise<Buffer> {
     return new Promise((resolve, reject) => {
         const doc = createBasePDF(data.header);
@@ -109,6 +123,45 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
         // Date
         doc.moveDown(4);
         doc.fontSize(10).text(`${data.date}`, { align: 'right' });
+
+        // Footer
+        addFooter(doc, data.doctor);
+
+        doc.end();
+    });
+}
+
+export async function generateReport(data: ReportData): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const doc = createBasePDF(data.header);
+        const chunks: Buffer[] = [];
+
+        doc.on('data', (chunk) => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', reject);
+
+        // Title
+        doc.fontSize(18).text('LAUDO MÉDICO', { align: 'center', underline: true });
+        doc.moveDown(2);
+
+        // Patient Info
+        doc.fontSize(11).text(`Paciente: `, { continued: true }).font('Helvetica-Bold').text(data.patient.name);
+        doc.font('Helvetica');
+        if (data.patient.document) {
+            doc.text(`CPF/Doc: ${data.patient.document}`);
+        }
+        doc.moveDown(2);
+
+        // Content
+        doc.fontSize(12).font('Helvetica-Bold').text('DESCRIÇÃO DO LAUDO / PARECER:');
+        doc.font('Helvetica').fontSize(11).text(data.content, {
+            align: 'justify',
+            lineGap: 5
+        });
+
+        // Date
+        doc.moveDown(4);
+        doc.fontSize(10).text(`Data: ${data.date}`, { align: 'right' });
 
         // Footer
         addFooter(doc, data.doctor);

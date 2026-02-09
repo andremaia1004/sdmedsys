@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS public.clinical_documents (
     patient_id UUID NOT NULL REFERENCES public.patients(id),
     consultation_id UUID REFERENCES public.consultations(id), -- Nullable if issued outside flow (future proof)
     doctor_id UUID NOT NULL REFERENCES public.doctors(id), -- The doctor who signed
-    type TEXT NOT NULL CHECK (type IN ('prescription', 'certificate')),
+    type TEXT NOT NULL CHECK (type IN ('prescription', 'certificate', 'report')),
     issued_at TIMESTAMPTZ DEFAULT now(),
     meta JSONB DEFAULT '{}'::jsonb, -- Store extra info like 'days', 'cid' for certificates
     created_by UUID REFERENCES auth.users(id), -- The user who clicked the button (might be same as doctor)

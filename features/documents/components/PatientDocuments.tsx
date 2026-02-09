@@ -46,7 +46,8 @@ export const PatientDocuments: React.FC<Props> = ({ patientId }) => {
                     {documents.map((doc) => (
                         <tr key={doc.id}>
                             <td className={styles.type}>
-                                {doc.type === 'prescription' ? '💊 Receita' : '📜 Atestado'}
+                                {doc.type === 'prescription' ? '💊 Receita' :
+                                    doc.type === 'certificate' ? '📜 Atestado' : '📄 Laudo'}
                             </td>
                             <td>{new Date(doc.issuedAt).toLocaleString('pt-BR')}</td>
                             <td>{doc.doctorName}</td>
@@ -57,6 +58,19 @@ export const PatientDocuments: React.FC<Props> = ({ patientId }) => {
                                 {doc.type === 'prescription' && (doc.meta as { observations?: string })?.observations && (
                                     <span className={styles.obs}>{(doc.meta as { observations: string }).observations}</span>
                                 )}
+                                {doc.type === 'report' && (
+                                    <span className={styles.obs}>Laudo Médico Estruturado</span>
+                                )}
+                            </td>
+                            <td>
+                                <a
+                                    href={`/api/documents/${doc.type}/${doc.consultationId}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.downloadBtn}
+                                >
+                                    ⬇️ Baixar
+                                </a>
                             </td>
                         </tr>
                     ))}

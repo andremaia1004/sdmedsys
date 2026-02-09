@@ -1,4 +1,4 @@
-export type ClinicalDocumentType = 'prescription' | 'certificate';
+export type ClinicalDocumentType = 'prescription' | 'certificate' | 'report';
 
 export interface ClinicalDocument {
     id: string;

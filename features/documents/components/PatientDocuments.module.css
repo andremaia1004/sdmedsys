@@ -49,3 +49,18 @@
     text-align: center;
     color: #666;
 }
+
+.downloadBtn {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--primary, #2563eb);
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: opacity 0.2s;
+}
+
+.downloadBtn:hover {
+    opacity: 0.9;
+}
