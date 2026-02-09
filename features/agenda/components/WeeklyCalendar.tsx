@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Appointment } from '../types';
 import AppointmentModal from './AppointmentModal';
 import styles from '../styles/Agenda.module.css';
@@ -138,7 +138,7 @@ export default function WeeklyCalendar({
                     doctorId={doctorId}
                     date={selectedSlot.date}
                     time={selectedSlot.time}
-                    onClose={() => setSelectedSlot(null)}
+                    onClose={useCallback(() => setSelectedSlot(null), [])}
                 />
             )}
         </div>

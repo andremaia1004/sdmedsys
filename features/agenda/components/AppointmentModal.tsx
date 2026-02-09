@@ -56,6 +56,10 @@ export default function AppointmentModal({
     // @ts-ignore
     const [apptState, apptFormAction, isApptPending] = useActionState(createAppointmentAction, { error: '', success: false });
 
+    // Internal state to track if we've already handled the success action
+    // This prevents router.refresh() from causing a re-render that might reset the view or loop
+    const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
+
     // Fetch Doctors for selection
     useEffect(() => {
         setIsLoadingDoctors(true);
@@ -77,14 +81,18 @@ export default function AppointmentModal({
 
     // Handle Appointment Success
     useEffect(() => {
-        if (apptState?.success) {
+        if (apptState?.success && !isSuccessfullySubmitted) {
+            setIsSuccessfullySubmitted(true);
             router.refresh();
-            const timer = setTimeout(() => onClose(), 1500);
+            // Close modal after delay
+            const timer = setTimeout(() => {
+                onClose();
+            }, 1500);
             return () => clearTimeout(timer);
         }
-    }, [apptState?.success, onClose, router]);
+    }, [apptState?.success, isSuccessfullySubmitted, onClose, router]);
 
-    if (apptState?.success) {
+    if (isSuccessfullySubmitted || apptState?.success) {
         return (
             <div className={styles.modalOverlay}>
                 <Card className={styles.modalCard}>
