@@ -98,7 +98,13 @@ export class ClinicalDocumentService {
             },
             content: clinicalEntry.conduct || 'Nenhuma conduta registrada',
             observations: clinicalEntry.observations || '',
-            date: new Date().toLocaleDateString('pt-BR')
+            date: new Date().toLocaleDateString('pt-BR'),
+            metadata: {
+                consultationId: consultation.id,
+                patientId: consultation.patient_id,
+                doctorId: consultation.doctor_user_id,
+                clinicId: consultation.clinic_id
+            }
         };
     }
 
@@ -125,7 +131,8 @@ export class ClinicalDocumentService {
             ...base,
             days,
             cid,
-            startTime: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            startTime: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            metadata: base.metadata
         };
     }
 }

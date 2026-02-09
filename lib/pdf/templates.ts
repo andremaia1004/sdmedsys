@@ -7,6 +7,12 @@ export interface PrescriptionData {
     content: string; // Conduta / Prescrição
     observations?: string;
     date: string;
+    metadata?: {
+        consultationId: string;
+        patientId: string;
+        doctorId: string;
+        clinicId: string;
+    };
 }
 
 export interface CertificateData {
@@ -17,6 +23,12 @@ export interface CertificateData {
     cid?: string;
     date: string;
     startTime?: string;
+    metadata?: {
+        consultationId: string;
+        patientId: string;
+        doctorId: string;
+        clinicId: string;
+    };
 }
 
 export async function generatePrescription(data: PrescriptionData): Promise<Buffer> {

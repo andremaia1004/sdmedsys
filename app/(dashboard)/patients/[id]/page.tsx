@@ -2,6 +2,7 @@ import { requireRole } from '@/lib/session';
 import { PatientService } from '@/features/patients/service';
 import { ClinicalSummaryService } from '@/features/consultation/service.summary';
 import PatientOverview from '@/features/patients/components/PatientOverview';
+import { PatientDocuments } from '@/features/documents/components/PatientDocuments';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -36,6 +37,12 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
                 summary={summary}
                 role={user.role}
             />
+
+            {user.role !== 'SECRETARY' && (
+                <div style={{ marginTop: '2rem' }}>
+                    <PatientDocuments patientId={id} />
+                </div>
+            )}
         </div>
     );
 }
