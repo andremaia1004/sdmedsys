@@ -56,6 +56,7 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
             startTime,
             endTime,
             status: 'SCHEDULED',
+            kind: 'SCHEDULED',
             notes: notes || undefined,
         };
 

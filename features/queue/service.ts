@@ -74,4 +74,59 @@ export class QueueService {
         const repo = await getRepository();
         return repo.changeStatus(id, newStatus, actorRole);
     }
+
+    static async getOperationalQueue(doctorId?: string): Promise<QueueItemWithPatient[]> {
+        const repo = await getRepository();
+        const items = await repo.list(doctorId);
+
+        // Filter only WAITING and CALLED for the operational view
+        const filtered = items.filter(i => i.status === 'WAITING' || i.status === 'CALLED');
+
+        const enriched: QueueItemWithPatient[] = [];
+        const supabase = await createClient();
+
+        for (const item of filtered) {
+            const patient = await PatientService.findById(item.patientId);
+
+            // Enrich with startTime from appointments if available
+            let startTime: string | undefined;
+            if (item.appointmentId) {
+                const { data: app } = await supabase
+                    .from('appointments')
+                    .select('start_time')
+                    .eq('id', item.appointmentId)
+                    .single();
+                startTime = app?.start_time;
+            }
+
+            enriched.push({
+                ...item,
+                patientName: patient ? patient.name : 'Unknown',
+                startTime
+            });
+        }
+
+        const now = new Date();
+
+        // Smart Sorting
+        return enriched.sort((a, b) => {
+            // 1. CALLED status always first
+            if (a.status === 'CALLED' && b.status !== 'CALLED') return -1;
+            if (a.status !== 'CALLED' && b.status === 'CALLED') return 1;
+
+            // 2. Late Scheduled (status is WAITING at this point)
+            const aIsLate = a.sourceType === 'SCHEDULED' && a.startTime && new Date(a.startTime) < now;
+            const bIsLate = b.sourceType === 'SCHEDULED' && b.startTime && new Date(b.startTime) < now;
+
+            if (aIsLate && !bIsLate) return -1;
+            if (!aIsLate && bIsLate) return 1;
+
+            // 3. Regular Scheduled
+            if (a.sourceType === 'SCHEDULED' && b.sourceType !== 'SCHEDULED') return -1;
+            if (a.sourceType !== 'SCHEDULED' && b.sourceType === 'SCHEDULED') return 1;
+
+            // 4. Tie-breaker: createdAt ASC
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        });
+    }
 }

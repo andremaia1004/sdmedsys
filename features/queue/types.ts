@@ -14,6 +14,7 @@ export interface QueueItem {
 
 export interface QueueItemWithPatient extends QueueItem {
     patientName: string;
+    startTime?: string; // For sorting and display in Ops view
 }
 
 export interface AuditLog {

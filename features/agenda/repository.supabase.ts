@@ -40,6 +40,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
                 start_time: input.startTime,
                 end_time: input.endTime,
                 status: input.status,
+                kind: input.kind,
                 notes: input.notes,
                 clinic_id: this.clinicId
             }])
@@ -52,13 +53,6 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
         }
 
         console.log('[SupabaseRepo] Insert success:', data);
-        return this.mapToAppointment(data);
-
-        if (error) {
-            console.error('Supabase Error (create appointment):', error);
-            throw new Error('Failed to create appointment');
-        }
-
         return this.mapToAppointment(data);
     }
 
@@ -120,6 +114,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
             startTime: row.start_time,
             endTime: row.end_time,
             status: row.status,
+            kind: row.kind || 'SCHEDULED',
             notes: row.notes,
         };
     }

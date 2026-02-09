@@ -13,6 +13,7 @@ export class MockAppointmentsRepository implements IAppointmentsRepository {
         return MOCK_APPOINTMENTS.some(appt => {
             if (appt.doctorId !== doctorId) return false;
             if (appt.status === 'CANCELED') return false;
+            if (!appt.startTime || !appt.endTime) return false;
 
             const apptStart = new Date(appt.startTime).getTime();
             const apptEnd = new Date(appt.endTime).getTime();
@@ -25,6 +26,7 @@ export class MockAppointmentsRepository implements IAppointmentsRepository {
         // Validation logic is cleaner in service, but checkConflict is reused
         const newAppt: Appointment = {
             ...input,
+            kind: input.kind || 'SCHEDULED',
             id: Math.random().toString(36).substring(7),
         };
 
@@ -45,6 +47,7 @@ export class MockAppointmentsRepository implements IAppointmentsRepository {
             const s = new Date(startRange).getTime();
             const e = new Date(endRange).getTime();
             filtered = filtered.filter(a => {
+                if (!a.startTime) return false;
                 const as = new Date(a.startTime).getTime();
                 return as >= s && as <= e;
             });

@@ -85,6 +85,16 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
                 },
                 {
+                    label: 'Operação de Fila',
+                    href: '/secretary/queue/ops',
+                    rolesAllowed: ['ADMIN', 'SECRETARY'],
+                },
+                {
+                    label: 'Gestão Kanban',
+                    href: '/secretary/queue/kanban',
+                    rolesAllowed: ['ADMIN', 'SECRETARY'],
+                },
+                {
                     label: 'Painel TV',
                     href: '/tv',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
