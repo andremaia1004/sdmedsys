@@ -3,9 +3,10 @@
 import { PatientService } from '@/features/patients/service';
 import { PatientInput } from '@/features/patients/types';
 import { revalidatePath } from 'next/cache';
+import { ActionState } from '@/lib/types/server-actions';
 import { requireRole } from '@/lib/session';
 
-export async function createPatientAction(prevState: any, formData: FormData) {
+export async function createPatientAction(prevState: ActionState, formData: FormData) {
     try {
         await requireRole(['ADMIN', 'SECRETARY']);
 
@@ -25,8 +26,9 @@ export async function createPatientAction(prevState: any, formData: FormData) {
         revalidatePath('/secretary/patients');
         revalidatePath('/admin/patients');
         return { success: true };
-    } catch (e: any) {
-        return { error: e.message };
+    } catch (e: unknown) {
+        const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+        return { error: errorMessage };
     }
 }
 

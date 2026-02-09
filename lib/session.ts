@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase-auth';
-import { supabaseServer } from '@/lib/supabase-server';
 
 import { Role, UserSession } from './types/auth';
 

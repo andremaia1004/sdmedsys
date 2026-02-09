@@ -1,7 +1,7 @@
 import { Appointment, AppointmentInput, AppointmentStatus } from './types';
 import { IAppointmentsRepository } from './repository.types';
 
-let MOCK_APPOINTMENTS: Appointment[] = [];
+const MOCK_APPOINTMENTS: Appointment[] = [];
 
 export class MockAppointmentsRepository implements IAppointmentsRepository {
     async checkConflict(doctorId: string, startTime: string, endTime: string): Promise<boolean> {

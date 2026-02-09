@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { QueueItemWithPatient } from '../types';
 import styles from '../styles/Queue.module.css';
-import { Clock, Building2, Activity, ArrowRight } from 'lucide-react';
+import { Building2, Activity, ArrowRight } from 'lucide-react';
 
 export default function TVBoard({
     items = [],
@@ -23,6 +23,7 @@ export default function TVBoard({
     const currentCalled = items.find(i => i.status === 'CALLED');
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
 
         // Auto-refresh data
@@ -33,17 +34,21 @@ export default function TVBoard({
         return () => clearInterval(interval);
     }, [router, refreshSeconds]);
 
+    const lastCalledId = useRef<string | null>(null);
+
     useEffect(() => {
-        if (currentCalled && currentCalled.id !== calling?.id) {
+        if (currentCalled && currentCalled.id !== lastCalledId.current) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setCalling(currentCalled);
+            lastCalledId.current = currentCalled.id || null;
+
             const audio = new Audio('/notification.mp3');
             audio.play().catch(() => { }); // Optional: notification sound
 
             const timer = setTimeout(() => setCalling(null), 5000);
             return () => clearTimeout(timer);
         }
-    }, [currentCalled, calling]);
-
+    }, [currentCalled]);
     const waiting = items.filter(i => i.status === 'WAITING').slice(0, 5);
 
     return (
@@ -88,6 +93,6 @@ export default function TVBoard({
                     {mounted && new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </div>
             </footer>
-        </div>
+        </div >
     );
 }

@@ -13,7 +13,6 @@ const initialState = {
 };
 
 export default function LoginPage() {
-    // @ts-ignore - React 19 / Next.js 15 types
     const [state, formAction, isPending] = useActionState(loginAction, initialState);
 
     return (

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { fetchDoctorsAction, createDoctorAction, updateDoctorAction } from '@/app/actions/admin';
 import { Doctor } from '@/features/doctors/types';
-import { UserPlus, UserMinus, ShieldCheck, Mail, Phone, Hash, Award, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { UserPlus, UserMinus, ShieldCheck, Mail, Phone, Hash, Award, Eye, EyeOff } from 'lucide-react';
 
 export default function DoctorsAdminPage() {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -35,8 +35,8 @@ export default function DoctorsAdminPage() {
         try {
             const data = await fetchDoctorsAction(false);
             setDoctors(data);
-        } catch (err) {
-            console.error(err);
+        } catch {
+            console.error('Failed to fetch doctors');
         } finally {
             setLoading(false);
         }
@@ -80,9 +80,10 @@ export default function DoctorsAdminPage() {
             } else {
                 alert(res.error || 'Erro ao processar (sem detalhes)');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            alert(err.message || 'Erro inesperado na comunicação com o servidor');
+            const msg = err instanceof Error ? err.message : 'Unknown error';
+            alert(msg || 'Erro inesperado na comunicação com o servidor');
         } finally {
             setIsSaving(false);
         }
@@ -120,7 +121,7 @@ export default function DoctorsAdminPage() {
         try {
             await updateDoctorAction(doctor.id, { active: !doctor.active });
             await loadDoctors();
-        } catch (err) {
+        } catch {
             alert('Erro ao atualizar status');
         }
     };

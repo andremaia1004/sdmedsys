@@ -30,10 +30,10 @@ export class SupabaseQueueRepository implements IQueueRepository {
         return data.map(this.mapToQueueItem);
     }
 
-    async getTVList(): Promise<Partial<QueueItemWithPatient>[]> {
+    async getTVList(): Promise<QueueItemWithPatient[]> {
         const { data, error } = await this.supabase
             .from('queue_items')
-            .select('ticket_code, status, doctor_id, patient_id, patients(name)')
+            .select('id, ticket_code, status, doctor_id, patient_id, created_at, updated_at, patients(name)')
             .eq('clinic_id', this.clinicId)
             .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
             .order('updated_at', { ascending: false });
@@ -43,13 +43,16 @@ export class SupabaseQueueRepository implements IQueueRepository {
             return [];
         }
 
-        return data.map((row: any) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data || []).map((row: any) => ({
             id: row.id,
             ticketCode: row.ticket_code,
-            status: row.status as QueueStatus,
+            status: row.status,
             doctorId: row.doctor_id,
             patientId: row.patient_id,
-            patientName: row.patients?.name || '---'
+            patientName: row.patients?.name || '---',
+            createdAt: row.created_at,
+            updatedAt: row.updated_at
         }));
     }
 
@@ -83,7 +86,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
         return this.mapToQueueItem(data);
     }
 
-    async changeStatus(id: string, newStatus: QueueStatus, actorRole: string): Promise<QueueItem> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async changeStatus(id: string, newStatus: QueueStatus, _actorRole: string): Promise<QueueItem> {
         const { data, error } = await this.supabase
             .from('queue_items')
             .update({
@@ -103,6 +107,7 @@ export class SupabaseQueueRepository implements IQueueRepository {
         return this.mapToQueueItem(data);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToQueueItem(row: any): QueueItem {
         return {
             id: row.id,

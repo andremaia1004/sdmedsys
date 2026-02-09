@@ -21,7 +21,8 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
             return [];
         }
 
-        return data.map(this.mapToEntry);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data || []).map((d: any) => this.mapToClinicalEntry(d));
     }
 
     async findById(id: string): Promise<ClinicalEntry | null> {
@@ -37,7 +38,7 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
             return null;
         }
 
-        return data ? this.mapToEntry(data) : null;
+        return data ? this.mapToClinicalEntry(data) : null;
     }
 
     async findByConsultation(consultationId: string): Promise<ClinicalEntry | null> {
@@ -53,10 +54,11 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
             return null;
         }
 
-        return data ? this.mapToEntry(data) : null;
+        return data ? this.mapToClinicalEntry(data) : null;
     }
 
     async upsert(input: ClinicalEntryInput & { id?: string, clinicId: string }): Promise<ClinicalEntry> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const payload: any = {
             consultation_id: input.consultationId,
             patient_id: input.patientId,
@@ -86,10 +88,11 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
             throw new Error(error.message || 'Failed to safe clinical entry');
         }
 
-        return this.mapToEntry(data);
+        return this.mapToClinicalEntry(data);
     }
 
-    private mapToEntry(row: any): ClinicalEntry {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private mapToClinicalEntry(row: any): ClinicalEntry {
         return {
             id: row.id,
             consultationId: row.consultation_id,

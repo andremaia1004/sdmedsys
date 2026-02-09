@@ -34,7 +34,8 @@ export class SupabasePatientsRepository implements IPatientsRepository {
             throw new Error('Failed to list patients');
         }
 
-        return data.map(this.mapToPatient);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data || []).map((d: any) => this.mapToPatient(d));
     }
 
     async findById(id: string): Promise<Patient | undefined> {
@@ -115,6 +116,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
         return this.mapToPatient(data);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToPatient(row: any): Patient {
         return {
             id: row.id,

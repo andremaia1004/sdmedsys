@@ -110,6 +110,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
         return this.mapToAppointment(data);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToAppointment(row: any): Appointment {
         return {
             id: row.id,

@@ -19,7 +19,7 @@ export default function PatientTimeline({ entries }: Props) {
 
     return (
         <div className={styles.timeline}>
-            {entries.map((entry, index) => (
+            {entries.map((entry) => (
                 <div key={entry.id} className={styles.timelineItem}>
                     <div className={styles.marker}></div>
                     <div className={styles.content}>

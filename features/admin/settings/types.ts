@@ -9,3 +9,5 @@ export interface ClinicSettings {
     createdAt: string;
     updatedAt: string;
 }
+
+export type ClinicSettingsInput = Omit<ClinicSettings, 'id' | 'clinicId' | 'createdAt' | 'updatedAt'>;

@@ -3,8 +3,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase-auth';
+import { ActionState } from '@/lib/types/server-actions';
 
-export async function loginAction(prevState: any, formData: FormData) {
+export async function loginAction(prevState: ActionState, formData: FormData) {
     const authMode = process.env.AUTH_MODE || 'stub';
     const emailOrUsername = formData.get('username') as string;
     const password = formData.get('password') as string;

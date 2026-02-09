@@ -1,7 +1,7 @@
 import { Consultation, ConsultationInput } from './types';
 import { IConsultationRepository } from './repository.types';
 
-let MOCK_CONSULTATIONS: Consultation[] = [];
+const MOCK_CONSULTATIONS: Consultation[] = [];
 
 export class MockConsultationRepository implements IConsultationRepository {
     async start(input: ConsultationInput): Promise<Consultation> {

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClinicalSummaryService } from '../service.summary';
 import { getCurrentUser } from '@/lib/session';
-import { createClient } from '@/lib/supabase-auth';
 import { SupabaseClinicalEntryRepository } from '../repository.clinical.supabase';
 
 // Mock dependencies
@@ -43,6 +42,7 @@ describe('ClinicalSummaryService', () => {
             // ... other fields
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vi.mocked(SupabaseClinicalEntryRepository.prototype.listByPatient).mockResolvedValue([mockEntry as any]);
 
         const summary = await ClinicalSummaryService.getLatestEntryByPatient('p1');

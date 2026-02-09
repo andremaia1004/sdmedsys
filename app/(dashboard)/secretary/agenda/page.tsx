@@ -4,6 +4,8 @@ import { fetchAppointmentsAction } from '@/features/agenda/actions';
 import Link from 'next/link';
 import { requireRole } from '@/lib/session';
 import styles from '@/features/agenda/styles/Agenda.module.css';
+import { Doctor } from '@/features/doctors/types';
+import { Appointment } from '@/features/agenda/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +14,7 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     const searchParams = await props.searchParams;
 
     // Call actions instead of services for Service Role (bypasses RLS issues)
-    let doctors: any[] = [];
+    let doctors: Doctor[] = [];
     try {
         doctors = await listDoctorsAction(true); // Active only
     } catch (e) {
@@ -20,7 +22,7 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     }
 
     const selectedDoctorId = searchParams.doctorId || doctors[0]?.id || 'doc';
-    const selectedDoctor = doctors.find((d: any) => d.id === selectedDoctorId);
+    const selectedDoctor = doctors.find((d: Doctor) => d.id === selectedDoctorId);
 
     // Date calculation - Find Sunday of the week
     const currentParamDate = searchParams.date ? new Date(searchParams.date + 'T00:00:00') : new Date();
@@ -41,7 +43,7 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     const startStr = sundayDate.toISOString();
     const endStr = saturdayDate.toISOString();
 
-    let appointments: any[] = [];
+    let appointments: Appointment[] = [];
     try {
         appointments = await fetchAppointmentsAction(selectedDoctorId, startStr, endStr);
     } catch (e) {
@@ -61,7 +63,7 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
                 </div>
 
                 <div className={styles.doctorSelector}>
-                    {doctors.map((doc: any) => (
+                    {doctors.map((doc: Doctor) => (
                         <Link key={doc.id} href={`/secretary/agenda?doctorId=${doc.id}`} prefetch={true}>
                             <button
                                 className={`${styles.doctorTab} ${selectedDoctorId === doc.id ? styles.doctorTabActive : ''}`}

@@ -98,6 +98,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToConsultation(row: any): Consultation {
         return {
             id: row.id,

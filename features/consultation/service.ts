@@ -42,13 +42,13 @@ export class ConsultationService {
         return repo.findById(id);
     }
 
-    static async updateNotes(id: string, notes: string, doctorId: string): Promise<void> {
+    static async updateNotes(id: string, notes: string): Promise<void> {
         const repo = await getRepository();
         // Repository currently doesn't take doctorId, but we pass it for future-proofing/signature match
         return repo.updateNotes(id, notes);
     }
 
-    static async finish(id: string, doctorId: string): Promise<void> {
+    static async finish(id: string): Promise<void> {
         const repo = await getRepository();
         return repo.finish(id);
     }

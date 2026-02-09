@@ -1,10 +1,6 @@
-export const dynamic = 'force-dynamic';
-
-import Link from 'next/link';
 import { logoutAction } from '@/app/actions/auth';
-import { getCurrentUser, Role } from '@/lib/session';
+import { getCurrentUser } from '@/lib/session';
 import styles from './layout.module.css';
-import { Button } from '@/components/ui/Button';
 import { LogOut } from 'lucide-react';
 
 import SidebarNav from './SidebarNav';

@@ -21,8 +21,8 @@ export default function SettingsAdminPage() {
         try {
             const data = await fetchSettingsAction();
             setSettings(data);
-        } catch (err) {
-            console.error(err);
+        } catch {
+            console.error('Failed to fetch settings');
         } finally {
             setLoading(false);
         }
@@ -36,7 +36,7 @@ export default function SettingsAdminPage() {
         try {
             await updateSettingsAction(settings);
             alert('Configurações atualizadas com sucesso!');
-        } catch (err) {
+        } catch {
             alert('Erro ao atualizar configurações');
         } finally {
             setIsSaving(false);

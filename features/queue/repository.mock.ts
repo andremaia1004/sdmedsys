@@ -1,9 +1,9 @@
 import { QueueItem, QueueItemWithPatient, QueueStatus, AuditLog } from './types';
 import { IQueueRepository } from './repository.types';
-import { PatientService } from '../patients/service';
 
-let MOCK_QUEUE: QueueItem[] = [];
-let AUDIT_LOGS: AuditLog[] = [];
+
+const MOCK_QUEUE: QueueItem[] = [];
+const AUDIT_LOGS: AuditLog[] = [];
 
 export class MockQueueRepository implements IQueueRepository {
     private isValidTransition(current: QueueStatus, next: QueueStatus): boolean {

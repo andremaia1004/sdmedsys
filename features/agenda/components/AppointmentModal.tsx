@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import styles from '../styles/Agenda.module.css';
 import { useRouter } from 'next/navigation';
-import { Calendar as CalendarIcon, Clock, Check, Search, User, X, UserPlus, ArrowLeft, Stethoscope, ChevronDown } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, User, X, UserPlus, ArrowLeft, Stethoscope, ChevronDown } from 'lucide-react';
 
 export default function AppointmentModal({
     doctorId,
@@ -53,16 +53,11 @@ export default function AppointmentModal({
     }, []);
 
     // Appointment Action
-    // @ts-ignore
     const [apptState, apptFormAction, isApptPending] = useActionState(createAppointmentAction, { error: '', success: false });
-
-    // Internal state to track if we've already handled the success action
-    // This prevents router.refresh() from causing a re-render that might reset the view or loop
-    const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
 
     // Fetch Doctors for selection
     useEffect(() => {
-        setIsLoadingDoctors(true);
+        // Initial state is already loading
         Promise.all([
             listDoctorsAction(false),
             getDoctorAction(doctorId)
@@ -79,26 +74,18 @@ export default function AppointmentModal({
         });
     }, [doctorId]);
 
-    // Handle Appointment Success
-    // Handle Appointment Success State
+    // Handle Appointment Success (Refresh + Close)
     useEffect(() => {
         if (apptState?.success) {
-            setIsSuccessfullySubmitted(true);
-        }
-    }, [apptState?.success]);
-
-    // Handle Side Effects (Refresh + Close) when fully submitted
-    useEffect(() => {
-        if (isSuccessfullySubmitted) {
             router.refresh();
             const timer = setTimeout(() => {
                 onClose();
             }, 1500);
             return () => clearTimeout(timer);
         }
-    }, [isSuccessfullySubmitted, onClose, router]);
+    }, [apptState?.success, onClose, router]);
 
-    if (isSuccessfullySubmitted || apptState?.success) {
+    if (apptState?.success) {
         return (
             <div className={styles.modalOverlay}>
                 <Card className={styles.modalCard}>

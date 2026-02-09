@@ -41,7 +41,7 @@ describe('QueueService', () => {
         await QueueService.add({ patientId: 'secret-patient-id', status: 'WAITING' }, 'SECRETARY');
 
         const tvList = await QueueService.getTVList();
-        const found = tvList.find(i => i.status === 'WAITING' && !i.patientName);
+        tvList.find(i => i.status === 'WAITING' && !i.patientName);
         // Strategy changed: types definition says patientName exists, but getTVList returns Partial.
         // Let's check if patientName is undefined in the returned partial objects or unchecked.
         // Actually implementation of getTVList maps: { ticketCode, status, doctorId }. patientName is NOT mapped.

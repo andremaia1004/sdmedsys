@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { ConsultationService } from '../service';
 import { QueueService } from '@/features/queue/service';
 
@@ -36,7 +36,7 @@ describe('ConsultationService', () => {
         const active = await ConsultationService.getActiveByDoctor(doctorId);
         if (!active) throw new Error('No active consultation');
 
-        await ConsultationService.updateNotes(active.id, 'Patient complains of headache', doctorId);
+        await ConsultationService.updateNotes(active.id, 'Patient complains of headache');
 
         const updated = await ConsultationService.findById(active.id);
         expect(updated?.clinicalNotes).toBe('Patient complains of headache');
@@ -46,13 +46,13 @@ describe('ConsultationService', () => {
         const active = await ConsultationService.getActiveByDoctor(doctorId);
         if (!active) throw new Error('No active consultation');
 
-        await ConsultationService.finish(active.id, doctorId);
+        await ConsultationService.finish(active.id);
 
         const finished = await ConsultationService.findById(active.id);
         expect(finished?.finishedAt).toBeDefined();
 
         // Check Queue Status
-        const queueList = await QueueService.list();
+        await QueueService.list();
         // Since list filters out DONE, we might check differently or trust implementation.
         // But for mock verification, let's verify logic didn't throw.
     });

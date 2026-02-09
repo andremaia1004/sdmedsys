@@ -26,6 +26,7 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
     }
 
     async update(input: Partial<ClinicSettings>): Promise<ClinicSettings> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateData: any = { updated_at: new Date().toISOString() };
 
         if (input.clinicName !== undefined) updateData.clinic_name = input.clinicName;
@@ -45,12 +46,14 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         return this.mapToSettings(data);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToSettings(row: any): ClinicSettings {
         return {
             id: row.id,
             clinicId: row.clinic_id,
             clinicName: row.clinic_name,
-            workingHours: row.working_hours,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            workingHours: row.working_hours as any,
             appointmentDurationMinutes: row.appointment_duration_minutes,
             queuePrefix: row.queue_prefix,
             tvRefreshSeconds: row.tv_refresh_seconds,

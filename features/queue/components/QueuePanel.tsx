@@ -11,7 +11,7 @@ import { Table } from '@/components/ui/Table';
 import styles from '../styles/Queue.module.css';
 
 export default function QueuePanel({ items }: { items: QueueItemWithPatient[] }) {
-    // @ts-ignore
+    // @ts-expect-error - ActionState type mismatch
     const [state, formAction, isPending] = useActionState(addToQueueAction, { error: '' });
 
     // Map status to Portuguese
@@ -31,7 +31,20 @@ export default function QueuePanel({ items }: { items: QueueItemWithPatient[] })
                             <tr key={item.id}>
                                 <td><strong>{item.ticketCode}</strong></td>
                                 <td>{item.patientName || 'Manual/Espontâneo'}</td>
-                                <td><Badge variant={item.status.toLowerCase() as any}>{statusMap[item.status] || item.status}</Badge></td>
+
+                                <td className="p-4 align-middle">
+                                    <Badge variant={
+                                        item.status === 'WAITING' ? 'waiting' :
+                                            item.status === 'CALLED' ? 'called' :
+                                                item.status === 'IN_SERVICE' ? 'in_service' :
+                                                    item.status === 'DONE' ? 'done' :
+                                                        item.status === 'CANCELED' ? 'danger' :
+                                                            item.status === 'NO_SHOW' ? 'danger' :
+                                                                'secondary'
+                                    }>
+                                        {statusMap[item.status] || item.status}
+                                    </Badge>
+                                </td>
                                 <td>
                                     {item.status === 'WAITING' && (
                                         <Button size="sm" onClick={() => changeQueueStatusAction(item.id, 'CALLED')}>
@@ -71,7 +84,7 @@ export default function QueuePanel({ items }: { items: QueueItemWithPatient[] })
                         >
                             {isPending ? 'Gerando...' : 'Gerar Nova Senha'}
                         </Button>
-                        {/* @ts-ignore */}
+                        {/* @ts-expect-error - State type might be null/undefined initially */}
                         {state?.error && <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '0.5rem' }}>{state.error}</p>}
                     </form>
                 </Card>

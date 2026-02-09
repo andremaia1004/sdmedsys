@@ -50,9 +50,10 @@ export async function createPatientAction(prevState: ActionState, formData: Form
         revalidatePath('/secretary/patients');
         revalidatePath('/admin/patients');
         return { success: true, patient };
-    } catch (err: any) {
-        console.error('Create Patient Error (Full):', err);
-        return { error: `Falha ao criar paciente: ${err.message}`, success: false };
+    } catch (err: unknown) {
+        console.error(err);
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { error: `Falha ao criar paciente: ${msg}`, success: false };
     }
 }
 

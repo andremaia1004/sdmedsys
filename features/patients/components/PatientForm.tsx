@@ -9,7 +9,6 @@ import { Patient } from '../types';
 import styles from '../styles/Patients.module.css';
 
 export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patient) => void }) {
-    // @ts-ignore
     const [state, formAction, isPending] = useActionState(createPatientAction, { error: '' });
 
     // Wizard State
@@ -36,13 +35,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
     // Safety state to prevent double-click "Next" -> "Finish" race condition
     const [isSubmissionReady, setIsSubmissionReady] = useState(false);
 
-    useEffect(() => {
-        if (currentStep === 3) {
-            setIsSubmissionReady(false);
-            const timer = setTimeout(() => setIsSubmissionReady(true), 800);
-            return () => clearTimeout(timer);
-        }
-    }, [currentStep]);
+    // Reverted: useEffect for step 3 delay moved to handleNext to avoid set-state-in-effect warning
 
     useEffect(() => {
         if (state?.success && state?.patient) {
@@ -80,7 +73,14 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
 
     const handleNext = () => {
         if (validateStep(currentStep)) {
-            setCurrentStep(prev => prev + 1);
+            const nextStep = currentStep + 1;
+            setCurrentStep(nextStep);
+
+            if (nextStep === 3) {
+                setIsSubmissionReady(false);
+                setTimeout(() => setIsSubmissionReady(true), 800);
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
@@ -152,7 +152,6 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
                     if (currentStep === 3 && isFinishButton) {
                         console.log('Valid submission allowed.');
                         const formData = new FormData(e.currentTarget);
-                        // @ts-ignore
                         formAction(formData);
                     } else {
                         console.warn('Submission BLOCKED: Implicit submit or wrong step detected.');

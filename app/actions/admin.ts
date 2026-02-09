@@ -3,6 +3,7 @@
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireRole } from '@/lib/session';
 import { revalidatePath } from 'next/cache';
+import { DoctorInput, Doctor } from '@/features/doctors/types';
 
 /**
  * Administrative action to link a Supabase Auth User with a Profile Role.
@@ -159,21 +160,23 @@ export async function createDoctorAction(formData: FormData) {
             revalidatePath('/secretary/agenda');
 
             return { success: true, doctor };
-        } catch (dbError: any) {
+        } catch (dbError: unknown) {
             // Rollback Auth user if it was created
             if (profileId) {
                 await supabaseServer.auth.admin.deleteUser(profileId);
                 await supabaseServer.from('profiles').delete().eq('id', profileId);
             }
-            return { success: false, error: `Erro ao salvar dados do médico: ${dbError.message}` };
+            const msg = dbError instanceof Error ? dbError.message : 'Erro desconhecido';
+            return { success: false, error: `Erro ao salvar dados do médico: ${msg}` };
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Unexpected error in createDoctorAction:', err);
-        return { success: false, error: `Erro inesperado: ${err.message || 'Erro desconhecido'}` };
+        const msg = err instanceof Error ? err.message : 'Erro desconhecido';
+        return { success: false, error: `Erro inesperado: ${msg}` };
     }
 }
 
-export async function updateDoctorAction(id: string, data: any) {
+export async function updateDoctorAction(id: string, data: Partial<DoctorInput> & { password?: string, profileId?: string, active?: boolean }) {
     try {
         const user = await requireRole(['ADMIN']);
         const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
@@ -218,9 +221,10 @@ export async function updateDoctorAction(id: string, data: any) {
         const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
 
         // Remove password from data before passing to repository as it's not a doctor field
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...doctorData } = data;
 
-        const doctor = await repo.update(id, doctorData);
+        const doctor = await repo.update(id, doctorData as Partial<Doctor>);
 
         await logAudit('UPDATE', 'DOCTOR', id, { active: data.active });
 
@@ -228,15 +232,17 @@ export async function updateDoctorAction(id: string, data: any) {
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
         return { success: true, doctor };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Error in updateDoctorAction:', err);
-        return { success: false, error: err.message || 'Erro ao atualizar médico' };
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: msg || 'Erro ao atualizar médico' };
     }
 }
 
 // --- Clinic Settings ---
 
 import { SupabaseSettingsRepository } from '@/features/admin/settings/repository.supabase';
+import { ClinicSettingsInput } from '@/features/admin/settings/types';
 
 export async function fetchSettingsAction() {
     const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
@@ -260,7 +266,7 @@ export async function fetchSettingsAction() {
     };
 }
 
-export async function updateSettingsAction(data: any) {
+export async function updateSettingsAction(data: Partial<ClinicSettingsInput>) {
     await requireRole(['ADMIN']);
     const { SettingsService } = await import('@/features/admin/settings/service');
     const { logAudit } = await import('@/lib/audit');

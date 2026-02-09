@@ -24,7 +24,8 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
             console.error('[SupabaseDoctorsRepository] list Error:', error);
             throw new Error(error.message);
         }
-        return (data || []).map(this.mapToDoctor);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data || []).map((d: any) => this.mapToDoctor(d));
     }
 
     async findById(id: string): Promise<Doctor | undefined> {
@@ -66,6 +67,7 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
 
     async update(id: string, input: Partial<Doctor>): Promise<Doctor | null> {
         const { profileId, name, specialty, active, crm, phone, email } = input;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateData: any = { updated_at: new Date().toISOString() };
         if (profileId !== undefined) updateData.profile_id = profileId;
         if (name !== undefined) updateData.name = name;
@@ -90,6 +92,7 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
         return this.mapToDoctor(data);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToDoctor(row: any): Doctor {
         return {
             id: row.id,

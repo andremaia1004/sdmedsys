@@ -15,9 +15,9 @@ export default async function AuditPage(props: { searchParams: Promise<{ page?: 
     const getActionBadgeVariant = (action: string) => {
         switch (action) {
             case 'CREATE': return 'success';
-            case 'UPDATE': return 'warning';
+            case 'UPDATE': return 'info'; // warning not supported
             case 'DELETE': return 'danger';
-            case 'STATUS_CHANGE': return 'primary';
+            case 'STATUS_CHANGE': return 'secondary'; // primary not supported
             default: return 'secondary';
         }
     };
@@ -35,48 +35,36 @@ export default async function AuditPage(props: { searchParams: Promise<{ page?: 
             </div>
 
             <Card padding="none">
-                <Table>
-                    <thead>
-                        <tr>
-                            <th>Data/Hora</th>
-                            <th>Usuário</th>
-                            <th>Ação</th>
-                            <th>Entidade</th>
-                            <th>ID Entidade</th>
-                            <th>Metadados</th>
+                <Table headers={['Data/Hora', 'Usuário', 'Ação', 'Entidade', 'ID Entidade', 'Metadados']}>
+                    {logs.map((log) => (
+                        <tr key={log.id}>
+                            <td style={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
+                                {new Date(log.created_at).toLocaleString('pt-BR')}
+                            </td>
+                            <td>
+                                <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>{log.role}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.user_id?.substring(0, 8)}...</div>
+                            </td>
+                            <td>
+                                <Badge variant={getActionBadgeVariant(log.action) as "success" | "info" | "danger" | "secondary"}>
+                                    {log.action}
+                                </Badge>
+                            </td>
+                            <td>
+                                <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                                    {log.entity}
+                                </span>
+                            </td>
+                            <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                                {log.entity_id || '-'}
+                            </td>
+                            <td>
+                                <div style={{ fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {JSON.stringify(log.metadata)}
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {logs.map((log) => (
-                            <tr key={log.id}>
-                                <td style={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
-                                    {new Date(log.created_at).toLocaleString('pt-BR')}
-                                </td>
-                                <td>
-                                    <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>{log.role}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.user_id?.substring(0, 8)}...</div>
-                                </td>
-                                <td>
-                                    <Badge variant={getActionBadgeVariant(log.action) as any}>
-                                        {log.action}
-                                    </Badge>
-                                </td>
-                                <td>
-                                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                                        {log.entity}
-                                    </span>
-                                </td>
-                                <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                                    {log.entity_id || '-'}
-                                </td>
-                                <td>
-                                    <div style={{ fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {JSON.stringify(log.metadata)}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
+                    ))}
                 </Table>
 
                 {logs.length === 0 && (
@@ -102,6 +90,6 @@ export default async function AuditPage(props: { searchParams: Promise<{ page?: 
                     </div>
                 </div>
             </Card>
-        </div>
+        </div >
     );
 }

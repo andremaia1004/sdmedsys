@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { isPathAuthorized, getAuthorizedHome } from '../rbac-rules';
-import { Role } from '../session';
+
 
 describe('RBAC Logic', () => {
     describe('isPathAuthorized', () => {
@@ -49,6 +49,11 @@ describe('RBAC Logic', () => {
         it('should allow public access to unlisted paths', () => {
             expect(isPathAuthorized('/login', 'SECRETARY')).toBe(true);
             expect(isPathAuthorized('/unauthorized', 'DOCTOR')).toBe(true);
+        });
+
+        it('should allow ADMIN and SECRETARY to access /tv', () => {
+            expect(isPathAuthorized('/tv', 'ADMIN')).toBe(true);
+            expect(isPathAuthorized('/tv', 'SECRETARY')).toBe(true);
         });
     });
 

@@ -38,7 +38,7 @@ export class AuthService {
                 email: 'mock@test.com',
                 role: payload.role as Role
             };
-        } catch (err) {
+        } catch {
             return null;
         }
     }

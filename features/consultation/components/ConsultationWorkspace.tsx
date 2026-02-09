@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Consultation, ClinicalEntry } from '@/features/consultation/types';
-import { upsertClinicalEntryAction, finishConsultationAction, finalizeClinicalEntryAction } from '../actions';
+import { useState } from 'react';
+import { Consultation, ClinicalEntry, ClinicalEntryInput } from '@/features/consultation/types';
+import { upsertClinicalEntryAction, finishConsultationAction } from '../actions';
 import PatientTimeline from '@/features/patients/components/PatientTimeline';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
 import styles from '../styles/Consultation.module.css';
 
 interface Props {
@@ -35,10 +34,15 @@ export default function ConsultationWorkspace({ consultation, patientName, initi
 
         setSaving(true);
         try {
-            const res = await upsertClinicalEntryAction({
-                ...entry as any,
+            // entry is Partial<ClinicalEntry>, but upsert needs ClinicalEntryInput
+            // We cast to ClinicalEntryInput based on fields we have. 
+            // Warning: mandatory fields must be present or handled by Service/DB default.
+            const payload = {
+                ...entry,
                 isFinal: isFinal
-            });
+            } as ClinicalEntryInput & { id?: string };
+
+            const res = await upsertClinicalEntryAction(payload);
             if (res.success && res.entry) {
                 setEntry(res.entry);
                 setLastSaved(new Date());
@@ -50,7 +54,7 @@ export default function ConsultationWorkspace({ consultation, patientName, initi
         }
     };
 
-    const updateField = (field: keyof ClinicalEntry, value: any) => {
+    const updateField = <K extends keyof ClinicalEntry>(field: K, value: ClinicalEntry[K]) => {
         setEntry(prev => ({ ...prev, [field]: value }));
     };
 

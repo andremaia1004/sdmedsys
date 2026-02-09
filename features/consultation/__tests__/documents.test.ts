@@ -50,6 +50,7 @@ describe('ClinicalDocumentService (RBAC)', () => {
             })
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
 
         const data = await ClinicalDocumentService.getDocumentData('cons-1');
@@ -81,7 +82,7 @@ describe('ClinicalDocumentService (RBAC)', () => {
             })
         };
 
-        vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+        vi.mocked(createClient).mockResolvedValue(mockSupabase as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
         const data = await ClinicalDocumentService.getDocumentData('cons-1');
         expect(data).not.toBeNull();

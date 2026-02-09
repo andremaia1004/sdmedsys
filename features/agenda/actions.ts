@@ -24,7 +24,7 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
             const { fetchSettingsAction } = await import('@/app/actions/admin');
             const settings = await fetchSettingsAction();
             duration = settings.appointmentDurationMinutes;
-        } catch (e) {
+        } catch {
             console.warn('createAppointmentAction: Using default duration 30 due to settings error');
         }
 
@@ -99,9 +99,10 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         }
 
         return { success: true, appointment };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Create Appointment Error:', err);
-        return { error: err.message || 'Failed to create appointment', success: false };
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { error: msg, success: false };
     }
 }
 

@@ -63,7 +63,7 @@ export class QueueService {
             const { SettingsService } = await import('../admin/settings/service');
             const settings = await SettingsService.get();
             prefix = settings.queuePrefix;
-        } catch (e) {
+        } catch {
             console.warn('QueueService: Using default prefix A due to settings error');
         }
 

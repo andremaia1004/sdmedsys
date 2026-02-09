@@ -26,14 +26,14 @@ export async function createClient() {
                 set(name: string, value: string, options: CookieOptions) {
                     try {
                         cookieStore.set({ name, value, ...options });
-                    } catch (error) {
+                    } catch {
                         // Safe to ignore in Server Components
                     }
                 },
                 remove(name: string, options: CookieOptions) {
                     try {
                         cookieStore.set({ name, value: '', ...options });
-                    } catch (error) {
+                    } catch {
                         // Safe to ignore in Server Components
                     }
                 },

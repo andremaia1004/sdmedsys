@@ -51,23 +51,23 @@ export async function middleware(request: NextRequest) {
     }
 
     // 3. Legacy Patient Redirects & Forwarding
+    // Check for legacy routes: /admin/patients, /doctor/patients, /secretary/patients
     if (pathname.includes('/patients')) {
-        // Handle legacy role-prefixed patient paths
-        if (pathname.startsWith('/admin/patients') ||
-            pathname.startsWith('/doctor/patients') ||
-            pathname.startsWith('/secretary/patients')) {
+        const legacyPrefixes = ['/admin/patients', '/doctor/patients', '/secretary/patients'];
+        const matchedPrefix = legacyPrefixes.find(prefix => pathname.startsWith(prefix));
 
-            // Extract potential ID: /role/patients/[id]...
-            const pathParts = pathname.split('/');
-            const patientId = pathParts[3]; // e.g., "", "uuid", etc.
-
-            const targetUrl = patientId ? `/patients/${patientId}` : '/patients';
+        if (matchedPrefix) {
+            // Extract the remainder of the path after the prefix
+            // e.g., /admin/patients/new -> /patients/new
+            // e.g., /doctor/patients/123 -> /patients/123
+            const remainder = pathname.replace(matchedPrefix, '');
+            const targetUrl = `/patients${remainder}`;
             return NextResponse.redirect(new URL(targetUrl, request.url));
         }
     }
 
     // 4. Routing Protection (Primary Gate)
-    const protectedPaths = ['/admin', '/secretary', '/doctor', '/patients'];
+    const protectedPaths = ['/admin', '/secretary', '/doctor', '/patients', '/tv'];
     const currentPathIsProtected = protectedPaths.some(prefix => pathname.startsWith(prefix));
 
     if (currentPathIsProtected) {
@@ -76,11 +76,13 @@ export async function middleware(request: NextRequest) {
         }
 
         if (!userRole) {
+            // If logged in but no role, redirect to unauthorized or login
             return NextResponse.redirect(new URL('/unauthorized', request.url));
         }
 
         // Use RBAC logic helper
         if (!isPathAuthorized(pathname, userRole as Role)) {
+            // If denied, redirect to their role's home
             const redirectUrl = getAuthorizedHome(userRole as Role);
             return NextResponse.redirect(new URL(redirectUrl, request.url));
         }

@@ -3,6 +3,8 @@ import { requireRole } from '@/lib/session';
 import { listDoctorsAction } from '@/features/doctors/actions';
 import { fetchAppointmentsAction } from '@/features/agenda/actions';
 import styles from '@/features/agenda/styles/Agenda.module.css';
+import { Doctor } from '@/features/doctors/types';
+import { Appointment } from '@/features/agenda/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +12,7 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
     const searchParams = await props.searchParams;
     const user = await requireRole(['DOCTOR', 'ADMIN']);
 
-    let doctors: any[] = [];
+    let doctors: Doctor[] = [];
     try {
         doctors = await listDoctorsAction(true);
     } catch (e) {
@@ -18,7 +20,7 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
     }
 
     // Find matching doctor record for this profile
-    const myDoctor = doctors.find((d: any) => d.profileId === user?.id);
+    const myDoctor = doctors.find((d: Doctor) => d.profileId === user?.id);
     const doctorId = myDoctor?.id || 'doc'; // Fallback to 'doc' if not linked yet
 
     // Date calculation - Find Sunday of the week
@@ -40,7 +42,7 @@ export default async function DoctorAgendaPage(props: { searchParams: Promise<{ 
     const startStr = sundayDate.toISOString();
     const endStr = saturdayDate.toISOString();
 
-    let appointments: any[] = [];
+    let appointments: Appointment[] = [];
     try {
         appointments = await fetchAppointmentsAction(doctorId, startStr, endStr);
     } catch (e) {

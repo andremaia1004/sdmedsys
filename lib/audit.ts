@@ -12,7 +12,7 @@ export async function logAudit(
     action: AuditAction,
     entity: AuditEntity,
     entityId?: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
 ) {
     try {
         const user = await getCurrentUser();

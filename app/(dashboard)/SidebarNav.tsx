@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './layout.module.css';
 import { Role } from '@/lib/session';
+import { navItemsByRole } from '@/lib/nav';
 import {
     Calendar,
     Users,
@@ -12,74 +13,62 @@ import {
     Stethoscope,
     Settings,
     ShieldCheck,
-    Tv
+    Tv,
+    LayoutDashboard,
+    ClipboardList
 } from 'lucide-react';
 
-interface NavItem {
-    label: string;
-    href: string;
-    roles: Role[];
-    icon: React.ElementType;
-    target?: string;
-}
-
-interface NavCategory {
-    title: string;
-    items: NavItem[];
-}
-
-const navCategories: NavCategory[] = [
-    {
-        title: 'Atendimento',
-        items: [
-            { label: 'Agenda (Séc)', href: '/secretary/agenda', roles: ['SECRETARY', 'ADMIN'], icon: Calendar },
-            { label: 'Controle de Fila', href: '/secretary/queue', roles: ['SECRETARY', 'ADMIN'], icon: Users },
-            { label: 'Agenda (Doc)', href: '/doctor/agenda', roles: ['DOCTOR', 'ADMIN'], icon: Calendar },
-            { label: 'Minha Fila', href: '/doctor/queue', roles: ['DOCTOR', 'ADMIN'], icon: Users },
-            { label: 'Consultas', href: '/doctor/consultation', roles: ['DOCTOR', 'ADMIN'], icon: FileText },
-        ]
-    },
-    {
-        title: 'Cadastros',
-        items: [
-            { label: 'Pacientes', href: '/patients', roles: ['ADMIN', 'SECRETARY', 'DOCTOR'], icon: Contact },
-            { label: 'Médicos', href: '/admin/doctors', roles: ['ADMIN'], icon: Stethoscope },
-        ]
-    },
-    {
-        title: 'Sistema',
-        items: [
-            { label: 'Painel TV', href: '/tv', roles: ['ADMIN', 'SECRETARY'], icon: Tv, target: '_blank' },
-            { label: 'Configurações', href: '/admin/settings', roles: ['ADMIN'], icon: Settings },
-            { label: 'Auditoria', href: '/admin/audit', roles: ['ADMIN'], icon: ShieldCheck },
-        ]
-    }
-];
+// Icon Mapping
+const ICON_MAP: Record<string, React.ElementType> = {
+    'Agenda (Sec)': Calendar,
+    'Controle de fila (Sec)': Users,
+    'Agenda (Doc)': Calendar,
+    'Minha fila (Doc)': Users,
+    'Minha Fila': Users,
+    'Consultas': FileText,
+    'Pacientes': Contact,
+    'Médicos': Stethoscope,
+    'Painel TV': Tv,
+    'Configurações': Settings,
+    'Auditoria': ShieldCheck,
+    'Agenda': Calendar,
+    'Painel do dia': LayoutDashboard,
+    'Controle de fila': Users,
+};
 
 export default function SidebarNav({ role }: { role: Role }) {
     const pathname = usePathname();
+    const navGroups = navItemsByRole[role] || [];
 
-    const filteredCategories = navCategories.map(category => ({
-        ...category,
-        items: category.items.filter(item => item.roles.includes(role))
-    })).filter(category => category.items.length > 0);
+    const isRouteActive = (itemHref: string) => {
+        if (pathname === itemHref) return true;
+        // Special case for accessing sub-routes of patients
+        if (itemHref === '/patients' && pathname.startsWith('/patients')) return true;
+        return false;
+    };
 
     return (
         <div className={styles.navContent}>
-            {filteredCategories.map((category) => (
-                <nav key={category.title} className={styles.navSection}>
-                    <h3 className={styles.navTitle}>{category.title}</h3>
+            {navGroups.map((group) => (
+                <nav key={group.title} className={styles.navSection}>
+                    <h3 className={styles.navTitle}>{group.title}</h3>
                     <div className={styles.navGroup}>
-                        {category.items.map((item) => {
-                            const isActive = pathname === item.href;
+                        {group.items.map((item) => {
+                            const IconComponent = ICON_MAP[item.label] || ClipboardList;
+                            const isActive = isRouteActive(item.href);
+
+                            // Check if the item is properly configured for the current role
+                            // This is a safety check validation, though navItemsByRole should already be correct
+                            if (!item.rolesAllowed.includes(role)) return null;
+
                             return (
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    target={item.target}
+                                    target={item.label === 'Painel TV' ? '_blank' : undefined}
                                     className={`${styles.navLink} ${isActive ? styles.activeLink : ''}`}
                                 >
-                                    <item.icon size={18} className={styles.navIcon} />
+                                    <IconComponent size={18} className={styles.navIcon} />
                                     <span>{item.label}</span>
                                 </Link>
                             );

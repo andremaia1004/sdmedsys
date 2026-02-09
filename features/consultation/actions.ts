@@ -16,8 +16,8 @@ export type ActionState = {
 
 export async function startConsultationAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
     try {
-        const user = await requireRole(['DOCTOR']);
-        const doctorId = user.id;
+        const { id: doctorId } = await requireRole(['DOCTOR']);
+        // const doctorId = user.id;
 
         const queueItemId = formData.get('queueItemId') as string;
         const patientId = formData.get('patientId') as string;
@@ -38,9 +38,10 @@ export async function startConsultationAction(prevState: ActionState, formData: 
         revalidatePath('/doctor/consultation');
         revalidatePath('/doctor/queue');
         return { success: true, consultation };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Start Consultation Error:', err);
-        return { error: err.message || 'Failed to start consultation', success: false };
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { error: msg || 'Failed to start consultation', success: false };
     }
 }
 
@@ -63,15 +64,16 @@ export async function upsertClinicalEntryAction(input: ClinicalEntryInput & { id
         revalidatePath(`/doctor/consultation`);
         revalidatePath(`/patients/${entry.patientId}`);
         return { success: true, entry };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Upsert Clinical Entry Error:', err);
-        return { error: err.message, success: false };
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { error: msg, success: false };
     }
 }
 
 export async function finalizeClinicalEntryAction(id: string): Promise<ActionState> {
     try {
-        const user = await requireRole(['DOCTOR']);
+        await requireRole(['DOCTOR']);
         const entry = await ClinicalEntryService.finalize(id);
 
         await logAudit('FINALIZE', 'CLINICAL_ENTRY', entry.id, {
@@ -81,9 +83,10 @@ export async function finalizeClinicalEntryAction(id: string): Promise<ActionSta
         revalidatePath(`/doctor/consultation`);
         revalidatePath(`/patients/${entry.patientId}`);
         return { success: true, entry };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Finalize Clinical Entry Error:', err);
-        return { error: err.message, success: false };
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { error: msg, success: false };
     }
 }
 
@@ -119,14 +122,15 @@ export async function updateClinicalNotesAction(id: string, notes: string): Prom
 
         revalidatePath(`/doctor/consultation`);
         return { success: true };
-    } catch (err: any) {
-        return { success: false, error: err.message };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: msg };
     }
 }
 
 export async function finishConsultationAction(id: string): Promise<{ success: boolean, error?: string }> {
     try {
-        const user = await requireRole(['DOCTOR']);
+        await requireRole(['DOCTOR']);
 
         // Also finalize clinical entry if it exists
         const entry = await ClinicalEntryService.findByConsultation(id);
@@ -134,14 +138,15 @@ export async function finishConsultationAction(id: string): Promise<{ success: b
             await ClinicalEntryService.finalize(entry.id);
         }
 
-        await ConsultationService.finish(id, user.id);
+        await ConsultationService.finish(id);
         await logAudit('STATUS_CHANGE', 'CONSULTATION', id, { status: 'FINISHED' });
 
         revalidatePath('/doctor/queue');
         revalidatePath('/doctor/consultation');
         return { success: true };
-    } catch (err: any) {
-        return { success: false, error: err.message };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: msg };
     }
 }
 
