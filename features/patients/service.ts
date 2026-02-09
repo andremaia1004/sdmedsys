@@ -7,26 +7,26 @@ import { createClient } from '@/lib/supabase-auth';
 import { supabaseServer } from '@/lib/supabase-server';
 
 const getRepository = async (): Promise<IPatientsRepository> => {
-    const useSupabase = process.env.USE_SUPABASE === 'true';
+    // Default to Supabase unless explicitly disabled
+    const useSupabase = process.env.USE_SUPABASE !== 'false';
+    const authMode = process.env.AUTH_MODE || 'stub';
+    const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
 
     if (useSupabase) {
         const user = await getCurrentUser();
-        const authMode = process.env.AUTH_MODE || 'stub';
-
-        // default clinic id for all data for now as per requirement
-        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
         const clinicId = user?.clinicId || defaultClinicId;
 
-        // If we have a real supabase session, use the authenticated client to respect RLS
+        console.log(`[PatientService] Using Supabase Repository (Clinic: ${clinicId}, Auth: ${authMode})`);
+
         if (authMode === 'supabase' && user) {
             const client = await createClient();
             return new SupabasePatientsRepository(client, clinicId);
         }
 
-        // Fallback to Service Role (e.g., initialization or if auth is stub but DB is supabase)
         return new SupabasePatientsRepository(supabaseServer, clinicId);
     }
 
+    console.warn('[PatientService] Using Mock Repository (USE_SUPABASE is false)');
     return new MockPatientsRepository();
 };
 

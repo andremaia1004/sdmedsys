@@ -1,4 +1,6 @@
 import { requireRole } from '@/lib/session';
+import { createClient } from '@/lib/supabase-auth';
+
 import { PatientService } from '@/features/patients/service';
 import { ClinicalSummaryService } from '@/features/consultation/service.summary';
 import PatientOverview from '@/features/patients/components/PatientOverview';
@@ -15,13 +17,33 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
     const patient = await PatientService.findById(id);
     console.log(`[SharedPatientDetailPage] Result: ${patient ? 'Found' : 'Not Found'}`);
 
-    if (!patient) return (
-        <div style={{ padding: '2rem' }}>
-            <h2>Paciente não encontrado</h2>
-            <p style={{ color: 'var(--text-muted)' }}>ID: {id}</p>
-            <p style={{ color: 'var(--text-muted)' }}>Clinic: {user.clinicId || 'default'}</p>
-        </div>
-    );
+    if (!patient) {
+        const supabase = await createClient();
+        const { count } = await supabase.from('patients').select('*', { count: 'exact', head: true });
+        const { data: samples } = await supabase.from('patients').select('id, name').limit(3);
+
+        return (
+            <div style={{ padding: '2rem', border: '2rem solid #fee2e2', borderRadius: '1rem' }}>
+                <h2 style={{ color: '#991b1b', marginBottom: '1rem' }}>⚠️ Erro: Paciente não encontrado</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fff', padding: '1rem', borderRadius: '0.5rem' }}>
+                    <p><strong>URL ID:</strong> <code>{id}</code></p>
+                    <p><strong>Config Clinic:</strong> <code>{user.clinicId || 'default (fallback)'}</code></p>
+                    <hr />
+                    <p><strong>Diagnóstico do Banco:</strong></p>
+                    <p>Total de pacientes na tabela: <code>{count ?? 'Erro ao contar'}</code></p>
+                    <p>Amostras de IDs no banco:</p>
+                    <ul style={{ fontSize: '0.8rem' }}>
+                        {samples?.map((s: any) => (
+                            <li key={s.id}>{s.name}: <code>{s.id}</code></li>
+                        ))}
+                    </ul>
+                </div>
+                <div style={{ marginTop: '1.5rem' }}>
+                    <a href="/patients" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>← Voltar para a lista</a>
+                </div>
+            </div>
+        );
+    }
 
     // Service will return null for SECRETARY (additional guard)
     const summary = await ClinicalSummaryService.getLatestEntryByPatient(id);
