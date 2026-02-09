@@ -65,8 +65,7 @@ describe('ClinicalDocumentService (RBAC)', () => {
             clinicId: 'c1'
         });
 
-        const mockSupabase = {
-            from: vi.fn().mockReturnThis(),
+        const mockQueryChain = {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             single: vi.fn().mockResolvedValue({
@@ -82,10 +81,27 @@ describe('ClinicalDocumentService (RBAC)', () => {
             })
         };
 
+        const mockDoctorsChain = {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({
+                data: { name: 'Dr. House', crm: '12345-SP' },
+                error: null
+            })
+        };
+
+        const mockSupabase = {
+            from: vi.fn((table) => {
+                if (table === 'doctors') return mockDoctorsChain;
+                return mockQueryChain;
+            })
+        };
+
         vi.mocked(createClient).mockResolvedValue(mockSupabase as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
         const data = await ClinicalDocumentService.getDocumentData('cons-1');
         expect(data).not.toBeNull();
         expect(data?.patient.name).toBe('Patient X');
+        expect(data?.doctor.crm).toBe('12345-SP');
     });
 });

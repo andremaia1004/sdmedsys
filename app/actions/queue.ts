@@ -81,11 +81,11 @@ export async function changeQueueStatusAction(id: string, newStatus: QueueStatus
 
 import { SupabaseQueueRepository } from '@/features/queue/repository.supabase';
 import { supabaseServer } from '@/lib/supabase-server';
-import { QueueItem, QueueItemWithPatient } from '@/features/queue/types';
+import { QueueItemWithPatient } from '@/features/queue/types';
 
 export async function fetchQueueAction(doctorId?: string): Promise<QueueItemWithPatient[]> {
     try {
-        const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+        await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         // const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
         // const repo = new SupabaseQueueRepository(supabaseServer, clinicId);
         return await QueueService.list(doctorId);

@@ -44,9 +44,23 @@ export class ClinicalDocumentService {
             return null;
         }
 
-        // 3. Fetch Doctor Name from Profiles (if needed) or use current user if they are the doctor
+        // 3. Fetch Doctor details (Name + CRM)
+        // We try to find the doctor in the 'doctors' table using the doctor_user_id (which is a profile_id)
+        // or if it's a legacy ID. The consultation.doctor_user_id is usually the auth user id (profile).
         let doctorName = user.name;
-        if (user.role === 'ADMIN' && consultation.doctor_user_id !== user.id) {
+        let doctorCrm = '';
+
+        const { data: doctorRecord } = await supabase
+            .from('doctors')
+            .select('name, crm')
+            .eq('profile_id', consultation.doctor_user_id)
+            .single();
+
+        if (doctorRecord) {
+            doctorName = doctorRecord.name;
+            doctorCrm = doctorRecord.crm || '';
+        } else if (user.role === 'ADMIN' && consultation.doctor_user_id !== user.id) {
+            // Fallback if not found in doctors table (rare), try profiles
             const { data: docProfile } = await supabase
                 .from('profiles')
                 .select('email')
@@ -57,7 +71,7 @@ export class ClinicalDocumentService {
 
         // 4. Audit Log
         await logAudit(
-            'GENERATE_DOCUMENT',
+            'GENERATE_PRESCRIPTION_PDF',
             'CONSULTATION',
             consultationId,
             {
@@ -80,7 +94,7 @@ export class ClinicalDocumentService {
             },
             doctor: {
                 name: doctorName,
-                crm: '' // Fallback as requested
+                crm: doctorCrm
             },
             content: clinicalEntry.conduct || 'Nenhuma conduta registrada',
             observations: clinicalEntry.observations || '',
@@ -97,7 +111,7 @@ export class ClinicalDocumentService {
         const user = await getCurrentUser();
         if (user && user.clinicId) {
             await logAudit(
-                'GENERATE_DOCUMENT',
+                'GENERATE_CERTIFICATE_PDF',
                 'CONSULTATION',
                 consultationId,
                 {
