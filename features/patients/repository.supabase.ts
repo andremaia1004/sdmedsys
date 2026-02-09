@@ -45,15 +45,34 @@ export class SupabasePatientsRepository implements IPatientsRepository {
             .select('*')
             .eq('id', id)
             .eq('clinic_id', this.clinicId)
-            .single();
+            .maybeSingle();
 
         if (error) {
-            if (error.code === 'PGRST116') return undefined; // No rows
-            console.error('Supabase Error (findById):', error);
+            console.error('[SupabaseRepo] findById error:', error);
             throw new Error('Failed to find patient');
         }
 
-        return this.mapToPatient(data);
+        if (data) return this.mapToPatient(data);
+
+        // DIAGNOSTIC FALLBACK: Try without clinic_id filter
+        console.warn(`[SupabaseRepo] Patient ${id} NOT found in clinic ${this.clinicId}. Trying global lookup...`);
+        const { data: globalData, error: globalError } = await this.supabase
+            .from('patients')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle();
+
+        if (globalError) {
+            console.error('[SupabaseRepo] Global lookup error:', globalError);
+            return undefined;
+        }
+
+        if (globalData) {
+            console.warn(`[SupabaseRepo] ALERT: Patient ${id} found but belongs to clinic ${globalData.clinic_id} (Current: ${this.clinicId})`);
+            return this.mapToPatient(globalData);
+        }
+
+        return undefined;
     }
 
     async create(input: PatientInput): Promise<Patient> {
