@@ -63,6 +63,7 @@ export default function WeeklyCalendar({
 
     const getAppointment = (date: string, time: string) => {
         return appointments.find(a => {
+            if (!a.startTime) return false;
             // a.startTime is ISO (UTC). Convert to local for display.
             const d = new Date(a.startTime);
             const apptDate = d.toLocaleDateString('en-CA'); // YYYY-MM-DD local

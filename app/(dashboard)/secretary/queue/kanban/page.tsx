@@ -1,6 +1,8 @@
 import KanbanBoard from '@/features/secretary/components/KanbanBoard';
 import { fetchDailyDashboardAction } from '@/features/secretary/actions';
 
+export const dynamic = 'force-dynamic';
+
 export default async function KanbanPage() {
     const today = new Date().toISOString().split('T')[0];
     const items = await fetchDailyDashboardAction(today);

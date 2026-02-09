@@ -34,10 +34,13 @@ export class AppointmentService {
     static async create(input: AppointmentInput): Promise<Appointment> {
         console.log('[AppointmentService] Creating appointment:', input);
         const repo = await getRepository();
-        const hasConflict = await repo.checkConflict(input.doctorId, input.startTime, input.endTime);
-        if (hasConflict) {
-            console.warn('[AppointmentService] Conflict detected');
-            throw new Error('Conflito de horário para este profissional.');
+
+        if (input.startTime && input.endTime) {
+            const hasConflict = await repo.checkConflict(input.doctorId, input.startTime, input.endTime);
+            if (hasConflict) {
+                console.warn('[AppointmentService] Conflict detected');
+                throw new Error('Conflito de horário para este profissional.');
+            }
         }
         const appt = await repo.create(input);
         console.log('[AppointmentService] Appointment created:', appt);
