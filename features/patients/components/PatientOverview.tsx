@@ -25,12 +25,50 @@ export default function PatientOverview({ patient, summary, role }: PatientOverv
                     </div>
                     <div className={styles.field}>
                         <label>CPF / Documento</label>
-                        <p>{patient.document}</p>
+                        <p>{patient.document || 'N/A'}</p>
                     </div>
                     <div className={styles.field}>
                         <label>Data de Nascimento</label>
-                        <p>{new Date(patient.birthDate).toLocaleDateString('pt-BR')}</p>
+                        <p>{patient.birthDate ? new Date(patient.birthDate).toLocaleDateString('pt-BR') : 'N/A'}</p>
                     </div>
+                    <div className={styles.field}>
+                        <label>Telefone</label>
+                        <p>{patient.phone || 'N/A'}</p>
+                    </div>
+                    <div className={styles.field}>
+                        <label>E-mail</label>
+                        <p>{patient.email || 'N/A'}</p>
+                    </div>
+                    {patient.address && (
+                        <div className={styles.field} style={{ gridColumn: 'span 2' }}>
+                            <label>Endereço</label>
+                            <p>{patient.address}</p>
+                        </div>
+                    )}
+                    {patient.insurance && (
+                        <div className={styles.field}>
+                            <label>Convênio / Plano</label>
+                            <p>{patient.insurance}</p>
+                        </div>
+                    )}
+                    {patient.guardian_name && (
+                        <div className={styles.field}>
+                            <label>Responsável</label>
+                            <p>{patient.guardian_name}</p>
+                        </div>
+                    )}
+                    {patient.emergency_contact && (
+                        <div className={styles.field}>
+                            <label>Contato de Emergência</label>
+                            <p>{patient.emergency_contact}</p>
+                        </div>
+                    )}
+                    {patient.main_complaint && (
+                        <div className={styles.field} style={{ gridColumn: 'span 2' }}>
+                            <label>Queixa Principal (Cadastro)</label>
+                            <p>{patient.main_complaint}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

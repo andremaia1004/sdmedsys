@@ -5,6 +5,7 @@ import { Patient } from '../types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Table } from '@/components/ui/Table';
+import Link from 'next/link';
 import styles from '../styles/Patients.module.css';
 
 export default function PatientList({ patients, canEdit = false }: { patients: Patient[], canEdit?: boolean }) {
@@ -37,7 +38,9 @@ export default function PatientList({ patients, canEdit = false }: { patients: P
                         </td>
                         <td>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <Button size="sm" variant="secondary">Ver</Button>
+                                <Link href={`/patients/${p.id}`}>
+                                    <Button size="sm" variant="secondary">Ver</Button>
+                                </Link>
                                 {canEdit && <Button size="sm" variant="ghost">Editar</Button>}
                             </div>
                         </td>

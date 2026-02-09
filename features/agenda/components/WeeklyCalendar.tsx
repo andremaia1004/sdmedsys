@@ -114,12 +114,18 @@ export default function WeeklyCalendar({
                                     <div
                                         key={`${date}-${time}`}
                                         className={styles.cell}
-                                        style={{ minHeight: '60px' }}
-                                        onClick={() => !appt && setSelectedSlot({ date, time })}
+                                        style={{ minHeight: '60px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                            if (appt) {
+                                                router.push(`/patients/${appt.patientId}`);
+                                            } else {
+                                                setSelectedSlot({ date, time });
+                                            }
+                                        }}
                                     >
                                         {appt ? (
-                                            <div className={styles.appointment}>
-                                                <div className={styles.patientName} title={appt.patientName}>
+                                            <div className={styles.appointment} title={`Ver ficha de ${appt.patientName}`}>
+                                                <div className={styles.patientName}>
                                                     {appt.patientName.split(' ')[0]}
                                                 </div>
                                                 <div className={styles.apptStatus}>{appt.status === 'SCHEDULED' ? 'Agendado' : appt.status}</div>
