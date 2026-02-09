@@ -33,13 +33,13 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
                     <p>Total de pacientes na tabela: <code>{count ?? 'Erro ao contar'}</code></p>
                     <p>Amostras de IDs no banco:</p>
                     <ul style={{ fontSize: '0.8rem' }}>
-                        {samples?.map((s: any) => (
+                        {samples?.map((s: { id: string, name: string }) => (
                             <li key={s.id}>{s.name}: <code>{s.id}</code></li>
                         ))}
                     </ul>
                 </div>
                 <div style={{ marginTop: '1.5rem' }}>
-                    <a href="/patients" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>← Voltar para a lista</a>
+                    <Link href="/patients" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>← Voltar para a lista</Link>
                 </div>
             </div>
         );
