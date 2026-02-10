@@ -2,7 +2,7 @@ import { requireRole } from '@/lib/session';
 import { getConsultationAction } from '@/features/consultation/actions';
 import { PatientService } from '@/features/patients/service'; // Assuming this exists or I use repository directly
 import ConsultationWorkspace from '@/features/consultation/components/ConsultationWorkspace';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
