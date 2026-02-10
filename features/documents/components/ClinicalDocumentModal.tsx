@@ -35,6 +35,7 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
 
     useEffect(() => {
         if (isOpen && initialType) setType(initialType);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, initialType]);
 
     if (!isOpen) return null;
@@ -150,7 +151,7 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
                                         placeholder="Ex: 3"
                                         style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
                                     />
-                                    <span style={{ fontSize: '0.8rem', color: '#666' }}>Deixe em branco para "Declaração de Comparecimento"</span>
+                                    <span style={{ fontSize: '0.8rem', color: '#666' }}>Deixe em branco para &quot;Declaração de Comparecimento&quot;</span>
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>CID (Opcional)</label>
