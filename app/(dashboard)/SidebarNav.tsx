@@ -33,6 +33,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
     'Auditoria': ShieldCheck,
     'Agenda': Calendar,
     'Painel do dia': LayoutDashboard,
+    'Painel': LayoutDashboard,
     'Operação de Fila': Users,
     'Gestão Kanban': LayoutDashboard,
     'Controle de fila': Users,
