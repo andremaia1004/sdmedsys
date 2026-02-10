@@ -9,6 +9,10 @@ export class MockConsultationRepository implements IConsultationRepository {
             id: Math.random().toString(36).substring(7),
             ...input,
             clinicalNotes: '',
+            chiefComplaint: '',
+            physicalExam: '',
+            diagnosis: '',
+            conduct: '',
             startedAt: new Date().toISOString(),
             finishedAt: null,
             createdAt: new Date().toISOString(),
@@ -31,11 +35,14 @@ export class MockConsultationRepository implements IConsultationRepository {
         return MOCK_CONSULTATIONS.filter(c => c.patientId === patientId);
     }
 
-    async updateNotes(id: string, notes: string): Promise<void> {
+    async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
         const index = MOCK_CONSULTATIONS.findIndex(c => c.id === id);
         if (index !== -1) {
-            MOCK_CONSULTATIONS[index].clinicalNotes = notes;
-            MOCK_CONSULTATIONS[index].updatedAt = new Date().toISOString();
+            MOCK_CONSULTATIONS[index] = {
+                ...MOCK_CONSULTATIONS[index],
+                ...fields,
+                updatedAt: new Date().toISOString()
+            };
         }
     }
 

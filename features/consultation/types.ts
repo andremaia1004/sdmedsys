@@ -21,7 +21,11 @@ export interface Consultation {
     patientId: string;
     doctorId: string; // Legacy ID from doctors table
     queueItemId: string;
-    clinicalNotes: string; // DEPRECATED
+    clinicalNotes: string; // DEPRECATED - Use structured fields
+    chiefComplaint: string | null;
+    physicalExam: string | null;
+    diagnosis: string | null;
+    conduct: string | null;
     startedAt: string;
     finishedAt: string | null;
     createdAt: string;

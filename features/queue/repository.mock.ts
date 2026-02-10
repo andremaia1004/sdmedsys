@@ -70,6 +70,10 @@ export class MockQueueRepository implements IQueueRepository {
         return MOCK_QUEUE[index];
     }
 
+    async findById(id: string): Promise<QueueItem | null> {
+        return MOCK_QUEUE.find(q => q.id === id) || null;
+    }
+
     private logAudit(action: string, role: string, itemId: string, details?: string) {
         AUDIT_LOGS.push({
             timestamp: new Date().toISOString(),

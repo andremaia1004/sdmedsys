@@ -40,6 +40,42 @@ export async function startConsultationAction(prevState: ActionState, formData: 
     }
 }
 
+export async function startConsultationFromAppointmentAction(appointmentId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
+    try {
+        const { id: doctorId } = await requireRole(['DOCTOR']);
+
+        // 1. Resolve Queue Item for this appointment
+        const { QueueService } = await import('@/features/queue/service');
+        const queueItems = await QueueService.list(doctorId);
+        let queueItem = queueItems.find(i => i.appointmentId === appointmentId);
+
+        if (!queueItem) {
+            // Create a queue item if it doesn't exist (Doctor essentially doing a 1-click check-in + attend)
+            const newItem = await QueueService.add({
+                patientId,
+                doctorId,
+                appointmentId,
+                status: 'WAITING',
+                sourceType: 'SCHEDULED'
+            }, 'DOCTOR');
+
+            // Re-assign to a variable that matches the expected ID
+            queueItem = { ...newItem, patientName: '' }; // patientName is not used in startConsultationFromQueueAction anyway
+        }
+
+        if (!queueItem) {
+            throw new Error('Falha ao criar ou localizar item na fila.');
+        }
+
+        // 2. Start Consultation (Re-use existing logic)
+        return await startConsultationFromQueueAction(queueItem.id, patientId);
+    } catch (err: unknown) {
+        console.error('Start Consultation From Appointment Error:', err);
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: msg };
+    }
+}
+
 export async function startConsultationFromQueueAction(queueItemId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
     try {
         const { id: doctorId } = await requireRole(['DOCTOR']);
@@ -68,16 +104,19 @@ export async function startConsultationFromQueueAction(queueItemId: string, pati
     }
 }
 
-export async function saveConsultationNotesAction(consultationId: string, notes: string): Promise<ActionState> {
+export async function saveConsultationFieldsAction(
+    consultationId: string,
+    fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>
+): Promise<ActionState> {
     try {
         await requireRole(['DOCTOR']);
-        await ConsultationService.updateNotes(consultationId, notes);
+        await ConsultationService.updateStructuredFields(consultationId, fields);
 
         // No audit for auto-save to avoid spam
         revalidatePath(`/doctor/consultations/${consultationId}`);
         return { success: true };
     } catch (err: unknown) {
-        console.error('Save Notes Error:', err);
+        console.error('Save Fields Error:', err);
         const msg = err instanceof Error ? err.message : 'Unknown error';
         return { error: msg, success: false };
     }

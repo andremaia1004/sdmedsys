@@ -47,10 +47,9 @@ export class ConsultationService {
         return repo.listByPatient(patientId);
     }
 
-    static async updateNotes(id: string, notes: string): Promise<void> {
+    static async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
         const repo = await getRepository();
-        // Repository currently doesn't take doctorId, but we pass it for future-proofing/signature match
-        return repo.updateNotes(id, notes);
+        return repo.updateStructuredFields(id, fields);
     }
 
     static async finish(id: string): Promise<void> {
@@ -75,6 +74,10 @@ export class ConsultationService {
                     .update({ status: 'COMPLETED' })
                     .eq('id', queueItem.appointment_id);
             }
+
+            // 4. Update Queue Status to DONE (Atomic transition)
+            const { QueueService } = await import('@/features/queue/service');
+            await QueueService.changeStatus(consultation.queueItemId, 'DONE', 'DOCTOR');
         }
 
         return repo.finish(id);

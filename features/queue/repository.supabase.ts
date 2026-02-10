@@ -107,6 +107,21 @@ export class SupabaseQueueRepository implements IQueueRepository {
         return this.mapToQueueItem(data);
     }
 
+    async findById(id: string): Promise<QueueItem | null> {
+        const { data, error } = await this.supabase
+            .from('queue_items')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null;
+            throw new Error('Queue item not found');
+        }
+
+        return this.mapToQueueItem(data);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToQueueItem(row: any): QueueItem {
         return {

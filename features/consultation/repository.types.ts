@@ -5,6 +5,6 @@ export interface IConsultationRepository {
     getActiveByDoctor(doctorId: string): Promise<Consultation | undefined>;
     findById(id: string): Promise<Consultation | undefined>;
     listByPatient(patientId: string): Promise<Consultation[]>;
-    updateNotes(id: string, notes: string): Promise<void>;
+    updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void>;
     finish(id: string): Promise<void>;
 }

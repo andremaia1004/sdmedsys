@@ -9,58 +9,41 @@ interface PrescriptionData {
 }
 
 export class PdfService {
-    static async generatePrescription(data: PrescriptionData): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
-            const doc = new PDFDocument({ size: 'A4', margin: 50 });
-            const chunks: Buffer[] = [];
+    private static drawHeader(doc: PDFKit.PDFDocument, title: string, doctorName: string, crm?: string) {
+        // SDMED Logo/Title area
+        doc.fontSize(22).fillColor('#1e40af').text('SDMED SYSTEM', { align: 'center', characterSpacing: 1 });
+        doc.fontSize(10).fillColor('#64748b').text('Gestão Médica Inteligente', { align: 'center' });
+        doc.moveDown(1.5);
 
-            doc.on('data', (chunk) => chunks.push(chunk));
-            doc.on('end', () => resolve(Buffer.concat(chunks)));
-            doc.on('error', reject);
+        // Document Title
+        doc.fontSize(16).fillColor('#1e293b').text(title, { align: 'center', underline: true });
+        doc.moveDown(1.5);
 
-            // Header
-            doc.fontSize(20).text('SDMED - Receita Médica', { align: 'center' });
-            doc.moveDown();
+        // Doctor Header Info
+        doc.fontSize(11).fillColor('#334155').text(`Dr(a). ${doctorName}`, { align: 'right' });
+        if (crm) {
+            doc.text(`CRM: ${crm}`, { align: 'right' });
+        }
+        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, { align: 'right' });
 
-            // Doctor Info
-            doc.fontSize(12).text(`Dr(a). ${data.doctorName}`, { align: 'right' });
-            doc.text(`Data: ${new Date(data.date).toLocaleDateString('pt-BR')}`, { align: 'right' });
-            doc.moveDown();
-
-            // Patient Info
-            doc.fontSize(14).text(`Paciente: ${data.patientName}`, { align: 'left' });
-            doc.moveDown();
-
-            // Divider
-            doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
-            doc.moveDown();
-
-            // Body (Medications)
-            doc.fontSize(12).text('Uso:', { underline: true });
-            doc.moveDown(0.5);
-            doc.text(data.medications, {
-                align: 'justify',
-                lineGap: 5
-            });
-
-            doc.moveDown();
-
-            if (data.instructions) {
-                doc.fontSize(12).text('Instruções:', { underline: true });
-                doc.moveDown(0.5);
-                doc.text(data.instructions);
-            }
-
-            // Footer
-            const bottom = doc.page.height - 100;
-            doc.fontSize(10).text('Assinatura Eletrônica', 50, bottom, { align: 'center', width: 500 });
-            doc.text('Documento gerado pelo sistema SDMED', { align: 'center', width: 500 });
-
-            doc.end();
-        });
+        doc.moveTo(50, doc.y + 10).lineTo(545, doc.y + 10).strokeColor('#e2e8f0').lineWidth(1).stroke();
+        doc.moveDown(2.5);
     }
 
-    static async generateCertificate(data: { patientName: string; doctorName: string; date: string; days?: number; cid?: string; observation?: string }): Promise<Buffer> {
+    private static drawFooter(doc: PDFKit.PDFDocument, doctorName: string, crm?: string) {
+        const bottom = doc.page.height - 120;
+
+        // Signature Line
+        doc.moveTo(150, bottom).lineTo(450, bottom).strokeColor('#94a3b8').lineWidth(0.5).stroke();
+        doc.fontSize(10).fillColor('#475569').text(`Dr(a). ${doctorName}`, 50, bottom + 10, { align: 'center', width: 500 });
+        if (crm) {
+            doc.text(`CRM: ${crm}`, { align: 'center', width: 500 });
+        }
+
+        doc.fontSize(8).fillColor('#94a3b8').text('Documento eletrônico gerado pelo SDMED System • Validação via QR Code ou Assinatura Digital', 50, doc.page.height - 40, { align: 'center', width: 500 });
+    }
+
+    static async generatePrescription(data: PrescriptionData & { crm?: string }): Promise<Buffer> {
         return new Promise((resolve, reject) => {
             const doc = new PDFDocument({ size: 'A4', margin: 50 });
             const chunks: Buffer[] = [];
@@ -68,40 +51,67 @@ export class PdfService {
             doc.on('end', () => resolve(Buffer.concat(chunks)));
             doc.on('error', reject);
 
-            doc.fontSize(24).text('ATESTADO MÉDICO', { align: 'center' });
+            this.drawHeader(doc, 'RECEITUÁRIO MÉDICO', data.doctorName, data.crm);
+
+            // Patient Area
+            doc.fontSize(13).fillColor('#1e293b').text('PACIENTE:', { continued: true });
+            doc.fontSize(13).font('Helvetica-Bold').text(` ${data.patientName}`);
             doc.moveDown(2);
 
-            doc.fontSize(12).text(`Atesto para os devidos fins que o(a) Sr(a). ${data.patientName}`, { align: 'justify' });
-            doc.moveDown(0.5);
+            // Content Area - Medications
+            doc.font('Helvetica-Bold').fontSize(12).text('USO EXTERNO/INTERNO:', { underline: true });
+            doc.moveDown(1);
+            doc.font('Helvetica').fontSize(12).fillColor('#334155').text(data.medications, {
+                align: 'justify',
+                lineGap: 6
+            });
 
-            let text = `foi atendido(a) nesta data.`;
-            if (data.days) {
-                text += ` Necessita de ${data.days} (${data.days === 1 ? 'um dia' : 'dias'}) de afastamento de suas atividades laborais/escolares.`;
+            if (data.instructions) {
+                doc.moveDown(2);
+                doc.font('Helvetica-Bold').fontSize(12).text('ORIENTAÇÕES:', { underline: true });
+                doc.moveDown(0.5);
+                doc.font('Helvetica').fontSize(11).text(data.instructions, { align: 'justify' });
             }
-            doc.text(text, { align: 'justify' });
+
+            this.drawFooter(doc, data.doctorName, data.crm);
+            doc.end();
+        });
+    }
+
+    static async generateCertificate(data: { patientName: string; doctorName: string; date: string; days?: number; cid?: string; observation?: string; crm?: string }): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const doc = new PDFDocument({ size: 'A4', margin: 50 });
+            const chunks: Buffer[] = [];
+            doc.on('data', chunk => chunks.push(chunk));
+            doc.on('end', () => resolve(Buffer.concat(chunks)));
+            doc.on('error', reject);
+
+            this.drawHeader(doc, 'ATESTADO MÉDICO', data.doctorName, data.crm);
+
+            doc.fontSize(12).fillColor('#334155').text(`Atesto para os devidos fins que o(a) Sr(a). ${data.patientName}, foi atendido(a) nesta unidade médica nesta data.`, { align: 'justify', lineGap: 8 });
+            doc.moveDown(1);
+
+            if (data.days) {
+                doc.text(`O(A) mesmo(a) necessita de ${data.days} (${data.days === 1 ? 'um dia' : 'dias'}) de afastamento de suas atividades laborais e/ou escolares a partir desta data, por motivo de tratamento de saúde.`, { align: 'justify', lineGap: 8 });
+            }
 
             if (data.cid) {
-                doc.moveDown();
-                doc.text(`CID: ${data.cid}`);
+                doc.moveDown(1.5);
+                doc.font('Helvetica-Bold').text(`CID-10: ${data.cid}`);
             }
 
             if (data.observation) {
-                doc.moveDown();
-                doc.text(`Observações: ${data.observation}`);
+                doc.moveDown(1.5);
+                doc.font('Helvetica-Bold').text('Observações:');
+                doc.font('Helvetica').text(data.observation, { align: 'justify' });
             }
 
-            doc.moveDown(4);
-            doc.text(new Date(data.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' }), { align: 'right' });
-
-            const bottom = doc.page.height - 100;
-            doc.fontSize(10).text(`Dr(a). ${data.doctorName}`, 50, bottom, { align: 'center', width: 500 });
-            doc.text('Assinatura Eletrônica', { align: 'center', width: 500 });
-
+            this.drawFooter(doc, data.doctorName, data.crm);
             doc.end();
         });
     }
 
-    static async generateReport(data: { patientName: string; doctorName: string; date: string; content: string }): Promise<Buffer> {
+    static async generateReport(data: { patientName: string; doctorName: string; date: string; content: string; crm?: string }): Promise<Buffer> {
         return new Promise((resolve, reject) => {
             const doc = new PDFDocument({ size: 'A4', margin: 50 });
             const chunks: Buffer[] = [];
@@ -109,17 +119,47 @@ export class PdfService {
             doc.on('end', () => resolve(Buffer.concat(chunks)));
             doc.on('error', reject);
 
-            doc.fontSize(20).text('LAUDO MÉDICO', { align: 'center' });
+            this.drawHeader(doc, 'LAUDO MÉDICO', data.doctorName, data.crm);
+
+            doc.fontSize(12).font('Helvetica-Bold').text('PACIENTE: ', { continued: true });
+            doc.font('Helvetica').text(data.patientName);
+            doc.moveDown(1.5);
+
+            doc.font('Helvetica-Bold').text('RELATÓRIO CLÍNICO:');
+            doc.moveDown(0.5);
+            doc.font('Helvetica').fillColor('#334155').text(data.content, { align: 'justify', lineGap: 6 });
+
+            this.drawFooter(doc, data.doctorName, data.crm);
+            doc.end();
+        });
+    }
+
+    static async generateExamRequest(data: { patientName: string; doctorName: string; date: string; examList: string; justification?: string; crm?: string }): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const doc = new PDFDocument({ size: 'A4', margin: 50 });
+            const chunks: Buffer[] = [];
+            doc.on('data', chunk => chunks.push(chunk));
+            doc.on('end', () => resolve(Buffer.concat(chunks)));
+            doc.on('error', reject);
+
+            this.drawHeader(doc, 'SOLICITAÇÃO DE EXAMES', data.doctorName, data.crm);
+
+            doc.fontSize(12).font('Helvetica-Bold').text('PACIENTE: ', { continued: true });
+            doc.font('Helvetica').text(data.patientName);
             doc.moveDown(2);
 
-            doc.fontSize(12).text(`Paciente: ${data.patientName}`);
-            doc.text(`Data: ${new Date(data.date).toLocaleDateString('pt-BR')}`);
-            doc.moveDown(2);
+            doc.font('Helvetica-Bold').text('EXAMES SOLICITADOS:');
+            doc.moveDown(0.5);
+            doc.font('Helvetica').fillColor('#334155').text(data.examList, { align: 'justify', lineGap: 6 });
 
-            doc.text(data.content, { align: 'justify', lineGap: 5 });
+            if (data.justification) {
+                doc.moveDown(2);
+                doc.font('Helvetica-Bold').text('INDICAÇÃO CLÍNICA / JUSTIFICATIVA:');
+                doc.moveDown(0.5);
+                doc.font('Helvetica').text(data.justification, { align: 'justify' });
+            }
 
-            const bottom = doc.page.height - 100;
-            doc.fontSize(10).text(`Dr(a). ${data.doctorName}`, 50, bottom, { align: 'center', width: 500 });
+            this.drawFooter(doc, data.doctorName, data.crm);
             doc.end();
         });
     }

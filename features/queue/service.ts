@@ -72,7 +72,47 @@ export class QueueService {
 
     static async changeStatus(id: string, newStatus: QueueStatus, actorRole: string): Promise<QueueItem> {
         const repo = await getRepository();
-        return repo.changeStatus(id, newStatus, actorRole);
+
+        // 1. Fetch current item for validation
+        const currentItem = await repo.findById(id);
+        if (!currentItem) throw new Error('Paciente não encontrado na fila.');
+
+        // 2. State Machine Validation
+        const transitions: Record<QueueStatus, QueueStatus[]> = {
+            'WAITING': ['CALLED', 'CANCELED', 'NO_SHOW'],
+            'CALLED': ['IN_SERVICE', 'NO_SHOW', 'WAITING'],
+            'IN_SERVICE': ['DONE'],
+            'DONE': [],
+            'NO_SHOW': ['WAITING'],
+            'CANCELED': ['WAITING']
+        };
+
+        if (!transitions[currentItem.status]?.includes(newStatus)) {
+            throw new Error(`Transição inválida: ${currentItem.status} -> ${newStatus}`);
+        }
+
+        // 3. Role/Assignment Validation (Doctor starting consultation)
+        if (newStatus === 'IN_SERVICE') {
+            const user = await getCurrentUser();
+            if (currentItem.doctorId && currentItem.doctorId !== user?.id && user?.role !== 'ADMIN') {
+                throw new Error('Apenas o médico designado pode iniciar este atendimento.');
+            }
+        }
+
+        // 4. Perform Transition
+        const item = await repo.changeStatus(id, newStatus, actorRole);
+
+        // 5. Audit the transition
+        const { logAudit } = await import('@/lib/audit');
+        await logAudit('STATUS_CHANGE', 'QUEUE_ITEM', id, {
+            from: currentItem.status,
+            to: newStatus,
+            patientId: item.patientId,
+            doctorId: item.doctorId,
+            actorRole
+        });
+
+        return item;
     }
 
     static async getOperationalQueue(doctorId?: string): Promise<QueueItemWithPatient[]> {

@@ -126,31 +126,81 @@ export default function DoctorQueue({ doctorId }: Props) {
                             </div>
 
                             <div className={styles.inlineActions}>
-                                {item.status === 'WAITING' && !calledPatient && (
+                                {item.status === 'WAITING' && !items.some(i => i.status === 'CALLED') && (
                                     <button
                                         onClick={() => handleAction(callNextAction(doctorId))}
                                         className={`${styles.inlineBtn} ${styles.btnCall}`}
+                                        style={{
+                                            background: 'var(--primary)',
+                                            color: '#fff',
+                                            borderRadius: '8px',
+                                            padding: '0.5rem 1rem',
+                                            fontWeight: 700,
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.4rem'
+                                        }}
                                     >
-                                        Chamar
+                                        <PhoneOutgoing size={14} /> Chamar
                                     </button>
                                 )}
                                 {item.status === 'CALLED' && (
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            onClick={() => handleStartConsultation(item.id, item.patientId)}
+                                            className={`${styles.inlineBtn} ${styles.btnStart}`}
+                                            title="Iniciar Consulta"
+                                            style={{
+                                                background: '#16a34a',
+                                                color: '#fff',
+                                                borderRadius: '8px',
+                                                padding: '0.5rem 1rem',
+                                                fontWeight: 700,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.4rem'
+                                            }}
+                                        >
+                                            <Play size={14} fill="currentColor" /> Atender
+                                        </button>
+                                        <button
+                                            onClick={() => handleAction(callNextAction(doctorId))}
+                                            className={styles.inlineBtn}
+                                            title="Chamar Novamente"
+                                            style={{
+                                                background: '#fff',
+                                                color: 'var(--primary)',
+                                                border: '1px solid var(--primary)',
+                                                borderRadius: '8px',
+                                                padding: '0.5rem',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            <RefreshCcw size={16} />
+                                        </button>
+                                    </div>
+                                )}
+                                {item.status !== 'CALLED' && item.status !== 'IN_SERVICE' && (
                                     <button
-                                        onClick={() => handleStartConsultation(item.id, item.patientId)}
-                                        className={`${styles.inlineBtn} ${styles.btnStart}`}
-                                        title="Iniciar Consulta"
+                                        onClick={() => handleAction(quickNoShowAction(item.id))}
+                                        className={`${styles.inlineBtn} ${styles.btnCancel}`}
+                                        style={{
+                                            background: '#fff',
+                                            color: '#ef4444',
+                                            border: '1px solid #fecaca',
+                                            borderRadius: '8px',
+                                            padding: '0.5rem',
+                                            cursor: 'pointer'
+                                        }}
+                                        title="Marcar como Falta"
                                     >
-                                        <Play size={14} style={{ marginRight: '4px' }} />
-                                        Atender
+                                        <UserX size={16} />
                                     </button>
                                 )}
-                                <button
-                                    onClick={() => handleAction(quickNoShowAction(item.id))}
-                                    className={`${styles.inlineBtn} ${styles.btnCancel}`}
-                                >
-                                    <UserX size={14} style={{ marginRight: '4px' }} />
-                                    Faltou
-                                </button>
                             </div>
                         </div>
                     );

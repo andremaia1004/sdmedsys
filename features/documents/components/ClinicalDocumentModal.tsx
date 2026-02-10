@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { generatePrescriptionAction, generateCertificateAction, generateReportAction } from '../actions';
-import { X, FileText, Download, Loader2, Scroll, Activity } from 'lucide-react';
+import { generatePrescriptionAction, generateCertificateAction, generateReportAction, generateExamRequestAction } from '../actions';
+import { X, FileText, Download, Loader2, Scroll, Activity, ClipboardList } from 'lucide-react';
 import styles from '@/components/ui/Modal.module.css';
 
-export type DocumentType = 'prescription' | 'certificate' | 'report';
+export type DocumentType = 'prescription' | 'certificate' | 'report' | 'exam_request';
 
 interface Props {
     isOpen: boolean;
@@ -30,6 +30,10 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
     const [cid, setCid] = useState('');
     const [observation, setObservation] = useState('');
 
+    // Exam Request Fields
+    const [examList, setExamList] = useState('');
+    const [justification, setJustification] = useState('');
+
     // Report Fields
     const [content, setContent] = useState('');
 
@@ -49,6 +53,9 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
             res = await generatePrescriptionAction(patientId, consultationId, medications, instructions);
         } else if (type === 'certificate') {
             res = await generateCertificateAction(patientId, consultationId, days ? parseInt(days) : undefined, cid, observation);
+        } else if (type === 'exam_request') {
+            if (!examList.trim()) { alert('Preencha a lista de exames'); setLoading(false); return; }
+            res = await generateExamRequestAction(patientId, consultationId, examList, justification);
         } else {
             if (!content.trim()) { alert('Preencha o conteúdo do laudo'); setLoading(false); return; }
             res = await generateReportAction(patientId, consultationId, content);
@@ -89,6 +96,7 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
                         {[
                             { id: 'prescription', label: 'Receita', icon: FileText },
                             { id: 'certificate', label: 'Atestado', icon: Activity },
+                            { id: 'exam_request', label: 'Exames', icon: ClipboardList },
                             { id: 'report', label: 'Laudo', icon: Scroll }
                         ].map(t => (
                             <button
@@ -171,6 +179,30 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
                                     onChange={e => setObservation(e.target.value)}
                                     placeholder="Ex: Paciente esteve em consulta..."
                                     style={{ width: '100%', height: '100px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    {/* Exam Request Form */}
+                    {type === 'exam_request' && (
+                        <>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Exames Solicitados</label>
+                                <textarea
+                                    value={examList}
+                                    onChange={e => setExamList(e.target.value)}
+                                    placeholder="Ex: Hemograma completo\nCreatinina\nUrina I..."
+                                    style={{ width: '100%', height: '150px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Justificativa / Indicação Clínica</label>
+                                <textarea
+                                    value={justification}
+                                    onChange={e => setJustification(e.target.value)}
+                                    placeholder="Ex: Suspeita clínica de infecção..."
+                                    style={{ width: '100%', height: '80px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
                                 />
                             </div>
                         </>

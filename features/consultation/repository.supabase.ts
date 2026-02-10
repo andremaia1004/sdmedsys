@@ -66,19 +66,22 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         return this.mapToConsultation(data);
     }
 
-    async updateNotes(id: string, notes: string): Promise<void> {
+    async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
         const { error } = await this.supabase
             .from('consultations')
             .update({
-                clinical_notes: notes,
+                chief_complaint: fields.chiefComplaint,
+                physical_exam: fields.physicalExam,
+                diagnosis: fields.diagnosis,
+                conduct: fields.conduct,
                 updated_at: new Date().toISOString()
             })
             .eq('id', id)
             .eq('clinic_id', this.clinicId);
 
         if (error) {
-            console.error('Supabase Error (updateNotes):', error);
-            throw new Error('Failed to update notes');
+            console.error('Supabase Error (updateStructuredFields):', error);
+            throw new Error('Failed to update clinical entry');
         }
     }
 
@@ -122,6 +125,10 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
             doctorId: row.doctor_id,
             queueItemId: row.queue_item_id,
             clinicalNotes: row.clinical_notes || '',
+            chiefComplaint: row.chief_complaint || '',
+            physicalExam: row.physical_exam || '',
+            diagnosis: row.diagnosis || '',
+            conduct: row.conduct || '',
             startedAt: row.started_at,
             finishedAt: row.finished_at,
             createdAt: row.created_at,
