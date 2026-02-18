@@ -15,9 +15,10 @@ interface Props {
     patientName: string;
     items?: DocumentType[]; // Allow filtering if needed
     initialType?: DocumentType;
+    onSuccess?: () => void;
 }
 
-export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultationId, patientName, items, initialType = 'prescription' }: Props) {
+export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultationId, patientName, items, initialType = 'prescription', onSuccess }: Props) {
     const [type, setType] = useState<DocumentType>(initialType);
     const [loading, setLoading] = useState(false);
 
@@ -70,6 +71,8 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            if (onSuccess) onSuccess();
             onClose();
         } else {
             alert(res.error || 'Erro ao gerar documento.');

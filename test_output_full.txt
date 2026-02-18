@@ -1,0 +1,25 @@
+
+> sdmed-sys@0.1.0 test
+> vitest features/consultation
+
+
+[1m[44m DEV [49m[22m [34mv4.0.18 [39m[90mE:/SDMED Sys[39m
+
+[90mstderr[2m | features/consultation/__tests__/repository.clinical.test.ts[2m > [22m[2mSupabaseClinicalEntryRepository[2m > [22m[2mshould return empty on error
+[22m[39mSupabase Error (listByPatient): { message: [32m'DB Error'[39m }
+
+ [32m✓[39m features/consultation/__tests__/repository.clinical.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+[90mstderr[2m | features/consultation/__tests__/documents.test.ts[2m > [22m[2mClinicalDocumentService (RBAC)[2m > [22m[2mshould allow DOCTOR only if owner
+[22m[39mDocumentService: Doctor attempted to access another doctors consultation
+
+ [32m✓[39m features/consultation/__tests__/documents.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m features/consultation/__tests__/summary.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m features/consultation/__tests__/service.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m   Start at [22m 14:05:44
+[2m   Duration [22m 3.21s[2m (transform 259ms, setup 0ms, import 569ms, tests 45ms, environment 4.54s)[22m
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m

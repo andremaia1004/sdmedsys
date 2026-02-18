@@ -21,8 +21,11 @@ export type AuditAction =
     | 'START_SERVICE'
     | 'NO_SHOW'
     | 'CANCEL_APPOINTMENT'
+    | 'DOWNLOAD_PRESCRIPTION'
+    | 'DOWNLOAD_CERTIFICATE'
+    | 'DOWNLOAD_REPORT'
     | 'OTHER';
-export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'QUEUE_ITEM' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS' | 'CLINICAL_ENTRY';
+export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'QUEUE_ITEM' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS' | 'CLINICAL_ENTRY' | 'DOCUMENT';
 
 /**
  * Records a critical action to the audit logs.

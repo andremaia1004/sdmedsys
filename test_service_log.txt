@@ -1,0 +1,122 @@
+
+> sdmed-sys@0.1.0 test
+> vitest features/consultation/__tests__/service.test.ts
+
+
+[1m[44m DEV [49m[22m [34mv4.0.18 [39m[90mE:/SDMED Sys[39m
+
+[90mstderr[2m | features/consultation/__tests__/service.test.ts[2m > [22m[2mConsultationService[2m > [22m[2mshould start consultation from queue item
+[22m[39mSession: Failed to get stub user Error: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context
+    at getExpectedRequestStore [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\app-render\work-unit-async-storage.external.js:64:33[90m)[39m
+    at cookies [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\request\cookies.js:85:84[90m)[39m
+    at getStubUser (E:/SDMED Sys/lib/session.ts:11:35)
+    at getCurrentUser (E:/SDMED Sys/lib/session.ts:76:12)
+    at logAudit (E:/SDMED Sys/lib/audit.ts:41:28)
+    at Function.changeStatus (E:/SDMED Sys/features/queue/service.ts:107:15)
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at E:/SDMED Sys/features/consultation/__tests__/service.test.ts:13:9
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:20
+
+[90mstderr[2m | features/consultation/__tests__/service.test.ts[2m > [22m[2mConsultationService[2m > [22m[2mshould start consultation from queue item
+[22m[39mAudit Logging Failed: {
+  message: [32m'TypeError: fetch failed'[39m,
+  details: [32m'TypeError: fetch failed\n'[39m +
+    [32m'\n'[39m +
+    [32m'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n'[39m +
+    [32m'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n'[39m +
+    [32m'    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+[90mstderr[2m | features/consultation/__tests__/service.test.ts[2m > [22m[2mConsultationService[2m > [22m[2mshould start consultation from queue item
+[22m[39mSession: Failed to get stub user Error: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context
+    at getExpectedRequestStore [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\app-render\work-unit-async-storage.external.js:64:33[90m)[39m
+    at cookies [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\request\cookies.js:85:84[90m)[39m
+    at getStubUser (E:/SDMED Sys/lib/session.ts:11:35)
+    at getCurrentUser (E:/SDMED Sys/lib/session.ts:76:12)
+    at Function.changeStatus (E:/SDMED Sys/features/queue/service.ts:96:32)
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at E:/SDMED Sys/features/consultation/__tests__/service.test.ts:14:9
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:20
+
+[90mstderr[2m | features/consultation/__tests__/service.test.ts[2m > [22m[2mConsultationService[2m > [22m[2mshould start consultation from queue item
+[22m[39mSession: Failed to get stub user Error: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context
+    at getExpectedRequestStore [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\app-render\work-unit-async-storage.external.js:64:33[90m)[39m
+    at cookies [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\request\cookies.js:85:84[90m)[39m
+    at getStubUser (E:/SDMED Sys/lib/session.ts:11:35)
+    at getCurrentUser (E:/SDMED Sys/lib/session.ts:76:12)
+    at logAudit (E:/SDMED Sys/lib/audit.ts:41:28)
+    at Function.changeStatus (E:/SDMED Sys/features/queue/service.ts:107:15)
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at E:/SDMED Sys/features/consultation/__tests__/service.test.ts:14:9
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:20
+
+[90mstderr[2m | features/consultation/__tests__/service.test.ts[2m > [22m[2mConsultationService[2m > [22m[2mshould start consultation from queue item
+[22m[39mAudit Logging Failed: {
+  message: [32m'TypeError: fetch failed'[39m,
+  details: [32m'TypeError: fetch failed\n'[39m +
+    [32m'\n'[39m +
+    [32m'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n'[39m +
+    [32m'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n'[39m +
+    [32m'    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+ [31m❯[39m features/consultation/__tests__/service.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 154[2mms[22m[39m
+     [32m✓[39m should start consultation from queue item[32m 150[2mms[22m[39m
+     [32m✓[39m should active consultation by doctor[32m 1[2mms[22m[39m
+[31m     [31m×[31m should update clinical notes[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should finish consultation and update queue[39m[32m 1[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m features/consultation/__tests__/service.test.ts[2m > [22mConsultationService[2m > [22mshould update clinical notes
+[31m[1mTypeError[22m: __vite_ssr_import_1__.ConsultationService.updateNotes is not a function[39m
+[36m [2m❯[22m features/consultation/__tests__/service.test.ts:[2m39:35[22m[39m
+    [90m 37| [39m        [35mif[39m ([33m![39mactive) [35mthrow[39m [35mnew[39m [33mError[39m([32m'No active consultation'[39m)[33m;[39m
+    [90m 38| [39m
+    [90m 39| [39m        await ConsultationService.updateNotes(active.id, 'Patient comp…
+    [90m   | [39m                                  [31m^[39m
+    [90m 40| [39m
+    [90m 41| [39m        [35mconst[39m updated [33m=[39m [35mawait[39m [33mConsultationService[39m[33m.[39m[34mfindById[39m(active[33m.[39mid)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/consultation/__tests__/service.test.ts[2m > [22mConsultationService[2m > [22mshould finish consultation and update queue
+[31m[1mError[22m: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context[39m
+[90m [2m❯[22m getExpectedRequestStore node_modules/next/dist/server/app-render/work-unit-async-storage.external.js:[2m64:33[22m[39m
+[90m [2m❯[22m cookies node_modules/next/dist/server/request/cookies.js:[2m85:84[22m[39m
+[36m [2m❯[22m createClient lib/supabase-auth.ts:[2m16:31[22m[39m
+    [90m 14| [39m    }
+    [90m 15| [39m
+    [90m 16| [39m    [35mconst[39m cookieStore [33m=[39m [35mawait[39m [34mcookies[39m()[33m;[39m
+    [90m   | [39m                              [31m^[39m
+    [90m 17| [39m
+    [90m 18| [39m    [35mreturn[39m [34mcreateServerClient[39m(
+[90m [2m❯[22m Function.finish features/consultation/service.ts:[2m66:36[22m[39m
+[90m [2m❯[22m features/consultation/__tests__/service.test.ts:[2m49:9[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 14:03:31
+[2m   Duration [22m 1.75s[2m (transform 188ms, setup 0ms, import 303ms, tests 154ms, environment 996ms)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mfeatures/consultation/__tests__/service.test.ts [22m[34mx1 [34m[39m
+       [2m Filename pattern: [22m[34mfeatures/consultation/__tests__/service.test.ts[39m
+
+ [32m✓[39m features/consultation/__tests__/service.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 14:04:13
+[2m   Duration [22m 33ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m

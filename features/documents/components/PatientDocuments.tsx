@@ -76,11 +76,12 @@ export const PatientDocuments: React.FC<Props> = ({ patientId, patientName, acti
             {showModal && (
                 <ClinicalDocumentModal
                     isOpen={showModal}
-                    onClose={() => { setShowModal(false); load(); }}
+                    onClose={() => { setShowModal(false); }}
                     patientId={patientId}
                     consultationId={activeConsultationId || null}
                     patientName={patientName}
                     initialType={modalType}
+                    onSuccess={load}
                 />
             )}
         </>
@@ -124,7 +125,7 @@ export const PatientDocuments: React.FC<Props> = ({ patientId, patientName, acti
                             </td>
                             <td>
                                 <a
-                                    href={`/api/documents/${doc.type}/${doc.consultationId}`}
+                                    href={`/api/documents/${doc.type}/${doc.id}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.downloadBtn}
@@ -140,11 +141,12 @@ export const PatientDocuments: React.FC<Props> = ({ patientId, patientName, acti
             {showModal && (
                 <ClinicalDocumentModal
                     isOpen={showModal}
-                    onClose={() => { setShowModal(false); load(); }}
+                    onClose={() => { setShowModal(false); }}
                     patientId={patientId}
                     consultationId={activeConsultationId || null}
                     patientName={patientName}
                     initialType={modalType}
+                    onSuccess={load}
                 />
             )}
         </div>

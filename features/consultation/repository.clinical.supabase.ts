@@ -8,21 +8,48 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
         private clinicId: string
     ) { }
 
-    async listByPatient(patientId: string): Promise<ClinicalEntry[]> {
-        const { data, error } = await this.supabase
+    async listByPatient(patientId: string, options?: {
+        limit?: number;
+        offset?: number;
+        startDate?: string;
+        endDate?: string;
+        doctorId?: string;
+    }): Promise<{ data: ClinicalEntry[]; total: number; hasMore: boolean }> {
+        const limit = options?.limit || 20;
+        const offset = options?.offset || 0;
+
+        let query = this.supabase
             .from('clinical_entries')
-            .select('*')
+            .select('*', { count: 'exact' })
             .eq('patient_id', patientId)
-            .eq('clinic_id', this.clinicId)
-            .order('created_at', { ascending: false });
+            .eq('clinic_id', this.clinicId); // Enforcement
+
+        if (options?.doctorId) {
+            query = query.eq('doctor_user_id', options.doctorId);
+        }
+
+        if (options?.startDate) {
+            query = query.gte('created_at', options.startDate);
+        }
+
+        if (options?.endDate) {
+            query = query.lte('created_at', options.endDate);
+        }
+
+        const { data, count, error } = await query
+            .order('created_at', { ascending: false })
+            .range(offset, offset + limit - 1);
 
         if (error) {
             console.error('Supabase Error (listByPatient):', error);
-            return [];
+            return { data: [], total: 0, hasMore: false };
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (data || []).map((d: any) => this.mapToClinicalEntry(d));
+        const mappedData = (data || []).map((d: any) => this.mapToClinicalEntry(d));
+        const total = count || 0;
+        const hasMore = total > (offset + mappedData.length);
+
+        return { data: mappedData, total, hasMore };
     }
 
     async findById(id: string): Promise<ClinicalEntry | null> {

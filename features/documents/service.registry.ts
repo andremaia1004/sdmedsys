@@ -88,6 +88,26 @@ export class ClinicalDocumentsRegistryService {
         return count || 0;
     }
 
+    static async findById(id: string): Promise<ClinicalDocument | null> {
+        const user = await getCurrentUser();
+        if (!user) return null;
+
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from('clinical_documents')
+            .select('*, doctors(name)')
+            .eq('id', id)
+            .eq('clinic_id', user.clinicId)
+            .single();
+
+        if (error || !data) {
+            return null;
+        }
+
+        return this.mapToDocument(data);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private static mapToDocument(row: any): ClinicalDocument {
         return {

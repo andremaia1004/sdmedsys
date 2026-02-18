@@ -169,3 +169,64 @@ export async function generateReport(data: ReportData): Promise<Buffer> {
         doc.end();
     });
 }
+
+
+export interface ExamRequestData {
+    header: DocumentHeader;
+    patient: PatientInfo;
+    doctor: DoctorInfo;
+    examList: string;
+    justification?: string;
+    date: string;
+    metadata?: {
+        consultationId: string;
+        patientId: string;
+        doctorId: string;
+        clinicId: string;
+    };
+}
+
+export async function generateExamRequest(data: ExamRequestData): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const doc = createBasePDF(data.header);
+        const chunks: Buffer[] = [];
+
+        doc.on('data', (chunk) => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', reject);
+
+        // Title
+        doc.fontSize(18).text('SOLICITAÇÃO DE EXAMES', { align: 'center', underline: true });
+        doc.moveDown(2);
+
+        // Patient Info
+        doc.fontSize(11).text(`Paciente: `, { continued: true }).font('Helvetica-Bold').text(data.patient.name);
+        doc.font('Helvetica');
+        if (data.patient.document) {
+            doc.text(`CPF/Doc: ${data.patient.document}`);
+        }
+        doc.moveDown(2);
+
+        // Content
+        doc.fontSize(12).font('Helvetica-Bold').text('EXAMES SOLICITADOS:');
+        doc.font('Helvetica').fontSize(11).text(data.examList, {
+            align: 'justify',
+            lineGap: 5
+        });
+
+        if (data.justification) {
+            doc.moveDown(1);
+            doc.fontSize(11).font('Helvetica-Bold').text('Indicação Clínica / Justificativa:');
+            doc.font('Helvetica').text(data.justification);
+        }
+
+        // Date
+        doc.moveDown(4);
+        doc.fontSize(10).text(`Data: ${data.date}`, { align: 'right' });
+
+        // Footer
+        addFooter(doc, data.doctor);
+
+        doc.end();
+    });
+}

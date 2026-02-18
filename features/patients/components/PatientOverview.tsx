@@ -1,6 +1,14 @@
+'use client';
+
+import React, { useState } from 'react';
 import { Patient } from '../types';
 import { ClinicalSummary } from '@/features/consultation/types';
 import styles from '../styles/Patients.module.css';
+import { IdentificationSection } from './sections/IdentificationSection';
+import { ContactSection } from './sections/ContactSection';
+import { AdditionalInfoSection } from './sections/AdditionalInfoSection';
+import { PatientEditModal, EditSection } from './PatientEditModal';
+import { useRouter } from 'next/navigation';
 
 interface PatientOverviewProps {
     patient: Patient;
@@ -9,68 +17,39 @@ interface PatientOverviewProps {
     onViewTimeline?: () => void;
 }
 
-export default function PatientOverview({ patient, summary, role, onViewTimeline }: PatientOverviewProps) {
+export default function PatientOverview({ patient: initialPatient, summary, role, onViewTimeline }: PatientOverviewProps) {
+    const [patient, setPatient] = useState(initialPatient);
+    const [editSection, setEditSection] = useState<EditSection | null>(null);
+    const router = useRouter();
+
     const isClinicalAllowed = role === 'ADMIN' || role === 'DOCTOR';
+    // Allow editing to Admin, Doctor and Secretary (Secretary manages registration)
+    const canEdit = role === 'ADMIN' || role === 'SECRETARY' || role === 'DOCTOR';
+
+    const handleSuccess = (updated: Patient) => {
+        setPatient(updated);
+        router.refresh(); // Refresh server components to ensure sync
+    };
 
     return (
         <div className={styles.overviewContainer}>
-            <div className={styles.patientCard}>
-                <div className={styles.cardHeader}>
-                    <h2>Detalhes do Cadastro</h2>
-                </div>
-                <div className={styles.cardGrid}>
-                    <div className={styles.field}>
-                        <label>Nome Completo</label>
-                        <p>{patient.name}</p>
-                    </div>
-                    <div className={styles.field}>
-                        <label>CPF / Documento</label>
-                        <p>{patient.document || 'N/A'}</p>
-                    </div>
-                    <div className={styles.field}>
-                        <label>Data de Nascimento</label>
-                        <p>{patient.birthDate ? new Date(patient.birthDate).toLocaleDateString('pt-BR') : 'N/A'}</p>
-                    </div>
-                    <div className={styles.field}>
-                        <label>Telefone</label>
-                        <p>{patient.phone || 'N/A'}</p>
-                    </div>
-                    <div className={styles.field}>
-                        <label>E-mail</label>
-                        <p>{patient.email || 'N/A'}</p>
-                    </div>
-                    {patient.address && (
-                        <div className={styles.field} style={{ gridColumn: 'span 2' }}>
-                            <label>Endereço</label>
-                            <p>{patient.address}</p>
-                        </div>
-                    )}
-                    {patient.insurance && (
-                        <div className={styles.field}>
-                            <label>Convênio / Plano</label>
-                            <p>{patient.insurance}</p>
-                        </div>
-                    )}
-                    {patient.guardian_name && (
-                        <div className={styles.field}>
-                            <label>Responsável</label>
-                            <p>{patient.guardian_name}</p>
-                        </div>
-                    )}
-                    {patient.emergency_contact && (
-                        <div className={styles.field}>
-                            <label>Contato de Emergência</label>
-                            <p>{patient.emergency_contact}</p>
-                        </div>
-                    )}
-                    {patient.main_complaint && (
-                        <div className={styles.field} style={{ gridColumn: 'span 2' }}>
-                            <label>Queixa Principal (Cadastro)</label>
-                            <p>{patient.main_complaint}</p>
-                        </div>
-                    )}
-                </div>
-            </div>
+            <IdentificationSection
+                patient={patient}
+                onEdit={() => setEditSection('identification')}
+                canEdit={canEdit}
+            />
+
+            <ContactSection
+                patient={patient}
+                onEdit={() => setEditSection('contact')}
+                canEdit={canEdit}
+            />
+
+            <AdditionalInfoSection
+                patient={patient}
+                onEdit={() => setEditSection('additional')}
+                canEdit={canEdit}
+            />
 
             {isClinicalAllowed && (
                 <div className={`${styles.patientCard} ${styles.summaryCard}`}>
@@ -113,6 +92,17 @@ export default function PatientOverview({ patient, summary, role, onViewTimeline
                     )}
                 </div>
             )}
+
+            {editSection && (
+                <PatientEditModal
+                    isOpen={!!editSection}
+                    onClose={() => setEditSection(null)}
+                    patient={patient}
+                    section={editSection}
+                    onSuccess={handleSuccess}
+                />
+            )}
         </div>
     );
 }
+

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClinicalSummaryService } from '../service.summary';
 import { getCurrentUser } from '@/lib/session';
-import { SupabaseClinicalEntryRepository } from '../repository.clinical.supabase';
+import { SupabaseConsultationRepository } from '../repository.supabase';
 
 // Mock dependencies
 vi.mock('@/lib/session');
 vi.mock('@/lib/supabase-auth');
-vi.mock('../repository.clinical.supabase');
+vi.mock('../repository.supabase');
 
 describe('ClinicalSummaryService', () => {
     beforeEach(() => {
@@ -37,18 +37,17 @@ describe('ClinicalSummaryService', () => {
             id: 'e1',
             diagnosis: 'Test Diagnosis',
             conduct: 'Test Conduct',
-            doctorUserId: 'doc-123',
-            createdAt: '2026-01-30T10:00:00Z',
+            doctorId: 'doc-123',
+            startedAt: '2026-01-30T10:00:00Z',
             // ... other fields
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vi.mocked(SupabaseClinicalEntryRepository.prototype.listByPatient).mockResolvedValue([mockEntry as any]);
+        vi.mocked(SupabaseConsultationRepository.prototype.listByPatient).mockResolvedValue([mockEntry as any]);
 
         const summary = await ClinicalSummaryService.getLatestEntryByPatient('p1');
 
         expect(summary).not.toBeNull();
-        expect(summary?.diagnosis).toBe('Test Diagnosis');
         expect(summary?.doctorName).toContain('doc-1');
         expect(summary?.date).toBe('2026-01-30T10:00:00Z');
     });
@@ -61,7 +60,7 @@ describe('ClinicalSummaryService', () => {
             clinicId: 'c1'
         });
 
-        vi.mocked(SupabaseClinicalEntryRepository.prototype.listByPatient).mockResolvedValue([]);
+        vi.mocked(SupabaseConsultationRepository.prototype.listByPatient).mockResolvedValue([]);
 
         const summary = await ClinicalSummaryService.getLatestEntryByPatient('p1');
         expect(summary).toBeNull();

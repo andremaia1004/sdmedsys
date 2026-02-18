@@ -26,10 +26,11 @@ const getClinicalRepository = async (): Promise<IClinicalEntryRepository | null>
 };
 
 export class ClinicalEntryService {
-    static async listByPatient(patientId: string): Promise<ClinicalEntry[]> {
+    static async listByPatient(patientId: string, options?: { limit?: number; offset?: number; startDate?: string; endDate?: string; doctorId?: string; }): Promise<{ data: ClinicalEntry[]; total: number; hasMore: boolean }> {
         const repo = await getClinicalRepository();
-        if (!repo) return [];
-        return repo.listByPatient(patientId);
+        // Return empty structure if repo not available (e.g. mock missing)
+        if (!repo) return { data: [], total: 0, hasMore: false };
+        return repo.listByPatient(patientId, options);
     }
 
     static async findByConsultation(consultationId: string): Promise<ClinicalEntry | null> {
