@@ -67,7 +67,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
     }
 
     async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
-        const { error } = await this.supabase
+        const { error, count } = await this.supabase
             .from('consultations')
             .update({
                 chief_complaint: fields.chiefComplaint,
@@ -75,7 +75,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
                 diagnosis: fields.diagnosis,
                 conduct: fields.conduct,
                 updated_at: new Date().toISOString()
-            })
+            }, { count: 'exact' })
             .eq('id', id)
             .eq('clinic_id', this.clinicId);
 
@@ -83,21 +83,31 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
             console.error('Supabase Error (updateStructuredFields):', error);
             throw new Error('Failed to update clinical entry');
         }
+
+        if (count === 0) {
+            console.error(`Update failed: Consultation ${id} not found or clinic mismatch (${this.clinicId})`);
+            throw new Error('Consultation not found or access denied');
+        }
     }
 
     async finish(id: string): Promise<void> {
-        const { error } = await this.supabase
+        const { error, count } = await this.supabase
             .from('consultations')
             .update({
                 finished_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
-            })
+            }, { count: 'exact' })
             .eq('id', id)
             .eq('clinic_id', this.clinicId);
 
         if (error) {
             console.error('Supabase Error (finish):', error);
             throw new Error('Failed to finish consultation');
+        }
+
+        if (count === 0) {
+            console.error(`Finish failed: Consultation ${id} not found or clinic mismatch (${this.clinicId})`);
+            throw new Error('Consultation not found or access denied');
         }
     }
 
