@@ -1,0 +1,51 @@
+
+> sdmed-sys@0.1.0 lint
+> eslint
+
+
+E:\SDMED Sys\features\agenda\components\DailyCalendar.tsx
+   7:22  warning  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+   7:35  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+  12:5   warning  'doctorId' is defined but never used      @typescript-eslint/no-unused-vars
+
+E:\SDMED Sys\features\agenda\components\WeeklyCalendar.tsx
+  8:49  warning  'User' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\SDMED Sys\features\consultation\__tests__\repository.clinical.test.ts
+  17:6  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\SDMED Sys\features\consultation\__tests__\repository.supabase.test.ts
+  20:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\SDMED Sys\features\consultation\__tests__\service.test.ts
+  1:36  warning  'beforeEach' is defined but never used                  @typescript-eslint/no-unused-vars
+  2:10  warning  'ConsultationService' is defined but never used         @typescript-eslint/no-unused-vars
+  3:10  warning  'QueueService' is defined but never used                @typescript-eslint/no-unused-vars
+  4:10  warning  'MockConsultationRepository' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\SDMED Sys\features\consultation\repository.clinical.supabase.ts
+  48:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\SDMED Sys\features\documents\components\AttachmentUploadModal.tsx
+  52:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\SDMED Sys\features\documents\components\ClinicalDocumentModal.tsx
+  21:98  warning  'items' is defined but never used                                                               @typescript-eslint/no-unused-vars
+  43:9   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+E:\SDMED Sys\features\queue\actions.ts
+  4:10  warning  'QueueStatus' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\SDMED Sys\features\queue\components\DoctorQueue.tsx
+   8:5  warning  'quickStartAction' is defined but never used                                                                 @typescript-eslint/no-unused-vars
+  39:8  warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+E:\SDMED Sys\features\queue\components\OperationalQueue.tsx
+  42:8  warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+E:\SDMED Sys\features\secretary\service.dashboard.ts
+  2:10  warning  'Appointment' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 19 problems (3 errors, 16 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

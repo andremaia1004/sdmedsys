@@ -17,6 +17,7 @@ describe('SupabaseConsultationRepository', () => {
         from: vi.fn(() => ({
             update: vi.fn(() => mockBuilder),
         })),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     beforeEach(() => {

@@ -14,6 +14,7 @@ const mockSupabase = {
     from: vi.fn(() => ({
         select: mockSelect,
     })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;
 
 describe('SupabaseClinicalEntryRepository', () => {

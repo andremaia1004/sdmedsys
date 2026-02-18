@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { Patient } from '../types';
 // ClinicalSummaryService is server-side only and not used here
-import { ClinicalEntry, ClinicalSummary } from '@/features/consultation/types';
+import { ClinicalSummary } from '@/features/consultation/types';
 import PatientOverview from './PatientOverview';
-import PatientTimeline from './PatientTimeline';
+import { PatientTimeline } from '@/features/patient-record/components/PatientTimeline';
+// import PatientTimeline from './PatientTimeline'; // Legacy removed
+
 import { PatientDocuments } from '@/features/documents/components/PatientDocuments';
 import { PatientAttachments } from '@/features/documents/components/PatientAttachments';
 import { PatientHeader } from './PatientHeader';
@@ -14,7 +16,7 @@ import styles from '../styles/Patients.module.css';
 interface Props {
     patient: Patient;
     summary: ClinicalSummary | null;
-    timeline: ClinicalEntry[];
+    // timeline: ClinicalEntry[]; // Removed in favor of self-fetching component
     role: string;
     documentsCount?: number | null;
     attachmentsCount?: number | null;
@@ -28,7 +30,7 @@ type Tab = 'data' | 'history' | 'documents' | 'attachments';
 export default function PatientHub({
     patient,
     summary,
-    timeline,
+    // timeline,
     role,
     documentsCount,
     attachmentsCount,
@@ -102,7 +104,7 @@ export default function PatientHub({
                         />
                     )}
                     {activeTab === 'history' && isClinicalAllowed && (
-                        <PatientTimeline entries={timeline} />
+                        <PatientTimeline patientId={patient.id} />
                     )}
                     {activeTab === 'documents' && isClinicalAllowed && (
                         <PatientDocuments

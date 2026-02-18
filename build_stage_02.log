@@ -1,0 +1,73 @@
+
+> sdmed-sys@0.1.0 build
+> next build
+
+   ▲ Next.js 15.2.9
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/9) ...
+Session: Failed to get stub user Error: Dynamic server usage: Route /admin/doctors couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (E:\SDMED Sys\.next\server\chunks\4447.js:12:42299)
+    at d (E:\SDMED Sys\.next\server\chunks\3410.js:59:59002)
+    at r (E:\SDMED Sys\.next\server\chunks\5927.js:1:1083)
+    at i (E:\SDMED Sys\.next\server\chunks\5927.js:1:1918)
+    at d (E:\SDMED Sys\.next\server\chunks\5927.js:1:11489)
+    at stringify (<anonymous>) {
+  description: "Route /admin/doctors couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (2/9) 
+Session: Failed to get stub user Error: Dynamic server usage: Route /admin/settings couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (E:\SDMED Sys\.next\server\chunks\4447.js:12:42299)
+    at d (E:\SDMED Sys\.next\server\chunks\3410.js:59:59002)
+    at r (E:\SDMED Sys\.next\server\chunks\5927.js:1:1083)
+    at i (E:\SDMED Sys\.next\server\chunks\5927.js:1:1918)
+    at d (E:\SDMED Sys\.next\server\chunks\5927.js:1:11489)
+    at stringify (<anonymous>) {
+  description: "Route /admin/settings couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (4/9) 
+   Generating static pages (6/9) 
+ ✓ Generating static pages (9/9)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                      352 B         104 kB
+├ ○ /_not-found                            977 B         102 kB
+├ ƒ /admin                                 144 B         101 kB
+├ ƒ /admin/audit                           633 B         104 kB
+├ ƒ /admin/doctors                       9.13 kB         110 kB
+├ ƒ /admin/settings                      2.08 kB         103 kB
+├ ƒ /api/documents/[type]/[id]             144 B         101 kB
+├ ƒ /doctor                                313 B         104 kB
+├ ƒ /doctor/agenda                       1.86 kB         117 kB
+├ ƒ /doctor/consultations/[id]            3.9 kB         109 kB
+├ ƒ /doctor/queue                         3.5 kB         104 kB
+├ ○ /login                               1.97 kB         103 kB
+├ ƒ /patients                            1.39 kB         110 kB
+├ ƒ /patients/[id]                       8.03 kB         116 kB
+├ ƒ /secretary                             144 B         101 kB
+├ ƒ /secretary/agenda                      201 B         115 kB
+├ ƒ /secretary/dashboard                 3.52 kB         104 kB
+├ ƒ /secretary/queue                       144 B         101 kB
+├ ƒ /secretary/queue/kanban              2.07 kB         103 kB
+├ ƒ /secretary/queue/ops                 4.73 kB         105 kB
+├ ƒ /tv                                  2.49 kB         103 kB
+└ ○ /unauthorized                          172 B         104 kB
++ First Load JS shared by all             101 kB
+  ├ chunks/4bd1b696-677e484d4a1dd9d7.js  53.3 kB
+  ├ chunks/684-f5eee8d484f57dfd.js       45.4 kB
+  └ other shared chunks (total)          2.02 kB
+
+
+ƒ Middleware                             79.4 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

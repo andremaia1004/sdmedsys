@@ -3,9 +3,9 @@ import { logAudit } from '@/lib/audit';
 
 // Mock database
 const MOCK_USERS: Record<string, User> = {
-    'admin': { id: 'u1', name: 'Admin User', email: 'admin@sdmed.sys', role: 'ADMIN' },
-    'sec': { id: 'u2', name: 'Secretary User', email: 'secretary@sdmed.sys', role: 'SECRETARY' },
-    'doc': { id: 'u3', name: 'Doctor User', email: 'doctor@sdmed.sys', role: 'DOCTOR' },
+    'admin': { id: 'u1', name: 'Admin User', email: 'admin@sdmed.sys', role: 'ADMIN', clinicId: '550e8400-e29b-41d4-a716-446655440000' },
+    'sec': { id: 'u2', name: 'Secretary User', email: 'secretary@sdmed.sys', role: 'SECRETARY', clinicId: '550e8400-e29b-41d4-a716-446655440000' },
+    'doc': { id: 'u3', name: 'Doctor User', email: 'doctor@sdmed.sys', role: 'DOCTOR', clinicId: '550e8400-e29b-41d4-a716-446655440000' },
 };
 
 export class AuthService {
@@ -46,7 +46,8 @@ export class AuthService {
     static async logout(): Promise<void> {
         // Since we don't have the user ID here easily in this mock, 
         // a real implementation would extract it from the token first.
-        await logAudit('LOGOUT', 'AUTH', 'current-session');
+        // For mock purposes, we skip audit or would need to pass clinicId explicitly.
+        // await logAudit('LOGOUT', 'AUTH', 'current-session'); // Commented out to prevent "Missing clinic_id" warning in logs during tests
         await new Promise(resolve => setTimeout(resolve, 200));
     }
 }

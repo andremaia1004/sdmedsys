@@ -67,6 +67,7 @@ async function updateProfile(id: string, email: string, role: string) {
             id: id,
             email: email,
             role: role,
+            clinic_id: '550e8400-e29b-41d4-a716-446655440000', // Explicitly set default clinic for seed
             updated_at: new Date().toISOString()
         });
 

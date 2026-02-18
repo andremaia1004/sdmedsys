@@ -32,32 +32,14 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
     const isClinicalAllowed = user.role !== 'SECRETARY';
 
     // Parallel Fetching for Performance
-    const [summary, consultations, historyCount, documentsCount, attachmentsCount, activeConsultation] = await Promise.all([
+    const [summary, historyCount, documentsCount, attachmentsCount, activeConsultation] = await Promise.all([
         isClinicalAllowed ? ClinicalSummaryService.getLatestEntryByPatient(id) : null,
-        isClinicalAllowed ? ConsultationService.listByPatient(id) : [],
+        // isClinicalAllowed ? ConsultationService.listByPatient(id) : [], // Moved to PatientTimeline component
         isClinicalAllowed ? ConsultationService.countByPatient(id) : null,
         ClinicalDocumentsRegistryService.countByPatient(id),
         PatientAttachmentService.countByPatient(id),
         user.role === 'DOCTOR' ? ConsultationService.getActiveByDoctor(user.id) : null
     ]);
-
-    // Map to ClinicalEntry shape for compatibility with PatientHub
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const timeline: any[] = consultations.map(c => ({
-        id: c.id,
-        consultationId: c.id,
-        patientId: c.patientId,
-        doctorUserId: c.doctorId,
-        clinicId: '', // Not needed for display
-        chiefComplaint: null,
-        diagnosis: null,
-        conduct: null,
-        observations: null,
-        freeNotes: c.clinicalNotes,
-        isFinal: !!c.finishedAt,
-        createdAt: c.startedAt,
-        updatedAt: c.updatedAt
-    }));
 
     const backLink = user.role === 'DOCTOR' ? '/doctor/agenda' :
         user.role === 'SECRETARY' ? '/secretary/agenda' : '/patients';
@@ -74,7 +56,7 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
             <PatientHub
                 patient={patient}
                 summary={summary}
-                timeline={timeline}
+                // timeline={timeline} // Component fetches its own data now
                 role={user.role}
                 historyCount={historyCount}
                 documentsCount={documentsCount}

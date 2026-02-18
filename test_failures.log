@@ -1,0 +1,227 @@
+
+> sdmed-sys@0.1.0 test
+> vitest --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mE:/SDMED Sys[39m
+
+[90mstdout[2m | features/agenda/__tests__/service.test.ts[2m > [22m[2mAppointmentService[2m > [22m[2mshould create an appointment if no conflict
+[22m[39m[AppointmentService] Creating appointment: {
+  doctorId: [32m'doc1'[39m,
+  patientId: [32m'p1'[39m,
+  patientName: [32m'Test Patient'[39m,
+  startTime: [32m'2026-01-29T10:00:00'[39m,
+  endTime: [32m'2026-01-29T10:30:00'[39m,
+  status: [32m'SCHEDULED'[39m,
+  kind: [32m'SCHEDULED'[39m
+}
+[AppointmentService] Using Mock Repository
+
+[90mstderr[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould list all initial mock patients
+[22m[39mSession: Failed to get stub user Error: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context
+    at getExpectedRequestStore [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\app-render\work-unit-async-storage.external.js:64:33[90m)[39m
+    at cookies [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\request\cookies.js:85:84[90m)[39m
+    at getStubUser (E:/SDMED Sys/lib/session.ts:11:35)
+    at getCurrentUser (E:/SDMED Sys/lib/session.ts:76:12)
+    at getRepository (E:/SDMED Sys/features/patients/service.ts:16:28)
+    at Function.list (E:/SDMED Sys/features/patients/service.ts:35:28)
+    at E:/SDMED Sys/features/patients/__tests__/service.test.ts:6:47
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:145:11
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:26
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1243:20
+
+[90mstdout[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould list all initial mock patients
+[22m[39m[PatientService] Using Supabase Repository (Clinic: 550e8400-e29b-41d4-a716-446655440000, Auth: stub)
+
+[90mstdout[2m | features/agenda/__tests__/service.test.ts[2m > [22m[2mAppointmentService[2m > [22m[2mshould create an appointment if no conflict
+[22m[39m[AppointmentService] Appointment created: {
+  doctorId: [32m'doc1'[39m,
+  patientId: [32m'p1'[39m,
+  patientName: [32m'Test Patient'[39m,
+  startTime: [32m'2026-01-29T10:00:00'[39m,
+  endTime: [32m'2026-01-29T10:30:00'[39m,
+  status: [32m'SCHEDULED'[39m,
+  kind: [32m'SCHEDULED'[39m,
+  id: [32m'buqbeu'[39m
+}
+
+[90mstdout[2m | features/agenda/__tests__/service.test.ts[2m > [22m[2mAppointmentService[2m > [22m[2mshould detect conflict for overlapping time
+[22m[39m[AppointmentService] Creating appointment: {
+  doctorId: [32m'doc1'[39m,
+  patientId: [32m'p2'[39m,
+  patientName: [32m'Another Patient'[39m,
+  startTime: [32m'2026-01-29T10:15:00'[39m,
+  endTime: [32m'2026-01-29T10:45:00'[39m,
+  status: [32m'SCHEDULED'[39m,
+  kind: [32m'SCHEDULED'[39m
+}
+[AppointmentService] Using Mock Repository
+
+[90mstderr[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould list all initial mock patients
+[22m[39mSupabase Error (list): {
+  message: [32m'TypeError: fetch failed'[39m,
+  details: [32m'TypeError: fetch failed\n'[39m +
+    [32m'\n'[39m +
+    [32m'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n'[39m +
+    [32m'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n'[39m +
+    [32m'    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+[90mstderr[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould search patients by name
+[22m[39mSession: Failed to get stub user Error: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context
+    at getExpectedRequestStore [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\app-render\work-unit-async-storage.external.js:64:33[90m)[39m
+    at cookies [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\request\cookies.js:85:84[90m)[39m
+    at getStubUser (E:/SDMED Sys/lib/session.ts:11:35)
+    at getCurrentUser (E:/SDMED Sys/lib/session.ts:76:12)
+    at getRepository (E:/SDMED Sys/features/patients/service.ts:16:28)
+    at Function.list (E:/SDMED Sys/features/patients/service.ts:35:28)
+    at E:/SDMED Sys/features/patients/__tests__/service.test.ts:11:46
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:145:11
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:26
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1243:20
+
+[90mstdout[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould search patients by name
+[22m[39m[PatientService] Using Supabase Repository (Clinic: 550e8400-e29b-41d4-a716-446655440000, Auth: stub)
+
+[90mstderr[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould search patients by name
+[22m[39mSupabase Error (list): {
+  message: [32m'TypeError: fetch failed'[39m,
+  details: [32m'TypeError: fetch failed\n'[39m +
+    [32m'\n'[39m +
+    [32m'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n'[39m +
+    [32m'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n'[39m +
+    [32m'    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+[90mstderr[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould create a new patient
+[22m[39mSession: Failed to get stub user Error: `cookies` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context
+    at getExpectedRequestStore [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\app-render\work-unit-async-storage.external.js:64:33[90m)[39m
+    at cookies [90m(E:\SDMED Sys\[39mnode_modules\[4mnext[24m\dist\server\request\cookies.js:85:84[90m)[39m
+    at getStubUser (E:/SDMED Sys/lib/session.ts:11:35)
+    at getCurrentUser (E:/SDMED Sys/lib/session.ts:76:12)
+    at getRepository (E:/SDMED Sys/features/patients/service.ts:16:28)
+    at Function.create (E:/SDMED Sys/features/patients/service.ts:45:28)
+    at E:/SDMED Sys/features/patients/__tests__/service.test.ts:23:49
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:145:11
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:26
+    at [90mfile:///E:/SDMED%20Sys/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1243:20
+
+[90mstdout[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould create a new patient
+[22m[39m[PatientService] Using Supabase Repository (Clinic: 550e8400-e29b-41d4-a716-446655440000, Auth: stub)
+
+[90mstderr[2m | features/patients/__tests__/service.test.ts[2m > [22m[2mPatientService[2m > [22m[2mshould create a new patient
+[22m[39mSupabase Error (create): {
+  message: [32m'TypeError: fetch failed'[39m,
+  details: [32m'TypeError: fetch failed\n'[39m +
+    [32m'\n'[39m +
+    [32m'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n'[39m +
+    [32m'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n'[39m +
+    [32m'    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+ [31m❯[39m features/patients/__tests__/service.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 148[2mms[22m[39m
+[31m     [31m×[31m should list all initial mock patients[39m[32m 137[2mms[22m[39m
+[31m     [31m×[31m should search patients by name[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should create a new patient[39m[32m 6[2mms[22m[39m
+[90mstderr[2m | features/agenda/__tests__/service.test.ts[2m > [22m[2mAppointmentService[2m > [22m[2mshould detect conflict for overlapping time
+[22m[39m[AppointmentService] Conflict detected
+
+[90mstdout[2m | features/agenda/__tests__/service.test.ts[2m > [22m[2mAppointmentService[2m > [22m[2mshould allow adjacent appointments
+[22m[39m[AppointmentService] Creating appointment: {
+  doctorId: [32m'doc1'[39m,
+  patientId: [32m'p3'[39m,
+  patientName: [32m'Patient 3'[39m,
+  startTime: [32m'2026-01-29T10:30:00'[39m,
+  endTime: [32m'2026-01-29T11:00:00'[39m,
+  status: [32m'SCHEDULED'[39m,
+  kind: [32m'SCHEDULED'[39m
+}
+[AppointmentService] Using Mock Repository
+
+ [32m✓[39m features/queue/__tests__/service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+[90mstdout[2m | features/agenda/__tests__/service.test.ts[2m > [22m[2mAppointmentService[2m > [22m[2mshould allow adjacent appointments
+[22m[39m[AppointmentService] Appointment created: {
+  doctorId: [32m'doc1'[39m,
+  patientId: [32m'p3'[39m,
+  patientName: [32m'Patient 3'[39m,
+  startTime: [32m'2026-01-29T10:30:00'[39m,
+  endTime: [32m'2026-01-29T11:00:00'[39m,
+  status: [32m'SCHEDULED'[39m,
+  kind: [32m'SCHEDULED'[39m,
+  id: [32m'xoud4m'[39m
+}
+
+ [32m✓[39m features/agenda/__tests__/service.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 322[2mms[22m[39m
+[90mstderr[2m | features/consultation/__tests__/repository.clinical.test.ts[2m > [22m[2mSupabaseClinicalEntryRepository[2m > [22m[2mshould return empty on error
+[22m[39mSupabase Error (listByPatient): { message: [32m'DB Error'[39m }
+
+ [32m✓[39m features/consultation/__tests__/repository.clinical.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstderr[2m | features/consultation/__tests__/repository.supabase.test.ts[2m > [22m[2mSupabaseConsultationRepository[2m > [22m[2mshould throw error if updateStructuredFields affects 0 rows
+[22m[39mUpdate failed: Consultation id-1 not found or clinic mismatch (clinic-123)
+
+[90mstderr[2m | features/consultation/__tests__/repository.supabase.test.ts[2m > [22m[2mSupabaseConsultationRepository[2m > [22m[2mshould throw error if finish affects 0 rows
+[22m[39mFinish failed: Consultation id-1 not found or clinic mismatch (clinic-123)
+
+ [32m✓[39m features/consultation/__tests__/repository.supabase.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+[90mstderr[2m | features/consultation/__tests__/documents.test.ts[2m > [22m[2mClinicalDocumentService (RBAC)[2m > [22m[2mshould allow DOCTOR only if owner
+[22m[39mDocumentService: Doctor attempted to access another doctors consultation
+
+ [32m✓[39m features/consultation/__tests__/documents.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m features/auth/__tests__/auth.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m lib/__tests__/rbac.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m features/consultation/__tests__/summary.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m features/consultation/__tests__/service.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m features/patients/__tests__/service.test.ts[2m > [22mPatientService[2m > [22mshould list all initial mock patients
+[31m[1mError[22m: Failed to list patients[39m
+[36m [2m❯[22m SupabasePatientsRepository.list features/patients/repository.supabase.ts:[2m34:19[22m[39m
+    [90m 32| [39m        [35mif[39m (error) {
+    [90m 33| [39m            console[33m.[39m[34merror[39m([32m'Supabase Error (list):'[39m[33m,[39m error)[33m;[39m
+    [90m 34| [39m            [35mthrow[39m [35mnew[39m [33mError[39m([32m'Failed to list patients'[39m)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m 35| [39m        }
+    [90m 36| [39m
+[90m [2m❯[22m features/patients/__tests__/service.test.ts:[2m6:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/patients/__tests__/service.test.ts[2m > [22mPatientService[2m > [22mshould search patients by name
+[31m[1mError[22m: Failed to list patients[39m
+[36m [2m❯[22m SupabasePatientsRepository.list features/patients/repository.supabase.ts:[2m34:19[22m[39m
+    [90m 32| [39m        [35mif[39m (error) {
+    [90m 33| [39m            console[33m.[39m[34merror[39m([32m'Supabase Error (list):'[39m[33m,[39m error)[33m;[39m
+    [90m 34| [39m            [35mthrow[39m [35mnew[39m [33mError[39m([32m'Failed to list patients'[39m)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m 35| [39m        }
+    [90m 36| [39m
+[90m [2m❯[22m features/patients/__tests__/service.test.ts:[2m11:25[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m features/patients/__tests__/service.test.ts[2m > [22mPatientService[2m > [22mshould create a new patient
+[31m[1mError[22m: Database Error: TypeError: fetch failed ()[39m
+[36m [2m❯[22m SupabasePatientsRepository.create features/patients/repository.supabase.ts:[2m101:19[22m[39m
+    [90m 99| [39m        [35mif[39m (error) {
+    [90m100| [39m            console[33m.[39m[34merror[39m([32m'Supabase Error (create):'[39m[33m,[39m error)[33m;[39m
+    [90m101| [39m            throw new Error(`Database Error: ${error.message} (${error…
+    [90m   | [39m                  [31m^[39m
+    [90m102| [39m        }
+    [90m103| [39m
+[90m [2m❯[22m features/patients/__tests__/service.test.ts:[2m23:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m9 passed[39m[22m[90m (10)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m40 passed[39m[22m[90m (43)[39m
+[2m   Start at [22m 16:26:53
+[2m   Duration [22m 8.26s[2m (transform 861ms, setup 0ms, import 1.93s, tests 584ms, environment 15.84s)[22m
+

@@ -45,6 +45,7 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
             return { data: [], total: 0, hasMore: false };
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mappedData = (data || []).map((d: any) => this.mapToClinicalEntry(d));
         const total = count || 0;
         const hasMore = total > (offset + mappedData.length);

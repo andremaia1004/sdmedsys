@@ -40,8 +40,16 @@ export async function logAudit(
     try {
         const user = await getCurrentUser();
 
-        // Fallback or system default clinic
-        const clinicId = user?.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+        // STRATEGY: Fail Closed.
+        // We do NOT default to a legacy clinic. If we don't know the clinic, we don't log to the DB
+        // to avoid cross-tenant leakage. 
+        // We accept an override via metadata for system actions (seeds, jobs).
+        const clinicId = (user?.clinicId) || (metadata?.clinicId as string);
+
+        if (!clinicId) {
+            console.warn(`[Audit] SKIPPED: Missing clinic_id for action ${action} on ${entity}. User: ${user?.id || 'anon'}`);
+            return;
+        }
 
         const { error } = await supabaseServer
             .from('audit_logs')
