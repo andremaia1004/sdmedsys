@@ -54,6 +54,33 @@ export class PatientAttachmentService {
         }));
     }
 
+    static async countByPatient(patientId: string): Promise<number> {
+        const user = await getCurrentUser();
+        if (!user || !user.clinicId) return 0;
+
+        const supabase = await createClient();
+
+        let query = supabase
+            .from('patient_attachments')
+            .select('*', { count: 'exact', head: true })
+            .eq('patient_id', patientId)
+            .eq('clinic_id', user.clinicId);
+
+        // SECRETARY: Category filtering (also enforced by RLS but good to be explicit for count)
+        if (user.role === 'SECRETARY') {
+            query = query.eq('category', 'ADMIN');
+        }
+
+        const { count, error } = await query;
+
+        if (error) {
+            console.error('AttachmentService: Failed to count', error);
+            return 0;
+        }
+
+        return count || 0;
+    }
+
     static async createRecord(patientId: string, category: AttachmentCategory, fileName: string, filePath: string, fileType: string): Promise<PatientAttachment | null> {
         const user = await getCurrentUser();
         if (!user || !user.clinicId) return null;

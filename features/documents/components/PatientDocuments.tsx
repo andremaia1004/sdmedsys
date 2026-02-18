@@ -3,36 +3,96 @@
 import React, { useEffect, useState } from 'react';
 import { fetchPatientDocumentsAction } from '../actions';
 import { ClinicalDocument } from '../types';
+import { LoadingState, EmptyState } from '@/features/patients/components/TabStates';
+import { ClinicalDocumentModal, DocumentType } from './ClinicalDocumentModal';
 import styles from './PatientDocuments.module.css';
 
 interface Props {
     patientId: string;
+    patientName: string;
+    activeConsultationId?: string;
 }
 
-export const PatientDocuments: React.FC<Props> = ({ patientId }) => {
+export const PatientDocuments: React.FC<Props> = ({ patientId, patientName, activeConsultationId }) => {
     const [documents, setDocuments] = useState<ClinicalDocument[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [modalType, setModalType] = useState<DocumentType>('prescription');
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const data = await fetchPatientDocumentsAction(patientId);
-                setDocuments(data);
-            } catch (error) {
-                console.error('Failed to load documents:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        load();
+    const load = React.useCallback(async () => {
+        try {
+            const data = await fetchPatientDocumentsAction(patientId);
+            setDocuments(data);
+        } catch (error) {
+            console.error('Failed to load documents:', error);
+        } finally {
+            setLoading(false);
+        }
     }, [patientId]);
 
-    if (loading) return <div className={styles.loading}>Carregando histórico...</div>;
-    if (documents.length === 0) return <div className={styles.empty}>Nenhum documento emitido para este paciente.</div>;
+    useEffect(() => {
+        load();
+    }, [load]);
+
+    const handleOpenModal = (type: DocumentType = 'prescription') => {
+        setModalType(type);
+        setShowModal(true);
+    };
+
+    const NewDocumentButton = () => (
+        <div className={styles.ctaContainer}>
+            {activeConsultationId ? (
+                <a
+                    href="#"
+                    className={styles.newDocBtn}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleOpenModal();
+                    }}
+                >
+                    ➕ Novo Documento
+                </a>
+            ) : (
+                <button
+                    className={`${styles.newDocBtn} ${styles.disabled}`}
+                    disabled
+                    title="Inicie uma consulta para emitir documento"
+                >
+                    ➕ Novo Documento
+                </button>
+            )}
+        </div>
+    );
+
+    if (loading) return <LoadingState message="Carregando histórico..." />;
+
+    // Empty State with Modal Logic
+    if (documents.length === 0) return (
+        <>
+            <EmptyState
+                message="Nenhum documento emitido para este paciente."
+                action={<NewDocumentButton />}
+            />
+            {showModal && (
+                <ClinicalDocumentModal
+                    isOpen={showModal}
+                    onClose={() => { setShowModal(false); load(); }}
+                    patientId={patientId}
+                    consultationId={activeConsultationId || null}
+                    patientName={patientName}
+                    initialType={modalType}
+                />
+            )}
+        </>
+    );
 
     return (
         <div className={styles.container}>
-            <h3 className={styles.title}>Histórico de Documentos</h3>
+            <div className={styles.header}>
+                <h3 className={styles.title}>Histórico de Documentos</h3>
+                <NewDocumentButton />
+            </div>
+
             <table className={styles.table}>
                 <thead>
                     <tr>
@@ -76,6 +136,17 @@ export const PatientDocuments: React.FC<Props> = ({ patientId }) => {
                     ))}
                 </tbody>
             </table>
+
+            {showModal && (
+                <ClinicalDocumentModal
+                    isOpen={showModal}
+                    onClose={() => { setShowModal(false); load(); }}
+                    patientId={patientId}
+                    consultationId={activeConsultationId || null}
+                    patientName={patientName}
+                    initialType={modalType}
+                />
+            )}
         </div>
     );
 };

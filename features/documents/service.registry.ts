@@ -65,6 +65,29 @@ export class ClinicalDocumentsRegistryService {
         return (data || []).map(this.mapToDocument);
     }
 
+    static async countByPatient(patientId: string): Promise<number> {
+        const user = await getCurrentUser();
+        // Explicit Security Block for SECRETARY
+        if (!user || user.role === 'SECRETARY') {
+            return 0;
+        }
+
+        const supabase = await createClient();
+
+        const { count, error } = await supabase
+            .from('clinical_documents')
+            .select('*', { count: 'exact', head: true })
+            .eq('patient_id', patientId)
+            .eq('clinic_id', user.clinicId); // Enforce clinic tenant
+
+        if (error) {
+            console.error('ClinicalDocumentsRegistryService: Failed to count documents', error);
+            return 0;
+        }
+
+        return count || 0;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private static mapToDocument(row: any): ClinicalDocument {
         return {

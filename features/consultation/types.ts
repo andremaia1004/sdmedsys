@@ -14,6 +14,13 @@ export interface ClinicalEntry {
     updatedAt: string;
 }
 
+export interface ClinicalSummary {
+    diagnosis: string | null;
+    conduct: string | null;
+    doctorName: string;
+    date: string;
+}
+
 export type ClinicalEntryInput = Omit<ClinicalEntry, 'id' | 'createdAt' | 'updatedAt' | 'clinicId'>;
 
 export interface Consultation {

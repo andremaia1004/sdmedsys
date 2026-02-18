@@ -1,14 +1,7 @@
 import { getCurrentUser } from '@/lib/session';
 import { createClient } from '@/lib/supabase-auth';
 import { SupabaseConsultationRepository } from './repository.supabase'; // Use Consultation Repo
-// import { SupabaseClinicalEntryRepository } from './repository.clinical.supabase'; 
-
-export interface ClinicalSummary {
-    diagnosis: string | null;
-    conduct: string | null;
-    doctorName: string;
-    date: string;
-}
+import { ClinicalSummary } from './types';
 
 export class ClinicalSummaryService {
     static async getLatestEntryByPatient(patientId: string): Promise<ClinicalSummary | null> {

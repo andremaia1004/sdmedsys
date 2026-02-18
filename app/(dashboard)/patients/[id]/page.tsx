@@ -6,6 +6,9 @@ import { ConsultationService } from '@/features/consultation/service';
 import PatientHub from '@/features/patients/components/PatientHub';
 import Link from 'next/link';
 
+import { ClinicalDocumentsRegistryService } from '@/features/documents/service.registry';
+import { PatientAttachmentService } from '@/features/documents/service.attachments';
+
 export const dynamic = 'force-dynamic';
 
 export default async function SharedPatientDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,10 +30,16 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
 
     // RBAC: SECRETARY gets null for summary/timeline
     const isClinicalAllowed = user.role !== 'SECRETARY';
-    const summary = isClinicalAllowed ? await ClinicalSummaryService.getLatestEntryByPatient(id) : null;
 
-    // Fetch consultations instead of clinical entries (due to schema limitation)
-    const consultations = isClinicalAllowed ? await ConsultationService.listByPatient(id) : [];
+    // Parallel Fetching for Performance
+    const [summary, consultations, historyCount, documentsCount, attachmentsCount, activeConsultation] = await Promise.all([
+        isClinicalAllowed ? ClinicalSummaryService.getLatestEntryByPatient(id) : null,
+        isClinicalAllowed ? ConsultationService.listByPatient(id) : [],
+        isClinicalAllowed ? ConsultationService.countByPatient(id) : null,
+        ClinicalDocumentsRegistryService.countByPatient(id),
+        PatientAttachmentService.countByPatient(id),
+        user.role === 'DOCTOR' ? ConsultationService.getActiveByDoctor(user.id) : null
+    ]);
 
     // Map to ClinicalEntry shape for compatibility with PatientHub
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,14 +65,10 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
 
     return (
         <div style={{ padding: '0 1rem' }}>
-            <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                    <Link href={backLink} style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '0.875rem' }}>
-                        {backLabel}
-                    </Link>
-                    <h1 style={{ marginTop: '0.5rem', marginBottom: '0' }}>Prontuário 360: {patient.name}</h1>
-                </div>
-                {/* Visual indicator of role/context if needed */}
+            <div style={{ marginBottom: '1rem' }}>
+                <Link href={backLink} style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '0.875rem' }}>
+                    {backLabel}
+                </Link>
             </div>
 
             <PatientHub
@@ -71,6 +76,11 @@ export default async function SharedPatientDetailPage({ params }: { params: Prom
                 summary={summary}
                 timeline={timeline}
                 role={user.role}
+                historyCount={historyCount}
+                documentsCount={documentsCount}
+                attachmentsCount={attachmentsCount}
+                lastConsultationDate={summary?.date}
+                activeConsultationId={activeConsultation?.id}
             />
         </div>
     );

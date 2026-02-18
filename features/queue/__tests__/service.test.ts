@@ -20,6 +20,7 @@ describe('QueueService', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (getCurrentUser as any).mockResolvedValue({ id: doctorId, role: 'DOCTOR' });
     });
 
@@ -49,6 +50,7 @@ describe('QueueService', () => {
 
     it('should block transition CALLED -> IN_SERVICE for different doctor', async () => {
         // Mock different user
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (getCurrentUser as any).mockResolvedValue({ id: 'other-dr', role: 'DOCTOR' });
 
         // Create new item for other doctor
@@ -56,7 +58,7 @@ describe('QueueService', () => {
             patientId: 'pt-2',
             doctorId: doctorId, // Assigned to dr-123
             status: 'CALLED',
-            sourceType: 'WALKIN'
+            sourceType: 'WALK_IN'
         }, 'SECRETARY');
 
         await expect(QueueService.changeStatus(otherItem.id, 'IN_SERVICE', 'DOCTOR'))
@@ -64,13 +66,14 @@ describe('QueueService', () => {
     });
 
     it('should allow transition CALLED -> IN_SERVICE if ADMIN regardless of assignment', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (getCurrentUser as any).mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
 
         const otherItem = await QueueService.add({
             patientId: 'pt-3',
             doctorId: doctorId,
             status: 'CALLED',
-            sourceType: 'WALKIN'
+            sourceType: 'WALK_IN'
         }, 'SECRETARY');
 
         const updated = await QueueService.changeStatus(otherItem.id, 'IN_SERVICE', 'ADMIN');

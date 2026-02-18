@@ -35,6 +35,10 @@ export class MockConsultationRepository implements IConsultationRepository {
         return MOCK_CONSULTATIONS.filter(c => c.patientId === patientId);
     }
 
+    async countByPatient(patientId: string): Promise<number> {
+        return MOCK_CONSULTATIONS.filter(c => c.patientId === patientId).length;
+    }
+
     async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
         const index = MOCK_CONSULTATIONS.findIndex(c => c.id === id);
         if (index !== -1) {

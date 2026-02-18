@@ -47,6 +47,11 @@ export class ConsultationService {
         return repo.listByPatient(patientId);
     }
 
+    static async countByPatient(patientId: string): Promise<number> {
+        const repo = await getRepository();
+        return repo.countByPatient(patientId);
+    }
+
     static async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
         const repo = await getRepository();
         return repo.updateStructuredFields(id, fields);

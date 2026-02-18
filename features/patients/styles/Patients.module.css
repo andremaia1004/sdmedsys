@@ -307,6 +307,97 @@
     border-radius: 2px 2px 0 0;
 }
 
+.tabButton .badge {
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    transition: all 0.2s;
+}
+
+.tabButton.active .badge {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Patient Header Styles */
+.patientHeader {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.headerMain {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.avatarPlaceholder {
+    width: 64px;
+    height: 64px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.patientName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+}
+
+.patientMeta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.separator {
+    color: var(--border);
+}
+
+.lastConsultation {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.lastConsultation .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+.lastConsultation .date {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+
 .tabPanel {
     animation: fadeIn 0.3s ease-out;
 }

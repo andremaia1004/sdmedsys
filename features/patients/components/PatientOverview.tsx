@@ -1,5 +1,5 @@
 import { Patient } from '../types';
-import { ClinicalSummary } from '@/features/consultation/service.summary';
+import { ClinicalSummary } from '@/features/consultation/types';
 import styles from '../styles/Patients.module.css';
 
 interface PatientOverviewProps {
@@ -16,8 +16,7 @@ export default function PatientOverview({ patient, summary, role, onViewTimeline
         <div className={styles.overviewContainer}>
             <div className={styles.patientCard}>
                 <div className={styles.cardHeader}>
-                    <h2>Dados do Paciente</h2>
-                    <span className={styles.patientId}>ID: {patient.id.substring(0, 8)}</span>
+                    <h2>Detalhes do Cadastro</h2>
                 </div>
                 <div className={styles.cardGrid}>
                     <div className={styles.field}>

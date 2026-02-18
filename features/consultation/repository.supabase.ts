@@ -117,6 +117,21 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (data || []).map((d: any) => this.mapToConsultation(d));
     }
+
+    async countByPatient(patientId: string): Promise<number> {
+        const { count, error } = await this.supabase
+            .from('consultations')
+            .select('*', { count: 'exact', head: true })
+            .eq('clinic_id', this.clinicId)
+            .eq('patient_id', patientId);
+
+        if (error) {
+            console.error('Supabase Error (countByPatient):', error);
+            return 0;
+        }
+
+        return count || 0;
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private mapToConsultation(row: any): Consultation {
         return {
