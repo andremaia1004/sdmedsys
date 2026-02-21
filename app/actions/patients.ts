@@ -14,7 +14,13 @@ export async function createPatientAction(prevState: ActionState, formData: Form
             name: formData.get('name') as string,
             document: formData.get('document') as string,
             phone: formData.get('phone') as string,
-            birthDate: formData.get('birthDate') as string,
+            email: null,
+            address: null,
+            insurance: null,
+            guardian_name: null,
+            main_complaint: null,
+            emergency_contact: null,
+            birth_date: formData.get('birthDate') as string,
         };
 
         // Basic Validation

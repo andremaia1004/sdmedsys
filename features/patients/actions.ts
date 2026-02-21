@@ -17,23 +17,23 @@ export type ActionState = {
 };
 
 export async function createPatientAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
-    const rawInput = {
+    const rawInput: PatientInput = {
         name: formData.get('name') as string,
         document: formData.get('document') as string,
-        phone: formData.get('phone') as string,
-        email: formData.get('email') as string || undefined,
-        address: formData.get('address') as string || undefined,
-        guardian_name: formData.get('guardian_name') as string || undefined,
-        insurance: formData.get('insurance') as string || undefined,
-        main_complaint: formData.get('main_complaint') as string || undefined,
-        emergency_contact: formData.get('emergency_contact') as string || undefined,
-        birthDate: formData.get('birthDate') as string || '',
+        phone: formData.get('phone') as string || null,
+        email: formData.get('email') as string || null,
+        address: formData.get('address') as string || null,
+        guardian_name: formData.get('guardian_name') as string || null,
+        insurance: formData.get('insurance') as string || null,
+        main_complaint: formData.get('main_complaint') as string || null,
+        emergency_contact: formData.get('emergency_contact') as string || null,
+        birth_date: formData.get('birth_date') as string || null,
     };
 
     // Server-side validation
-    if (!rawInput.name || !rawInput.document || !rawInput.phone || !rawInput.birthDate) {
+    if (!rawInput.name || !rawInput.document || !rawInput.birth_date) {
         console.error('Create Patient Error: Missing required fields', rawInput);
-        return { error: 'Campos obrigatórios faltando (Nome, Documento, Telefone, Nascimento).', success: false };
+        return { error: 'Campos obrigatórios faltando (Nome, Documento, Nascimento).', success: false };
     }
 
     try {

@@ -5,21 +5,35 @@ import { IPatientsRepository } from './repository.types';
 const MOCK_PATIENTS: Patient[] = [
     {
         id: 'p1',
+        clinic_id: 'default',
         name: 'John Doe',
         document: '12345678900',
         phone: '5511999999999',
-        birthDate: '1980-01-01',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        email: null,
+        address: null,
+        insurance: null,
+        guardian_name: null,
+        main_complaint: null,
+        emergency_contact: null,
+        birth_date: '1980-01-01',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
     },
     {
         id: 'p2',
+        clinic_id: 'default',
         name: 'Jane Smith',
         document: '98765432100',
         phone: '5511888888888',
-        birthDate: '1990-05-15',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        email: null,
+        address: null,
+        insurance: null,
+        guardian_name: null,
+        main_complaint: null,
+        emergency_contact: null,
+        birth_date: '1990-05-15',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
     }
 ];
 
@@ -35,7 +49,7 @@ export class MockPatientsRepository implements IPatientsRepository {
         return MOCK_PATIENTS.filter(p =>
             p.name.toLowerCase().includes(lowerQuery) ||
             p.document.includes(lowerQuery) ||
-            (phoneQuery.length > 0 && p.phone.includes(phoneQuery))
+            (phoneQuery.length > 0 && p.phone?.includes(phoneQuery))
         );
     }
 
@@ -49,11 +63,12 @@ export class MockPatientsRepository implements IPatientsRepository {
 
         const newPatient: Patient = {
             ...input,
-            phone: input.phone.replace(/\D/g, ''),
+            phone: input.phone ? input.phone.replace(/\D/g, '') : null,
             document: input.document.replace(/\D/g, ''),
             id: Math.random().toString(36).substring(7),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            clinic_id: 'default',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
 
         MOCK_PATIENTS.push(newPatient);
@@ -69,9 +84,9 @@ export class MockPatientsRepository implements IPatientsRepository {
         MOCK_PATIENTS[index] = {
             ...MOCK_PATIENTS[index],
             ...input,
-            phone: input.phone.replace(/\D/g, ''),
+            phone: input.phone ? input.phone.replace(/\D/g, '') : null,
             document: input.document.replace(/\D/g, ''),
-            updatedAt: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
 
         return MOCK_PATIENTS[index];

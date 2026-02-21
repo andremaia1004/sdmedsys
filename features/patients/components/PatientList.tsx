@@ -34,7 +34,7 @@ export default function PatientList({ patients, canEdit = false }: { patients: P
                         <td style={{ fontWeight: 600 }}>{p.name}</td>
                         <td>{p.document}</td>
                         <td style={{ color: 'var(--text-muted)' }}>
-                            {p.birthDate ? new Date(p.birthDate).toLocaleDateString('pt-BR') : 'N/A'}
+                            {p.birth_date ? new Date(p.birth_date).toLocaleDateString('pt-BR') : 'N/A'}
                         </td>
                         <td>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>

@@ -30,7 +30,7 @@ export const IdentificationSection = ({ patient, onEdit, canEdit }: Props) => {
                 </div>
                 <div className={styles.field}>
                     <label>Data de Nascimento</label>
-                    <p>{patient.birthDate ? new Date(patient.birthDate).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                    <p>{patient.birth_date ? new Date(patient.birth_date).toLocaleDateString('pt-BR') : 'N/A'}</p>
                 </div>
             </div>
         </div>

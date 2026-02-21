@@ -9,10 +9,10 @@ interface PatientHeaderProps {
 
 export const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, lastConsultationDate }) => {
     // Utility for Age
-    const getAge = (birthDate: string | undefined) => {
-        if (!birthDate) return 'N/A';
+    const getAge = (birth_date: string | null | undefined) => {
+        if (!birth_date) return 'N/A';
         const today = new Date();
-        const birth = new Date(birthDate);
+        const birth = new Date(birth_date);
         let age = today.getFullYear() - birth.getFullYear();
         const m = today.getMonth() - birth.getMonth();
         if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
@@ -51,11 +51,11 @@ export const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, lastConsu
                 <div>
                     <h1 className={styles.patientName}>{patient.name}</h1>
                     <div className={styles.patientMeta}>
-                        <span title="Idade">🎂 {getAge(patient.birthDate)}</span>
+                        <span title="Idade">🎂 {getAge(patient.birth_date)}</span>
                         <span className={styles.separator}>•</span>
                         <span title="CPF">🆔 {maskCPF(patient.document)}</span>
                         <span className={styles.separator}>•</span>
-                        <span title="Telefone">📱 {formatPhone(patient.phone)}</span>
+                        <span title="Telefone">📞 {patient.phone ? formatPhone(patient.phone) : 'N/A'}</span>
                     </div>
                 </div>
             </div>

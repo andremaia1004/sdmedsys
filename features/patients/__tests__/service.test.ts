@@ -26,7 +26,13 @@ describe('PatientService', () => {
             name: 'Test Patient',
             document: '00000000000',
             phone: '11999999999',
-            birthDate: '2000-01-01'
+            birth_date: '2000-01-01',
+            email: null,
+            address: null,
+            guardian_name: null,
+            insurance: null,
+            main_complaint: null,
+            emergency_contact: null
         };
         const newPatient = await PatientService.create(input);
         expect(newPatient.id).toBeDefined();

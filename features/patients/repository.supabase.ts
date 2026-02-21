@@ -76,7 +76,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async create(input: PatientInput): Promise<Patient> {
-        const normalizedPhone = input.phone.replace(/\D/g, '');
+        const normalizedPhone = input.phone ? input.phone.replace(/\D/g, '') : null;
 
         const { data, error } = await this.supabase
             .from('patients')
@@ -90,7 +90,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
                 insurance: input.insurance,
                 main_complaint: input.main_complaint,
                 emergency_contact: input.emergency_contact,
-                birth_date: input.birthDate,
+                birth_date: input.birth_date,
                 clinic_id: this.clinicId
             }])
             .select()
@@ -105,7 +105,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
     }
 
     async update(id: string, input: PatientInput): Promise<Patient | null> {
-        const normalizedPhone = input.phone.replace(/\D/g, '');
+        const normalizedPhone = input.phone ? input.phone.replace(/\D/g, '') : null;
 
         const { data, error } = await this.supabase
             .from('patients')
@@ -119,7 +119,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
                 insurance: input.insurance,
                 main_complaint: input.main_complaint,
                 emergency_contact: input.emergency_contact,
-                birth_date: input.birthDate,
+                birth_date: input.birth_date,
                 updated_at: new Date().toISOString(),
                 // clinic_id technically shouldn't change, but we could add it to eq
             })
@@ -149,9 +149,10 @@ export class SupabasePatientsRepository implements IPatientsRepository {
             insurance: row.insurance,
             main_complaint: row.main_complaint,
             emergency_contact: row.emergency_contact,
-            birthDate: row.birth_date,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at,
+            birth_date: row.birth_date,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            clinic_id: row.clinic_id,
         };
     }
 }

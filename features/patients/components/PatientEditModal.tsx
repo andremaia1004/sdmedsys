@@ -29,8 +29,8 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
             setFormData({
                 name: patient.name,
                 document: patient.document,
-                birthDate: patient.birthDate ? new Date(patient.birthDate).toISOString().split('T')[0] : '',
-                phone: patient.phone,
+                birth_date: patient.birth_date ? new Date(patient.birth_date).toISOString().split('T')[0] : '',
+                phone: patient.phone || '',
                 email: patient.email || '',
                 address: patient.address || '',
                 insurance: patient.insurance || '',
@@ -60,14 +60,14 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
             const input: PatientInput = {
                 name: formData.name || patient.name,
                 document: formData.document || patient.document,
-                phone: formData.phone || patient.phone,
-                birthDate: formData.birthDate || patient.birthDate,
-                email: formData.email,
-                address: formData.address,
-                insurance: formData.insurance,
-                guardian_name: formData.guardian_name,
-                emergency_contact: formData.emergency_contact,
-                main_complaint: formData.main_complaint,
+                phone: formData.phone !== undefined ? (formData.phone || null) : patient.phone,
+                birth_date: formData.birth_date !== undefined ? (formData.birth_date || null) : patient.birth_date,
+                email: formData.email !== undefined ? (formData.email || null) : patient.email,
+                address: formData.address !== undefined ? (formData.address || null) : patient.address,
+                insurance: formData.insurance !== undefined ? (formData.insurance || null) : patient.insurance,
+                guardian_name: formData.guardian_name !== undefined ? (formData.guardian_name || null) : patient.guardian_name,
+                emergency_contact: formData.emergency_contact !== undefined ? (formData.emergency_contact || null) : patient.emergency_contact,
+                main_complaint: formData.main_complaint !== undefined ? (formData.main_complaint || null) : patient.main_complaint,
             };
 
             const updated = await updatePatientAction(patient.id, input);
@@ -114,8 +114,8 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
                             <label>Data de Nascimento</label>
                             <input
                                 type="date"
-                                value={formData.birthDate || ''}
-                                onChange={e => handleChange('birthDate', e.target.value)}
+                                value={formData.birth_date || ''}
+                                onChange={e => handleChange('birth_date', e.target.value)}
                                 className={styles.input}
                             />
                         </div>

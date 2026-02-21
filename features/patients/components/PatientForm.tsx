@@ -16,7 +16,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
     const [formData, setFormData] = useState({
         name: '',
         document: '',
-        birthDate: '',
+        birth_date: '',
         guardian_name: '',
         phone: '',
         email: '',
@@ -53,7 +53,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
 
     const validateStep = (step: number) => {
         if (step === 1) {
-            if (!formData.name || !formData.document || !formData.birthDate) {
+            if (!formData.name || !formData.document || !formData.birth_date) {
                 alert('Por favor, preencha os campos obrigatórios (Nome, Documento e Data de Nascimento).');
                 return false;
             }
@@ -178,7 +178,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
                                 <Input label="Documento (CPF / RG) *" name="document" value={formData.document} onChange={handleChange} placeholder="000.000.000-00" fullWidth required />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
-                                <Input label="Data de Nascimento *" name="birthDate" type="date" value={formData.birthDate} onChange={handleChange} fullWidth required />
+                                <Input label="Data de Nascimento *" name="birth_date" type="date" value={formData.birth_date} onChange={handleChange} fullWidth required />
                                 <Input label="Nome do Responsável" name="guardian_name" value={formData.guardian_name} onChange={handleChange} placeholder="Mãe, Pai ou Responsável" fullWidth />
                             </div>
                         </div>
@@ -239,7 +239,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
                         // Only render hidden input if the field is NOT in the current step logic
                         // Strategy: Render hidden for fields NOT present in the current step.
 
-                        const step1Fields = ['name', 'document', 'birthDate', 'guardian_name'];
+                        const step1Fields = ['name', 'document', 'birth_date', 'guardian_name'];
                         const step2Fields = ['phone', 'email', 'address_zip', 'address_street', 'address_number', 'address_neighborhood', 'address_city'];
                         const step3Fields = ['insurance', 'emergency_contact', 'main_complaint'];
 
