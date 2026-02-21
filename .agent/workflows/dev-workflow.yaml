@@ -1,0 +1,12 @@
+name: Workflow do Desenvolvedor
+trigger: "@dev"
+agent: dev
+steps:
+  - name: analyze
+    action: read_story
+    input: "${story_path}"
+  - name: implement
+    action: write_code
+    context: "${analyze.output}"
+  - name: test
+    action: run_tests

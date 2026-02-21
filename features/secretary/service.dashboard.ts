@@ -32,12 +32,10 @@ export class SecretaryDashboardService {
                 doctor_id,
                 start_time,
                 status,
-                kind,
                 queue_items (
                     id,
                     ticket_code,
-                    status,
-                    source_type
+                    status
                 )
             `)
             .eq('clinic_id', clinicId) // Assumes clinic_id exists in appointments
@@ -57,11 +55,11 @@ export class SecretaryDashboardService {
             doctorId: row.doctor_id,
             startTime: row.start_time,
             appointmentStatus: row.status as AppointmentStatus,
-            kind: (row.kind || 'SCHEDULED') as 'SCHEDULED' | 'WALK_IN',
+            kind: 'SCHEDULED', // Default for MVP
             queueItemId: row.queue_items?.[0]?.id,
             ticketCode: row.queue_items?.[0]?.ticket_code,
             queueStatus: row.queue_items?.[0]?.status,
-            sourceType: row.queue_items?.[0]?.source_type
+            sourceType: 'SCHEDULED' // Default for MVP
         }));
     }
 
@@ -106,8 +104,7 @@ export class SecretaryDashboardService {
                 patient_id: appointment.patient_id,
                 doctor_id: appointment.doctor_id,
                 ticket_code: ticketCode,
-                status: 'WAITING',
-                source_type: 'SCHEDULED'
+                status: 'WAITING'
             }]);
 
         if (queueError) {
@@ -178,7 +175,6 @@ export class SecretaryDashboardService {
                 patient_id: patientId,
                 doctor_id: doctorId,
                 status: 'ARRIVED',
-                kind: 'WALK_IN',
                 notes: notes
             }])
             .select()
@@ -198,8 +194,7 @@ export class SecretaryDashboardService {
                 patient_id: patientId,
                 doctor_id: doctorId,
                 ticket_code: ticketCode,
-                status: 'WAITING',
-                source_type: 'WALK_IN'
+                status: 'WAITING'
             }]);
 
         if (queueError) {

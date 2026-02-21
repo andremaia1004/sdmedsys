@@ -26,7 +26,7 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
         conduct: consultation.conduct || ''
     });
     const [status, setStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
-    const [isFinished, setIsFinished] = useState(!!consultation.finishedAt);
+    const [isFinished, setIsFinished] = useState(consultation.isFinal || !!consultation.finishedAt);
     const [finishError, setFinishError] = useState<string | null>(null);
     const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
 
@@ -121,7 +121,10 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                     outline: 'none',
                     fontFamily: 'inherit',
                     transition: 'border-color 0.2s',
-                    backgroundColor: isFinished ? '#f1f5f9' : '#fff'
+                    backgroundColor: isFinished ? '#f1f5f9' : '#fff',
+                    color: isFinished ? '#64748b' : '#0f172a',
+                    cursor: isFinished ? 'not-allowed' : 'text',
+                    opacity: isFinished ? 0.8 : 1
                 }}
             />
         </div>

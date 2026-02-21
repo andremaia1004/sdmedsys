@@ -56,7 +56,14 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
                                         {item.ticketCode && <span className={styles.ticket}>{item.ticketCode}</span>}
                                         <span className={styles.sourceLabel}>{item.kind === 'SCHEDULED' ? '📅' : '🏃'}</span>
                                     </div>
-                                    <span className={styles.time}>{item.startTime ? new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Hora de chegada'}</span>
+                                    <span className={styles.time} suppressHydrationWarning>
+                                        {item.startTime
+                                            ? (() => {
+                                                try { return new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+                                                catch (e) { return 'Tempo indisponível' }
+                                            })()
+                                            : 'Hora de chegada'}
+                                    </span>
                                 </div>
                                 <h4 className={styles.patientName}>{item.patientName}</h4>
 

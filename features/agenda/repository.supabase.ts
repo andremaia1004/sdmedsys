@@ -40,7 +40,6 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
                 start_time: input.startTime,
                 end_time: input.endTime,
                 status: input.status,
-                kind: input.kind,
                 notes: input.notes,
                 clinic_id: this.clinicId
             }])
@@ -49,7 +48,7 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
 
         if (error) {
             console.error('Supabase Error (create appointment):', error);
-            throw new Error('Failed to create appointment');
+            throw new Error(`Failed to create appointment: ${error.message} (Code: ${error.code})`);
         }
 
         console.log('[SupabaseRepo] Insert success:', data);

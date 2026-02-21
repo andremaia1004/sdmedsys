@@ -71,9 +71,9 @@ describe('PatientTimelineService', () => {
         fromMock.mockImplementation((table: string) => {
             const chain = { ...queryMock };
             if (table === 'consultations') {
-                chain.then = (resolve: any) => resolve({ data: mockConsultations, error: null });
+                chain.then = vi.fn().mockImplementation((resolve: any) => resolve({ data: mockConsultations, error: null }));
             } else if (table === 'clinical_entries') {
-                chain.then = (resolve: any) => resolve({ data: mockEntries, error: null });
+                chain.then = vi.fn().mockImplementation((resolve: any) => resolve({ data: mockEntries, error: null }));
             }
             return chain;
         });

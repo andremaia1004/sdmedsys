@@ -1,0 +1,24 @@
+{
+    "version": "1.0",
+    "project": "SDMED Sys",
+    "agents": {
+        "default": "dev",
+        "available": [
+            "dev",
+            "qa",
+            "architect",
+            "pm",
+            "po",
+            "analyst"
+        ]
+    },
+    "workflows": {
+        "directory": ".agent/workflows"
+    },
+    "mcp": {
+        "enabled": true,
+        "servers": [
+            "filesystem"
+        ]
+    }
+}

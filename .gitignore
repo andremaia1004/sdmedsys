@@ -30,7 +30,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 *.log
-lint_results.txt
+# Lint, tests and build outputs
+lint_*.txt
+lint_*.json
+build_*.txt
+build_*.log
+test_*.txt
+test_*.log
+tsc_*.txt
+tsc_*.log
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -41,3 +49,27 @@ lint_results.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment & Secrets (AIOS)
+.env
+.env.local
+.env.*.local
+*.key
+
+# Dependencies (AIOS)
+node_modules/
+
+# Build & Logs (AIOS)
+dist/
+build/
+logs/
+
+# IDE & OS (AIOS)
+Thumbs.db
+.idea/
+*.swp
+
+# AIOS Local (AIOS)
+.aios-core/local/
+.claude/settings.local.json
+.aios/install-log.txt

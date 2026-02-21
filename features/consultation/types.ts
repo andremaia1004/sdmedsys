@@ -33,6 +33,7 @@ export interface Consultation {
     physicalExam: string | null;
     diagnosis: string | null;
     conduct: string | null;
+    isFinal?: boolean;
     startedAt: string;
     finishedAt: string | null;
     createdAt: string;

@@ -83,8 +83,8 @@ export class ClinicalDocumentService {
         const data: PrescriptionData = {
             header: {
                 clinicName: clinic?.clinic_name || 'SDMED Clinic',
-                clinicAddress: 'Endereço da Unidade', // TODO: Add to clinic_settings
-                clinicPhone: 'Fone: (00) 0000-0000'
+                clinicAddress: clinic?.address || 'Endereço da Unidade',
+                clinicPhone: clinic?.phone || 'Fone: (00) 0000-0000'
             },
             patient: {
                 name: patient.name,
@@ -209,8 +209,8 @@ export class ClinicalDocumentService {
         const data: ReportData = {
             header: {
                 clinicName: clinic?.clinic_name || 'SDMED Clinic',
-                clinicAddress: 'Endereço da Unidade',
-                clinicPhone: 'Fone: (00) 0000-0000'
+                clinicAddress: clinic?.address || 'Endereço da Unidade',
+                clinicPhone: clinic?.phone || 'Fone: (00) 0000-0000'
             },
             patient: {
                 name: patient.name,
