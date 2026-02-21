@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { generatePrescriptionAction, generateCertificateAction, generateReportAction, generateExamRequestAction } from '../actions';
+import { generatePrescriptionAction, generateCertificateAction, generateReportAction, generateExamRequestAction, generateReferralAction } from '../actions';
 import { X, FileText, Download, Loader2, Scroll, Activity, ClipboardList } from 'lucide-react';
 import styles from '@/components/ui/Modal.module.css';
 
-export type DocumentType = 'prescription' | 'certificate' | 'report' | 'exam_request';
+export type DocumentType = 'prescription' | 'certificate' | 'report' | 'referral' | 'exam_request';
 
 interface Props {
     isOpen: boolean;
@@ -38,6 +38,12 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
     // Report Fields
     const [content, setContent] = useState('');
 
+    // Referral Fields
+    const [specialty, setSpecialty] = useState('');
+    const [reason, setReason] = useState('');
+    const [clinicalSummary, setClinicalSummary] = useState('');
+    const [referralObservation, setReferralObservation] = useState('');
+
     useEffect(() => {
         if (isOpen && initialType) setType(initialType);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,6 +63,9 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
         } else if (type === 'exam_request') {
             if (!examList.trim()) { alert('Preencha a lista de exames'); setLoading(false); return; }
             res = await generateExamRequestAction(patientId, consultationId, examList, justification);
+        } else if (type === 'referral') {
+            if (!specialty.trim() || !reason.trim() || !clinicalSummary.trim()) { alert('Preencha a especialidade, motivo e resumo clínico'); setLoading(false); return; }
+            res = await generateReferralAction(patientId, consultationId, specialty, reason, clinicalSummary, referralObservation);
         } else {
             if (!content.trim()) { alert('Preencha o conteúdo do laudo'); setLoading(false); return; }
             res = await generateReportAction(patientId, consultationId, content);
@@ -99,8 +108,9 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
                         {[
                             { id: 'prescription', label: 'Receita', icon: FileText },
                             { id: 'certificate', label: 'Atestado', icon: Activity },
-                            { id: 'exam_request', label: 'Exames', icon: ClipboardList },
-                            { id: 'report', label: 'Laudo', icon: Scroll }
+                            { id: 'report', label: 'Laudo', icon: Scroll },
+                            { id: 'referral', label: 'Encaminhamento', icon: FileText },
+                            { id: 'exam_request', label: 'Exames', icon: ClipboardList }
                         ].map(t => (
                             <button
                                 key={t.id}
@@ -222,6 +232,49 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
                                 style={{ width: '100%', height: '300px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
                             />
                         </div>
+                    )}
+
+                    {/* Referral Form */}
+                    {type === 'referral' && (
+                        <>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Especialidade / Profissional Destino</label>
+                                <input
+                                    type="text"
+                                    value={specialty}
+                                    onChange={e => setSpecialty(e.target.value)}
+                                    placeholder="Ex: Cardiologista, Fisioterapeuta..."
+                                    style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Motivo / Indicação</label>
+                                <textarea
+                                    value={reason}
+                                    onChange={e => setReason(e.target.value)}
+                                    placeholder="Ex: Avaliação cardiológica pré-operatória..."
+                                    style={{ width: '100%', height: '80px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Resumo Clínico</label>
+                                <textarea
+                                    value={clinicalSummary}
+                                    onChange={e => setClinicalSummary(e.target.value)}
+                                    placeholder="Descreva brevemente o histórico e quadro atual..."
+                                    style={{ width: '100%', height: '120px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Observações (Opcional)</label>
+                                <textarea
+                                    value={referralObservation}
+                                    onChange={e => setReferralObservation(e.target.value)}
+                                    placeholder="Ex: Seguem exames laboratoriais em anexo..."
+                                    style={{ width: '100%', height: '80px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                        </>
                     )}
                 </div>
 
