@@ -14,7 +14,15 @@ export type ActionState = {
 
 export async function startConsultationAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
     try {
-        const { id: doctorId } = await requireRole(['DOCTOR']);
+        await requireRole(['DOCTOR']);
+
+        // Fetch explicit auth UID to satisfy RLS policy
+        const { createClient } = await import('@/lib/supabase-auth');
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Unauthorized');
+
+        const doctorId = user.id;
 
         const queueItemId = formData.get('queueItemId') as string;
         const patientId = formData.get('patientId') as string;
@@ -42,7 +50,12 @@ export async function startConsultationAction(prevState: ActionState, formData: 
 
 export async function startConsultationFromAppointmentAction(appointmentId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
     try {
-        const { id: doctorId } = await requireRole(['DOCTOR']);
+        await requireRole(['DOCTOR']);
+        const { createClient } = await import('@/lib/supabase-auth');
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Unauthorized');
+        const doctorId = user.id;
 
         // 1. Resolve Queue Item for this appointment
         const { QueueService } = await import('@/features/queue/service');
@@ -78,7 +91,12 @@ export async function startConsultationFromAppointmentAction(appointmentId: stri
 
 export async function startConsultationFromQueueAction(queueItemId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
     try {
-        const { id: doctorId } = await requireRole(['DOCTOR']);
+        await requireRole(['DOCTOR']);
+        const { createClient } = await import('@/lib/supabase-auth');
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Unauthorized');
+        const doctorId = user.id;
 
         // 1. Start Consultation
         const consultation = await ConsultationService.start({
