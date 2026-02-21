@@ -5,16 +5,14 @@ import { getCurrentUser } from '@/lib/session';
 
 export interface DashboardItem {
     id: string; // appointment_id
-    patientId: string;
-    patientName: string;
-    doctorId: string;
-    startTime?: string;
-    appointmentStatus: AppointmentStatus;
-    kind: 'SCHEDULED' | 'WALK_IN';
-    queueItemId?: string;
-    ticketCode?: string;
-    queueStatus?: 'WAITING' | 'CALLED' | 'IN_SERVICE' | 'DONE' | 'NO_SHOW' | 'CANCELED';
-    sourceType?: 'SCHEDULED' | 'WALK_IN';
+    patient_id: string;
+    patient_name: string;
+    doctor_id: string;
+    start_time: string | null;
+    appointment_status: AppointmentStatus;
+    queue_item_id: string | null;
+    ticket_code: string | null;
+    queue_status: 'WAITING' | 'CALLED' | 'IN_SERVICE' | 'DONE' | 'NO_SHOW' | 'CANCELED' | null;
 }
 
 export class SecretaryDashboardService {
@@ -50,16 +48,14 @@ export class SecretaryDashboardService {
 
         return (data || []).map(row => ({
             id: row.id,
-            patientId: row.patient_id,
-            patientName: row.patient_name || 'Desconhecido',
-            doctorId: row.doctor_id,
-            startTime: row.start_time,
-            appointmentStatus: row.status as AppointmentStatus,
-            kind: 'SCHEDULED', // Default for MVP
-            queueItemId: row.queue_items?.[0]?.id,
-            ticketCode: row.queue_items?.[0]?.ticket_code,
-            queueStatus: row.queue_items?.[0]?.status,
-            sourceType: 'SCHEDULED' // Default for MVP
+            patient_id: row.patient_id,
+            patient_name: row.patient_name || 'Desconhecido',
+            doctor_id: row.doctor_id,
+            start_time: row.start_time,
+            appointment_status: row.status as AppointmentStatus,
+            queue_item_id: row.queue_items?.[0]?.id || null,
+            ticket_code: row.queue_items?.[0]?.ticket_code || null,
+            queue_status: row.queue_items?.[0]?.status || null,
         }));
     }
 

@@ -32,8 +32,8 @@ export default function DailyCalendar({
 
     const getAppointment = (time: string) => {
         return appointments.find(a => {
-            if (!a.startTime) return false;
-            const d = new Date(a.startTime);
+            if (!a.start_time) return false;
+            const d = new Date(a.start_time);
             const apptTime = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             return apptTime === time;
         });
@@ -115,15 +115,18 @@ export default function DailyCalendar({
                                                 <User size={20} />
                                             </div>
                                             <div>
-                                                <div style={{ fontWeight: 700, fontSize: '1rem', color: '#1e293b' }}>{appt.patientName}</div>
-                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Cód: {appt.id.slice(0, 8)} • {appt.status === 'SCHEDULED' ? 'Agendado' : appt.status}</div>
+                                                <div style={{ fontWeight: 700, fontSize: '1rem', color: '#1e293b' }}>{appt.patient_name}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                                    {appt.start_time ? new Date(appt.start_time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''} - {appt.end_time ? new Date(appt.end_time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                    <span style={{ marginLeft: '0.5rem' }}>• Cód: {appt.id.slice(0, 8)} • {appt.status === 'SCHEDULED' ? 'Agendado' : appt.status}</span>
+                                                </div>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             {appt.status !== 'COMPLETED' && (
                                                 <button
                                                     disabled={!!loadingApptId}
-                                                    onClick={() => handleAtender(appt.id, appt.patientId)}
+                                                    onClick={() => handleAtender(appt.id, appt.patient_id)}
                                                     style={{
                                                         background: 'var(--primary)',
                                                         color: '#fff',
@@ -145,7 +148,7 @@ export default function DailyCalendar({
                                             )}
                                             <button
                                                 disabled={!!loadingApptId}
-                                                onClick={() => router.push(`/patients/${appt.patientId}`)}
+                                                onClick={() => router.push(`/patients/${appt.patient_id}`)}
                                                 style={{
                                                     background: '#fff',
                                                     color: 'var(--text-muted)',

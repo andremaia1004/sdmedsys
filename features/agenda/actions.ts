@@ -50,22 +50,21 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         const endTime = endDate.toISOString();
 
         const input: AppointmentInput = {
-            patientId,
-            patientName,
-            doctorId,
-            startTime,
-            endTime,
+            patient_id: patientId,
+            patient_name: patientName,
+            doctor_id: doctorId,
+            start_time: startTime,
+            end_time: endTime,
             status: 'SCHEDULED',
-            kind: 'SCHEDULED',
-            notes: notes || undefined,
+            notes: notes || null,
         };
 
         const appointment = await AppointmentService.create(input);
 
         await logAudit('CREATE', 'APPOINTMENT', appointment.id, {
-            patientName: appointment.patientName,
-            doctorId: appointment.doctorId,
-            startTime: appointment.startTime
+            patientName: appointment.patient_name,
+            doctorId: appointment.doctor_id,
+            startTime: appointment.start_time
         });
 
         revalidatePath('/doctor/agenda');
@@ -84,8 +83,8 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
                 const role = user?.role || 'SECRETARY';
 
                 await QueueService.add({
-                    patientId: appointment.patientId,
-                    doctorId: appointment.doctorId,
+                    patientId: appointment.patient_id,
+                    doctorId: appointment.doctor_id,
                     appointmentId: appointment.id,
                     status: 'WAITING'
                 }, role);

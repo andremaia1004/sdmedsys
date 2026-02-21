@@ -11,12 +11,12 @@ export class MockAppointmentsRepository implements IAppointmentsRepository {
         const end = new Date(endTime).getTime();
 
         return MOCK_APPOINTMENTS.some(appt => {
-            if (appt.doctorId !== doctorId) return false;
+            if (appt.doctor_id !== doctorId) return false;
             if (appt.status === 'CANCELED') return false;
-            if (!appt.startTime || !appt.endTime) return false;
+            if (!appt.start_time || !appt.end_time) return false;
 
-            const apptStart = new Date(appt.startTime).getTime();
-            const apptEnd = new Date(appt.endTime).getTime();
+            const apptStart = new Date(appt.start_time).getTime();
+            const apptEnd = new Date(appt.end_time).getTime();
 
             return (start < apptEnd) && (end > apptStart);
         });
@@ -26,8 +26,10 @@ export class MockAppointmentsRepository implements IAppointmentsRepository {
         // Validation logic is cleaner in service, but checkConflict is reused
         const newAppt: Appointment = {
             ...input,
-            kind: input.kind || 'SCHEDULED',
             id: Math.random().toString(36).substring(7),
+            clinic_id: 'mock_clinic',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
 
         MOCK_APPOINTMENTS.push(newAppt);
@@ -40,15 +42,15 @@ export class MockAppointmentsRepository implements IAppointmentsRepository {
         let filtered = MOCK_APPOINTMENTS.filter(a => a.status !== 'CANCELED');
 
         if (doctorId) {
-            filtered = filtered.filter(a => a.doctorId === doctorId);
+            filtered = filtered.filter(a => a.doctor_id === doctorId);
         }
 
         if (startRange && endRange) {
             const s = new Date(startRange).getTime();
             const e = new Date(endRange).getTime();
             filtered = filtered.filter(a => {
-                if (!a.startTime) return false;
-                const as = new Date(a.startTime).getTime();
+                if (!a.start_time) return false;
+                const as = new Date(a.start_time).getTime();
                 return as >= s && as <= e;
             });
         }

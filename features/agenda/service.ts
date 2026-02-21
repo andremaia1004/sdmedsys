@@ -35,8 +35,8 @@ export class AppointmentService {
         console.log('[AppointmentService] Creating appointment:', input);
         const repo = await getRepository();
 
-        if (input.startTime && input.endTime) {
-            const hasConflict = await repo.checkConflict(input.doctorId, input.startTime, input.endTime);
+        if (input.start_time && input.end_time) {
+            const hasConflict = await repo.checkConflict(input.doctor_id, input.start_time, input.end_time);
             if (hasConflict) {
                 console.warn('[AppointmentService] Conflict detected');
                 throw new Error('Conflito de horário para este profissional.');

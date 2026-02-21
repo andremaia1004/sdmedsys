@@ -31,11 +31,11 @@ export default function SecretaryDashboard() {
     }, [loadData]);
 
     const filteredItems = items.filter(item =>
-        item.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.ticketCode?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.patient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.ticket_code?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const scheduledItems = items.filter(item => item.kind === 'SCHEDULED' && item.appointmentStatus === 'SCHEDULED');
+    const scheduledItems = items.filter(item => item.appointment_status === 'SCHEDULED');
 
     return (
         <div className={styles.container}>
@@ -73,8 +73,8 @@ export default function SecretaryDashboard() {
                             scheduledItems.map(item => (
                                 <div key={item.id} className={styles.appCard}>
                                     <div className={styles.appInfo}>
-                                        <strong>{item.startTime ? new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</strong>
-                                        <span>{item.patientName}</span>
+                                        <strong>{item.start_time ? new Date(item.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</strong>
+                                        <span>{item.patient_name}</span>
                                     </div>
                                     <div className={styles.appActions}>
                                         <button onClick={async () => {

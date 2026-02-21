@@ -64,8 +64,8 @@ export default function WeeklyCalendar({
 
     const getAppointment = (date: string, time: string) => {
         return appointments.find(a => {
-            if (!a.startTime) return false;
-            const d = new Date(a.startTime);
+            if (!a.start_time) return false;
+            const d = new Date(a.start_time);
             const apptDate = d.toLocaleDateString('en-CA'); // YYYY-MM-DD local
             const apptTime = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             return apptDate === date && apptTime === time;
@@ -197,7 +197,7 @@ export default function WeeklyCalendar({
                                                 }}
                                             >
                                                 <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1e293b', lineHeight: 1.2 }}>
-                                                    {appt.patientName.split(' ')[0]}
+                                                    {appt.patient_name.split(' ')[0]}
                                                 </div>
                                                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.25rem' }}>
                                                     {appt.status !== 'COMPLETED' && (
@@ -205,7 +205,7 @@ export default function WeeklyCalendar({
                                                             disabled={!!loadingApptId}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleAtender(appt.id, appt.patientId);
+                                                                handleAtender(appt.id, appt.patient_id);
                                                             }}
                                                             style={{
                                                                 background: '#fff',
@@ -225,7 +225,7 @@ export default function WeeklyCalendar({
                                                         disabled={!!loadingApptId}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            router.push(`/patients/${appt.patientId}`);
+                                                            router.push(`/patients/${appt.patient_id}`);
                                                         }}
                                                         style={{
                                                             background: '#fff',

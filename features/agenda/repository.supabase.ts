@@ -34,11 +34,11 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
         const { data, error } = await this.supabase
             .from('appointments')
             .insert([{
-                patient_id: input.patientId,
-                patient_name: input.patientName,
-                doctor_id: input.doctorId,
-                start_time: input.startTime,
-                end_time: input.endTime,
+                patient_id: input.patient_id,
+                patient_name: input.patient_name,
+                doctor_id: input.doctor_id,
+                start_time: input.start_time,
+                end_time: input.end_time,
                 status: input.status,
                 notes: input.notes,
                 clinic_id: this.clinicId
@@ -107,14 +107,16 @@ export class SupabaseAppointmentsRepository implements IAppointmentsRepository {
     private mapToAppointment(row: any): Appointment {
         return {
             id: row.id,
-            patientId: row.patient_id,
-            patientName: row.patient_name,
-            doctorId: row.doctor_id,
-            startTime: row.start_time,
-            endTime: row.end_time,
+            clinic_id: row.clinic_id,
+            patient_id: row.patient_id,
+            patient_name: row.patient_name,
+            doctor_id: row.doctor_id,
+            start_time: row.start_time,
+            end_time: row.end_time,
             status: row.status,
-            kind: row.kind || 'SCHEDULED',
             notes: row.notes,
+            created_at: row.created_at || null,
+            updated_at: row.updated_at || null,
         };
     }
 }

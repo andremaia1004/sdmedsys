@@ -27,10 +27,10 @@ export default async function DoctorDashboard() {
     // Find next appointment
     const now = new Date().getTime();
     const upcomingAppointments = appointments
-        .filter((a): a is Appointment & { startTime: string } => !!a.startTime && a.status !== 'COMPLETED' && a.status !== 'CANCELED')
-        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+        .filter((a): a is Appointment & { start_time: string } => !!a.start_time && a.status !== 'COMPLETED' && a.status !== 'CANCELED')
+        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-    const nextAppointment = upcomingAppointments.find(a => new Date(a.startTime).getTime() > now);
+    const nextAppointment = upcomingAppointments.find(a => new Date(a.start_time).getTime() > now);
 
     return (
         <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -63,7 +63,7 @@ export default async function DoctorDashboard() {
                     { label: 'Em Espera', value: waitingPatients.length, icon: Users, color: '#3b82f6', bg: '#eff6ff' },
                     { label: 'Agendados', value: appointments.length, icon: Calendar, color: '#10b981', bg: '#f0fdf4' },
                     { label: 'Atendidos', value: completedToday.length, icon: ClipboardList, color: '#8b5cf6', bg: '#f5f3ff' },
-                    { label: 'Próximo', value: nextAppointment ? new Date(nextAppointment.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--', icon: Clock, color: '#f59e0b', bg: '#fffbeb' },
+                    { label: 'Próximo', value: nextAppointment ? new Date(nextAppointment.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--', icon: Clock, color: '#f59e0b', bg: '#fffbeb' },
                 ].map((stat, i) => (
                     <Card key={i} style={{ border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem' }}>
@@ -204,10 +204,10 @@ export default async function DoctorDashboard() {
                                             width: '55px',
                                             textAlign: 'center'
                                         }}>
-                                            {new Date(a.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {new Date(a.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontWeight: 600, fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.patientName}</div>
+                                            <div style={{ fontWeight: 600, fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.patient_name}</div>
                                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{a.id.slice(0, 8)} • Rotina</div>
                                         </div>
                                     </div>
