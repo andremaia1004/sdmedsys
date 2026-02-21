@@ -29,8 +29,8 @@ export default function QueuePanel({ items }: { items: QueueItemWithPatient[] })
                     <Table headers={['Senha', 'Paciente', 'Status', 'Ações']}>
                         {items.map(item => (
                             <tr key={item.id}>
-                                <td><strong>{item.ticketCode}</strong></td>
-                                <td>{item.patientName || 'Manual/Espontâneo'}</td>
+                                <td><strong>{item.ticket_code}</strong></td>
+                                <td>{item.patient_name || 'Manual/Espontâneo'}</td>
 
                                 <td className="p-4 align-middle">
                                     <Badge variant={

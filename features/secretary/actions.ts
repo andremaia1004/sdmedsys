@@ -3,58 +3,59 @@
 import { requireRole } from '@/lib/session';
 import { SecretaryDashboardService, DashboardItem } from './service.dashboard';
 import { revalidatePath } from 'next/cache';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
-export async function fetchDailyDashboardAction(date: string): Promise<DashboardItem[]> {
+export async function fetchDailyDashboardAction(date: string): Promise<ActionResponse<DashboardItem[]>> {
     try {
         const user = await requireRole(['SECRETARY', 'ADMIN', 'DOCTOR']);
-        if (!user.clinicId) return [];
-        return await SecretaryDashboardService.getDailyDashboard(user.clinicId, date);
+        if (!user.clinicId) return formatSuccess([]);
+        const data = await SecretaryDashboardService.getDailyDashboard(user.clinicId, date);
+        return formatSuccess(data);
     } catch (error) {
-        console.error('fetchDailyDashboardAction Error:', error);
-        return [];
+        return formatError(error);
     }
 }
 
-export async function checkInAction(appointmentId: string) {
+export async function checkInAction(appointmentId: string): Promise<ActionResponse> {
     try {
         await requireRole(['SECRETARY', 'ADMIN']);
-        const success = await SecretaryDashboardService.markArrived(appointmentId);
+        await SecretaryDashboardService.markArrived(appointmentId);
         revalidatePath('/secretary/dashboard');
-        return { success };
+        return formatSuccess();
     } catch (error) {
-        return { success: false, error: (error as Error).message };
+        return formatError(error);
     }
 }
 
-export async function updateQueueStatusAction(appointmentId: string, queueItemId: string, newStatus: string) {
+export async function updateQueueStatusAction(appointmentId: string, queueItemId: string, newStatus: string): Promise<ActionResponse> {
     try {
         await requireRole(['SECRETARY', 'ADMIN', 'DOCTOR']);
-        const success = await SecretaryDashboardService.updateQueueStatus(appointmentId, queueItemId, newStatus);
+        await SecretaryDashboardService.updateQueueStatus(appointmentId, queueItemId, newStatus);
         revalidatePath('/secretary/dashboard');
-        return { success };
+        return formatSuccess();
     } catch (error) {
-        return { success: false, error: (error as Error).message };
+        return formatError(error);
     }
 }
 
-export async function markNoShowAction(appointmentId: string) {
+export async function markNoShowAction(appointmentId: string): Promise<ActionResponse> {
     try {
         await requireRole(['SECRETARY', 'ADMIN']);
-        const success = await SecretaryDashboardService.markNoShow(appointmentId);
+        await SecretaryDashboardService.markNoShow(appointmentId);
         revalidatePath('/secretary/dashboard');
-        return { success };
+        return formatSuccess();
     } catch (error) {
-        return { success: false, error: (error as Error).message };
+        return formatError(error);
     }
 }
 
-export async function createWalkInAction(patientId: string, doctorId: string, notes?: string) {
+export async function createWalkInAction(patientId: string, doctorId: string, notes?: string): Promise<ActionResponse> {
     try {
         await requireRole(['SECRETARY', 'ADMIN']);
-        const success = await SecretaryDashboardService.createWalkIn(patientId, doctorId, notes);
+        await SecretaryDashboardService.createWalkIn(patientId, doctorId, notes);
         revalidatePath('/secretary/dashboard');
-        return { success };
+        return formatSuccess();
     } catch (error) {
-        return { success: false, error: (error as Error).message };
+        return formatError(error);
     }
 }

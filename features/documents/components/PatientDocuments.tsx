@@ -21,8 +21,8 @@ export const PatientDocuments: React.FC<Props> = ({ patientId, patientName, acti
 
     const load = React.useCallback(async () => {
         try {
-            const data = await fetchPatientDocumentsAction(patientId);
-            setDocuments(data);
+            const res = await fetchPatientDocumentsAction(patientId);
+            setDocuments(res.data || []);
         } catch (error) {
             console.error('Failed to load documents:', error);
         } finally {

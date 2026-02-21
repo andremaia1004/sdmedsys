@@ -60,14 +60,14 @@ export default function TVBoard({
                 </div>
                 <div className={`${styles.ticketCard} ${calling ? styles.pulse : ''}`}>
                     <div className={styles.ticketNumber}>
-                        {currentCalled?.ticketCode || '---'}
-                        {currentCalled?.sourceType && (
+                        {currentCalled?.ticket_code || '---'}
+                        {currentCalled?.appointment_id !== undefined && (
                             <span style={{ fontSize: '1.5rem', marginLeft: '1rem', verticalAlign: 'middle' }}>
-                                {currentCalled.sourceType === 'SCHEDULED' ? '📅' : '🏃'}
+                                {!!currentCalled?.appointment_id ? '📅' : '🏃'}
                             </span>
                         )}
                     </div>
-                    <div className={styles.patientName}>{currentCalled?.patientName || 'Aguardando...'}</div>
+                    <div className={styles.patientName}>{currentCalled?.patient_name || 'Aguardando...'}</div>
                 </div>
             </div>
 
@@ -77,11 +77,11 @@ export default function TVBoard({
                     {waiting.map(item => (
                         <div key={item.id} className={styles.nextItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span className={styles.nextTicket}>{item.ticketCode}</span>
-                                <span style={{ fontSize: '0.9rem' }}>{item.sourceType === 'SCHEDULED' ? '📅' : '🏃'}</span>
+                                <span className={styles.nextTicket}>{item.ticket_code}</span>
+                                <span style={{ fontSize: '0.9rem' }}>{!!item.appointment_id ? '📅' : '🏃'}</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <span className={styles.nextName}>{item.patientName}</span>
+                                <span className={styles.nextName}>{item.patient_name}</span>
                                 <ArrowRight size={20} color="rgba(255,255,255,0.2)" />
                             </div>
                         </div>

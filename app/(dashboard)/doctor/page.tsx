@@ -102,8 +102,8 @@ export default async function DoctorDashboard() {
                                     <div style={{ width: '8px', height: '8px', background: '#4ade80', borderRadius: '50%' }} />
                                     EM ATENDIMENTO
                                 </div>
-                                <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>{inServicePatient.patientName}</h2>
-                                <p style={{ opacity: 0.8, marginTop: '0.25rem' }}>Senha: {inServicePatient.ticketCode} • Iniciado há {Math.floor((new Date().getTime() - new Date(inServicePatient.updatedAt).getTime()) / 60000)} min</p>
+                                <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>{inServicePatient.patient_name}</h2>
+                                <p style={{ opacity: 0.8, marginTop: '0.25rem' }}>Senha: {inServicePatient.ticket_code} • Iniciado há {Math.floor((new Date().getTime() - new Date(inServicePatient.updated_at || '').getTime()) / 60000)} min</p>
                             </div>
                             <Link
                                 href="/doctor/queue"
@@ -132,7 +132,7 @@ export default async function DoctorDashboard() {
                                 {calledPatient ? (
                                     <div style={{ padding: '1.5rem', background: '#fef3c7', borderRadius: '16px', border: '1px solid #fcd34d', marginBottom: '1.5rem' }}>
                                         <div style={{ fontWeight: 800, color: '#92400e', fontSize: '1.2rem', marginBottom: '0.5rem' }}>Paciente Chamado</div>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 600 }}>{calledPatient.patientName} ({calledPatient.ticketCode})</div>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: 600 }}>{calledPatient.patient_name} ({calledPatient.ticket_code})</div>
                                         <p style={{ color: '#b45309', marginTop: '0.5rem' }}>Aguardando entrada no consultório...</p>
                                     </div>
                                 ) : (

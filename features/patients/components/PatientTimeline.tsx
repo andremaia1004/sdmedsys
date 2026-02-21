@@ -24,9 +24,9 @@ export default function PatientTimeline({ entries }: Props) {
                     <div className={styles.marker}></div>
                     <div className={styles.content}>
                         <div className={styles.date}>
-                            {new Date(entry.createdAt).toLocaleDateString('pt-BR')} às {new Date(entry.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(entry.created_at).toLocaleDateString('pt-BR')} às {new Date(entry.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </div>
-                        <Card header={entry.chiefComplaint || 'Atendimento'}>
+                        <Card header={entry.chief_complaint || 'Atendimento'}>
                             <div className={styles.entryData}>
                                 {entry.diagnosis && (
                                     <div className={styles.field}>
@@ -40,15 +40,15 @@ export default function PatientTimeline({ entries }: Props) {
                                         <p>{entry.conduct}</p>
                                     </div>
                                 )}
-                                {entry.freeNotes && (
+                                {entry.free_notes && (
                                     <div className={styles.field}>
                                         <span className={styles.fieldLabel}>Evolução:</span>
-                                        <div className={styles.freeText}>{entry.freeNotes}</div>
+                                        <div className={styles.freeText}>{entry.free_notes}</div>
                                     </div>
                                 )}
                                 <div className={styles.entryFooter}>
-                                    <span>Médico ID: {entry.doctorUserId.slice(0, 8)}...</span>
-                                    {entry.isFinal && <span className={styles.finalBadge}>🔒 FINALIZADO</span>}
+                                    <span>Médico ID: {entry.doctor_user_id.slice(0, 8)}...</span>
+                                    {entry.is_final && <span className={styles.finalBadge}>🔒 FINALIZADO</span>}
                                 </div>
                             </div>
                         </Card>

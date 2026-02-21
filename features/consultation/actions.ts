@@ -5,142 +5,105 @@ import { Consultation } from './types';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
 import { logAudit } from '@/lib/audit';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
-export type ActionState = {
-    error?: string;
-    success?: boolean;
-    consultation?: Consultation;
-};
-
-export async function startConsultationAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function startConsultationAction(prevState: ActionResponse<Consultation>, formData: FormData): Promise<ActionResponse<Consultation>> {
     try {
-        await requireRole(['DOCTOR']);
-
-        // Fetch explicit auth UID to satisfy RLS policy
-        const { createClient } = await import('@/lib/supabase-auth');
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Unauthorized');
-
-        const doctorId = user.id;
+        const sessionUser = await requireRole(['DOCTOR']);
+        const doctorId = sessionUser.id;
 
         const queueItemId = formData.get('queueItemId') as string;
         const patientId = formData.get('patientId') as string;
 
         const consultation = await ConsultationService.start({
-            patientId,
-            doctorId,
-            queueItemId
+            patient_id: patientId,
+            doctor_id: doctorId,
+            queue_item_id: queueItemId
         });
 
         await logAudit('CREATE', 'CONSULTATION', consultation.id, {
-            patientId,
-            queueItemId
+            patient_id: patientId,
+            queue_item_id: queueItemId
         });
 
         revalidatePath('/doctor/consultation');
         revalidatePath('/doctor/queue');
-        return { success: true, consultation };
-    } catch (err: unknown) {
-        console.error('Start Consultation Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { error: msg || 'Failed to start consultation', success: false };
+        return formatSuccess(consultation);
+    } catch (err) {
+        return formatError(err);
     }
 }
 
-export async function startConsultationFromAppointmentAction(appointmentId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
+export async function startConsultationFromAppointmentAction(appointmentId: string, patientId: string): Promise<ActionResponse<string>> {
     try {
-        await requireRole(['DOCTOR']);
-        const { createClient } = await import('@/lib/supabase-auth');
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Unauthorized');
-        const doctorId = user.id;
+        const sessionUser = await requireRole(['DOCTOR']);
+        const doctorId = sessionUser.id;
 
-        // 1. Resolve Queue Item for this appointment
         const { QueueService } = await import('@/features/queue/service');
         const queueItems = await QueueService.list(doctorId);
-        let queueItem = queueItems.find(i => i.appointmentId === appointmentId);
+        let queueItem = queueItems.find(i => i.appointment_id === appointmentId);
 
         if (!queueItem) {
-            // Create a queue item if it doesn't exist (Doctor essentially doing a 1-click check-in + attend)
             const newItem = await QueueService.add({
-                patientId,
-                doctorId,
-                appointmentId,
+                patient_id: patientId,
+                doctor_id: doctorId,
+                appointment_id: appointmentId,
                 status: 'WAITING',
-                sourceType: 'SCHEDULED'
+                clinic_id: sessionUser.clinicId || '550e8400-e29b-41d4-a716-446655440000'
             }, 'DOCTOR');
 
-            // Re-assign to a variable that matches the expected ID
-            queueItem = { ...newItem, patientName: '' }; // patientName is not used in startConsultationFromQueueAction anyway
+            queueItem = { ...newItem, patient_name: '' } as any;
         }
 
         if (!queueItem) {
-            throw new Error('Falha ao criar ou localizar item na fila.');
+            return { success: false, error: 'Falha ao criar ou localizar item na fila.' };
         }
 
-        // 2. Start Consultation (Re-use existing logic)
         return await startConsultationFromQueueAction(queueItem.id, patientId);
-    } catch (err: unknown) {
-        console.error('Start Consultation From Appointment Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { success: false, error: msg };
+    } catch (err) {
+        return formatError(err);
     }
 }
 
-export async function startConsultationFromQueueAction(queueItemId: string, patientId: string): Promise<{ success: boolean, consultationId?: string, error?: string }> {
+export async function startConsultationFromQueueAction(queueItemId: string, patientId: string): Promise<ActionResponse<string>> {
     try {
-        await requireRole(['DOCTOR']);
-        const { createClient } = await import('@/lib/supabase-auth');
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Unauthorized');
-        const doctorId = user.id;
+        const sessionUser = await requireRole(['DOCTOR']);
+        const doctorId = sessionUser.id;
 
-        // 1. Start Consultation
         const consultation = await ConsultationService.start({
-            patientId,
-            doctorId,
-            queueItemId
+            patient_id: patientId,
+            doctor_id: doctorId,
+            queue_item_id: queueItemId
         });
 
-        // 2. Update Queue Status and Audit
         const { QueueService } = await import('@/features/queue/service');
-        await QueueService.changeStatus(queueItemId, 'IN_SERVICE', doctorId); // User role not available here, but DOCTOR role is assumed and doctorId logic handles it
-        // Or wait, QueueService.changeStatus takes actorRole.
-        // I need to use 'DOCTOR' as role.
+        await QueueService.changeStatus(queueItemId, 'IN_SERVICE', 'DOCTOR');
 
-        await logAudit('START_SERVICE', 'CONSULTATION', consultation.id, { queueItemId });
+        await logAudit('CREATE', 'CONSULTATION', consultation.id, { patient_id: patientId, queue_item_id: queueItemId });
 
         revalidatePath('/doctor/queue');
-        return { success: true, consultationId: consultation.id };
-    } catch (err: unknown) {
-        console.error('Start Consultation From Queue Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { success: false, error: msg };
+        return formatSuccess(consultation.id);
+    } catch (err) {
+        return formatError(err);
     }
 }
 
 export async function saveConsultationFieldsAction(
     consultationId: string,
-    fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>
-): Promise<ActionState> {
+    fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>
+): Promise<ActionResponse> {
     try {
         await requireRole(['DOCTOR']);
         await ConsultationService.updateStructuredFields(consultationId, fields);
 
-        // No audit for auto-save to avoid spam
         revalidatePath(`/doctor/consultations/${consultationId}`);
-        return { success: true };
-    } catch (err: unknown) {
-        console.error('Save Fields Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { error: msg, success: false };
+        return formatSuccess();
+    } catch (err) {
+        return formatError(err);
     }
 }
 
-export async function finishConsultationAction(id: string): Promise<{ success: boolean, error?: string }> {
+export async function finishConsultationAction(id: string): Promise<ActionResponse> {
     try {
         await requireRole(['DOCTOR']);
 
@@ -150,30 +113,29 @@ export async function finishConsultationAction(id: string): Promise<{ success: b
 
         revalidatePath('/doctor/queue');
         revalidatePath('/doctor/consultation');
-        return { success: true };
-    } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { success: false, error: msg };
+        return formatSuccess();
+    } catch (err) {
+        return formatError(err);
     }
 }
 
-export async function getConsultationAction(id: string): Promise<Consultation | undefined> {
+export async function getConsultationAction(id: string): Promise<ActionResponse<Consultation>> {
     try {
         await requireRole(['DOCTOR', 'ADMIN']);
-        return await ConsultationService.findById(id);
+        const data = await ConsultationService.findById(id);
+        return formatSuccess(data);
     } catch (err) {
-        console.error('Get Consultation Error:', err);
-        return undefined;
+        return formatError(err);
     }
 }
 
-export async function getPatientTimelineAction(patientId: string): Promise<Consultation[]> {
+export async function getPatientTimelineAction(patientId: string): Promise<ActionResponse<Consultation[]>> {
     try {
         await requireRole(['DOCTOR', 'ADMIN']);
-        return await ConsultationService.listByPatient(patientId);
+        const data = await ConsultationService.listByPatient(patientId);
+        return formatSuccess(data);
     } catch (err) {
-        console.error('Get Patient Timeline Error:', err);
-        return [];
+        return formatError(err);
     }
 }
 

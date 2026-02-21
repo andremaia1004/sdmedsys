@@ -5,6 +5,7 @@ import { createWalkInAction } from '@/features/secretary/actions';
 import { searchPatientsAction } from '@/features/patients/actions';
 import { Patient } from '@/features/patients/types';
 import styles from '@/features/secretary/styles/Dashboard.module.css';
+import { useToast } from '@/components/ui/Toast';
 
 interface NewWalkInModalProps {
     onClose: () => void;
@@ -16,13 +17,14 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const [patients, setPatients] = useState<Patient[]>([]);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
 
     const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
         setPatientQuery(query);
         if (query.length > 2) {
-            const results = await searchPatientsAction(query);
-            setPatients(results);
+            const res = await searchPatientsAction(query);
+            setPatients(res.data || []);
         } else {
             setPatients([]);
         }
@@ -38,7 +40,7 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
             onSuccess();
             onClose();
         } else {
-            alert('Falha ao registrar: ' + (result.error || 'Erro desconhecido'));
+            showToast('error', result.error || 'Falha ao registrar');
         }
         setLoading(false);
     };

@@ -6,19 +6,12 @@ import { AppointmentInput, Appointment, AppointmentStatus } from './types';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/session';
 import { logAudit } from '@/lib/audit';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
-export type ActionState = {
-    error?: string;
-    success?: boolean;
-    appointment?: Appointment;
-};
-
-export async function createAppointmentAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function createAppointmentAction(prevState: ActionResponse<Appointment>, formData: FormData): Promise<ActionResponse<Appointment>> {
     try {
-        // Enforce RBAC
         await requireRole(['ADMIN', 'SECRETARY']);
 
-        // Fetch duration from settings
         let duration = 30;
         try {
             const { fetchSettingsAction } = await import('@/app/actions/admin');
@@ -36,17 +29,12 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         const notes = formData.get('notes') as string;
 
         if (!date || !time || !doctorId || !patientId) {
-            return { error: 'Missing required fields', success: false };
+            return { success: false, error: 'Campos obrigatórios faltando.' };
         }
 
-        // Explicitly set as BRT (-03:00) to ensure database stores the intended local time
         const startTime = `${date}T${time}:00-03:00`;
         const startDate = new Date(startTime);
         const endDate = new Date(startDate.getTime() + duration * 60000);
-
-        // Convert to ISO-like format but keeping it relative to database precision
-        // Use toISOString() which adds Z, or manually format to avoid shifts if needed.
-        // Actually, toISOString() is fine if we include the offset in the input.
         const endTime = endDate.toISOString();
 
         const input: AppointmentInput = {
@@ -70,23 +58,19 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
 
-        // Logic to auto-add to queue if appointment is today
+        // Auto-add to queue if appointment is today
         try {
-            // Get today's date in Brazil time for accurate auto-queue logic
             const todayLocal = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
-
-            console.log('[createAppointmentAction] Comparing date:', date, 'with todayLocal:', todayLocal);
-
             if (date === todayLocal) {
-                console.log('[createAppointmentAction] Auto-adding to queue for today...');
                 const user = await import('@/lib/session').then(m => m.getCurrentUser());
                 const role = user?.role || 'SECRETARY';
 
                 await QueueService.add({
-                    patientId: appointment.patient_id,
-                    doctorId: appointment.doctor_id,
-                    appointmentId: appointment.id,
-                    status: 'WAITING'
+                    patient_id: appointment.patient_id,
+                    doctor_id: appointment.doctor_id,
+                    appointment_id: appointment.id,
+                    status: 'WAITING',
+                    clinic_id: user?.clinicId || '550e8400-e29b-41d4-a716-446655440000'
                 }, role);
 
                 revalidatePath('/queue');
@@ -98,15 +82,13 @@ export async function createAppointmentAction(prevState: ActionState, formData: 
             console.error('Failed to auto-add to queue:', queueErr);
         }
 
-        return { success: true, appointment };
-    } catch (err: unknown) {
-        console.error('Create Appointment Error:', err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { error: msg, success: false };
+        return formatSuccess(appointment);
+    } catch (err) {
+        return formatError(err);
     }
 }
 
-export async function updateAppointmentStatusAction(id: string, status: AppointmentStatus): Promise<Appointment | null> {
+export async function updateAppointmentStatusAction(id: string, status: AppointmentStatus): Promise<ActionResponse<Appointment>> {
     try {
         const appointment = await AppointmentService.updateStatus(id, status);
 
@@ -116,28 +98,32 @@ export async function updateAppointmentStatusAction(id: string, status: Appointm
 
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
-        return appointment;
+        return formatSuccess(appointment ?? undefined);
     } catch (err) {
-        console.error('Update Status Error:', err);
-        return null;
+        return formatError(err);
     }
 }
 
-export async function checkConflictAction(doctorId: string, startTime: string, endTime: string): Promise<boolean> {
-    return AppointmentService.checkConflict(doctorId, startTime, endTime);
+export async function checkConflictAction(doctorId: string, startTime: string, endTime: string): Promise<ActionResponse<boolean>> {
+    try {
+        const result = await AppointmentService.checkConflict(doctorId, startTime, endTime);
+        return formatSuccess(result);
+    } catch (err) {
+        return formatError(err);
+    }
 }
 
 import { SupabaseAppointmentsRepository } from './repository.supabase';
 import { supabaseServer } from '@/lib/supabase-server';
 
-export async function fetchAppointmentsAction(doctorId?: string, startRange?: string, endRange?: string): Promise<Appointment[]> {
+export async function fetchAppointmentsAction(doctorId?: string, startRange?: string, endRange?: string): Promise<ActionResponse<Appointment[]>> {
     try {
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
         const repo = new SupabaseAppointmentsRepository(supabaseServer, clinicId);
-        return await repo.list(doctorId, startRange, endRange);
-    } catch (e) {
-        console.error('fetchAppointmentsAction: Failed to fetch appointments', e);
-        return [];
+        const data = await repo.list(doctorId, startRange, endRange);
+        return formatSuccess(data);
+    } catch (err) {
+        return formatError(err);
     }
 }

@@ -12,9 +12,9 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         const { data, error } = await this.supabase
             .from('consultations')
             .insert([{
-                patient_id: input.patientId,
-                doctor_id: input.doctorId,
-                queue_item_id: input.queueItemId,
+                patient_id: input.patient_id,
+                doctor_id: input.doctor_id,
+                queue_item_id: input.queue_item_id,
                 clinical_notes: '',
                 started_at: new Date().toISOString(),
                 clinic_id: this.clinicId
@@ -66,7 +66,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         return this.mapToConsultation(data);
     }
 
-    async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
+    async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>): Promise<void> {
         // 1. Get auth session for doctor_user_id
         const { data: { user } } = await this.supabase.auth.getUser();
         if (!user) throw new Error('Unauthorized');
@@ -98,8 +98,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
 
         const payload = {
             clinic_id: this.clinicId,
-            chief_complaint: fields.chiefComplaint,
-            physical_exam: fields.physicalExam,
+            chief_complaint: fields.chief_complaint,
             diagnosis: fields.diagnosis,
             conduct: fields.conduct,
             updated_at: new Date().toISOString()
@@ -199,19 +198,18 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         const entry = row.clinical_entries?.[0] || row.clinical_entries || {};
         return {
             id: row.id,
-            patientId: row.patient_id,
-            doctorId: row.doctor_id,
-            queueItemId: row.queue_item_id,
-            clinicalNotes: row.clinical_notes || '',
-            chiefComplaint: entry.chief_complaint || row.chief_complaint || '',
-            physicalExam: entry.physical_exam || row.physical_exam || '',
+            clinic_id: row.clinic_id,
+            patient_id: row.patient_id,
+            doctor_id: row.doctor_id,
+            queue_item_id: row.queue_item_id,
+            chief_complaint: entry.chief_complaint || row.chief_complaint || '',
             diagnosis: entry.diagnosis || row.diagnosis || '',
             conduct: entry.conduct || row.conduct || '',
-            isFinal: entry.is_final || false,
-            startedAt: row.started_at,
-            finishedAt: row.finished_at,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at,
+            is_final: entry.is_final || false,
+            started_at: row.started_at,
+            finished_at: row.finished_at,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
         };
     }
 }

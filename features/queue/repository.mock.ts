@@ -1,4 +1,5 @@
-import { QueueItem, QueueItemWithPatient, QueueStatus, AuditLog } from './types';
+import { QueueItem, QueueItemWithPatient, QueueStatus } from './types';
+import { AuditLog } from '../audit/types';
 import { IQueueRepository } from './repository.types';
 
 
@@ -22,7 +23,7 @@ export class MockQueueRepository implements IQueueRepository {
         await new Promise(resolve => setTimeout(resolve, 200));
         let filtered = MOCK_QUEUE.filter(i => !['DONE', 'CANCELED'].includes(i.status));
         if (doctorId) {
-            filtered = filtered.filter(i => (i.doctorId === doctorId || !i.doctorId));
+            filtered = filtered.filter(i => (i.doctor_id === doctorId || !i.doctor_id));
         }
         return filtered;
     }
@@ -30,23 +31,23 @@ export class MockQueueRepository implements IQueueRepository {
     async getTVList(): Promise<Partial<QueueItemWithPatient>[]> {
         const active = MOCK_QUEUE.filter(i => ['WAITING', 'CALLED', 'IN_SERVICE'].includes(i.status));
         return active.map(i => ({
-            ticketCode: i.ticketCode,
+            ticket_code: i.ticket_code,
             status: i.status,
-            doctorId: i.doctorId,
+            doctor_id: i.doctor_id,
         }));
     }
 
-    async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string): Promise<QueueItem> {
+    async add(item: Omit<QueueItem, 'id' | 'created_at' | 'updated_at' | 'ticket_code'>, actorRole: string): Promise<QueueItem> {
         const code = `A${(MOCK_QUEUE.length + 1).toString().padStart(3, '0')}`;
         const newItem: QueueItem = {
             ...item,
             id: Math.random().toString(36).substring(7),
-            ticketCode: code,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            ticket_code: code,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
         MOCK_QUEUE.push(newItem);
-        this.logAudit('ADD', actorRole, newItem.id, `Added ticket ${code} for patient ${item.patientId}`);
+        this.logAudit('ADD', actorRole, newItem.id, `Added ticket ${code} for patient ${item.patient_id}`);
         return newItem;
     }
 
@@ -63,7 +64,7 @@ export class MockQueueRepository implements IQueueRepository {
         MOCK_QUEUE[index] = {
             ...item,
             status: newStatus,
-            updatedAt: new Date().toISOString()
+            updated_at: new Date().toISOString()
         };
 
         this.logAudit('CHANGE_STATUS', actorRole, id, `Changed to ${newStatus}`);
@@ -78,8 +79,8 @@ export class MockQueueRepository implements IQueueRepository {
         AUDIT_LOGS.push({
             timestamp: new Date().toISOString(),
             action,
-            actorRole: role,
-            itemId,
+            actor_role: role,
+            item_id: itemId,
             details
         });
     }

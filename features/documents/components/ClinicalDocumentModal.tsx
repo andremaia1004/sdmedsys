@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { generatePrescriptionAction, generateCertificateAction, generateReportAction, generateExamRequestAction, generateReferralAction } from '../actions';
 import { X, FileText, Download, Loader2, Scroll, Activity, ClipboardList } from 'lucide-react';
 import styles from '@/components/ui/Modal.module.css';
+import { useToast } from '@/components/ui/Toast';
 
 export type DocumentType = 'prescription' | 'certificate' | 'report' | 'referral' | 'exam_request';
 
@@ -21,6 +22,7 @@ interface Props {
 export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultationId, patientName, items, initialType = 'prescription', onSuccess }: Props) {
     const [type, setType] = useState<DocumentType>(initialType);
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
 
     // Prescription Fields
     const [medications, setMedications] = useState('');
@@ -56,35 +58,36 @@ export function ClinicalDocumentModal({ isOpen, onClose, patientId, consultation
         let res;
 
         if (type === 'prescription') {
-            if (!medications.trim()) { alert('Preencha os medicamentos'); setLoading(false); return; }
+            if (!medications.trim()) { showToast('warning', 'Preencha os medicamentos'); setLoading(false); return; }
             res = await generatePrescriptionAction(patientId, consultationId, medications, instructions);
         } else if (type === 'certificate') {
             res = await generateCertificateAction(patientId, consultationId, days ? parseInt(days) : undefined, cid, observation);
         } else if (type === 'exam_request') {
-            if (!examList.trim()) { alert('Preencha a lista de exames'); setLoading(false); return; }
+            if (!examList.trim()) { showToast('warning', 'Preencha a lista de exames'); setLoading(false); return; }
             res = await generateExamRequestAction(patientId, consultationId, examList, justification);
         } else if (type === 'referral') {
-            if (!specialty.trim() || !reason.trim() || !clinicalSummary.trim()) { alert('Preencha a especialidade, motivo e resumo clínico'); setLoading(false); return; }
+            if (!specialty.trim() || !reason.trim() || !clinicalSummary.trim()) { showToast('warning', 'Preencha a especialidade, motivo e resumo clínico'); setLoading(false); return; }
             res = await generateReferralAction(patientId, consultationId, specialty, reason, clinicalSummary, referralObservation);
         } else {
-            if (!content.trim()) { alert('Preencha o conteúdo do laudo'); setLoading(false); return; }
+            if (!content.trim()) { showToast('warning', 'Preencha o conteúdo do laudo'); setLoading(false); return; }
             res = await generateReportAction(patientId, consultationId, content);
         }
 
         setLoading(false);
 
-        if (res.success && res.pdfBase64) {
+        if (res.success && res.data) {
             const link = document.createElement('a');
-            link.href = `data:application/pdf;base64,${res.pdfBase64}`;
+            link.href = `data:application/pdf;base64,${res.data}`;
             link.download = `${type}-${patientName}-${new Date().toISOString().split('T')[0]}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
 
+            showToast('success', 'Documento gerado com sucesso!');
             if (onSuccess) onSuccess();
             onClose();
         } else {
-            alert(res.error || 'Erro ao gerar documento.');
+            showToast('error', res.error || 'Erro ao gerar documento.');
         }
     };
 

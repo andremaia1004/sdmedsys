@@ -26,14 +26,15 @@ describe('QueueService', () => {
 
     it('should add item to queue and generate ticket code', async () => {
         item = await QueueService.add({
-            patientId: 'test-patient-id',
-            doctorId: doctorId,
+            clinic_id: 'mock-clinic',
+            patient_id: 'test-patient-id',
+            doctor_id: doctorId,
+            appointment_id: 'mock-appt',
             status: 'WAITING',
-            sourceType: 'SCHEDULED'
         }, 'SECRETARY');
 
         expect(item.id).toBeDefined();
-        expect(item.ticketCode).toBeDefined();
+        expect(item.ticket_code).toBeDefined();
         expect(item.status).toBe('WAITING');
     });
 
@@ -55,10 +56,11 @@ describe('QueueService', () => {
 
         // Create new item for other doctor
         const otherItem = await QueueService.add({
-            patientId: 'pt-2',
-            doctorId: doctorId, // Assigned to dr-123
+            clinic_id: 'mock-clinic',
+            appointment_id: null,
+            patient_id: 'pt-2',
+            doctor_id: doctorId, // Assigned to dr-123
             status: 'CALLED',
-            sourceType: 'WALK_IN'
         }, 'SECRETARY');
 
         await expect(QueueService.changeStatus(otherItem.id, 'IN_SERVICE', 'DOCTOR'))
@@ -70,10 +72,11 @@ describe('QueueService', () => {
         (getCurrentUser as any).mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
 
         const otherItem = await QueueService.add({
-            patientId: 'pt-3',
-            doctorId: doctorId,
+            clinic_id: 'mock-clinic',
+            appointment_id: null,
+            patient_id: 'pt-3',
+            doctor_id: doctorId,
             status: 'CALLED',
-            sourceType: 'WALK_IN'
         }, 'SECRETARY');
 
         const updated = await QueueService.changeStatus(otherItem.id, 'IN_SERVICE', 'ADMIN');
@@ -82,7 +85,7 @@ describe('QueueService', () => {
 
     it('should prevent invalid transition DONE -> WAITING', async () => {
         // Need a DONE item
-        const doneItem = await QueueService.add({ patientId: 'pt-4', status: 'DONE' }, 'DOCTOR');
+        const doneItem = await QueueService.add({ clinic_id: 'mock-clinic', appointment_id: null, doctor_id: null, patient_id: 'pt-4', status: 'DONE' }, 'DOCTOR');
         await expect(QueueService.changeStatus(doneItem.id, 'WAITING', 'SECRETARY'))
             .rejects.toThrow('Transição inválida');
     });

@@ -70,14 +70,14 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
                 main_complaint: formData.main_complaint !== undefined ? (formData.main_complaint || null) : patient.main_complaint,
             };
 
-            const updated = await updatePatientAction(patient.id, input);
+            const res = await updatePatientAction(patient.id, input);
 
-            if (updated) {
+            if (res.success && res.data) {
                 toastSuccess('Dados atualizados com sucesso!');
-                onSuccess(updated);
+                onSuccess(res.data);
                 onClose();
             } else {
-                toastError('Erro ao atualizar paciente.');
+                toastError(res.error || 'Erro ao atualizar paciente.');
             }
         } catch (error) {
             console.error(error);

@@ -76,15 +76,14 @@ export default function WeeklyCalendar({
         setLoadingApptId(apptId);
         try {
             const res = await startConsultationFromAppointmentAction(apptId, patientId);
-            if (res.success && res.consultationId) {
-                router.push(`/doctor/consultations/${res.consultationId}`);
+            if (res.success && res.data) {
+                router.push(`/doctor/consultations/${res.data}`);
             } else {
-                alert(res.error || 'Erro ao iniciar consulta');
+                console.error(res.error || 'Erro ao iniciar consulta');
                 setLoadingApptId(null);
             }
         } catch (error) {
             console.error('Atender Error:', error);
-            alert('Falha na comunicação com o servidor.');
             setLoadingApptId(null);
         }
     };

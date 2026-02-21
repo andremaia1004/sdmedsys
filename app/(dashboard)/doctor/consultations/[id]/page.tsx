@@ -14,12 +14,13 @@ export default async function ConsultationPage({
     const user = await requireRole(['DOCTOR', 'ADMIN']);
     const { id } = await params;
 
-    const consultation = await getConsultationAction(id);
+    const res = await getConsultationAction(id);
+    const consultation = res.data;
 
-    if (!consultation || consultation.doctorId !== user.id) {
+    if (!consultation || consultation.doctor_id !== user.id) {
         // Strict security: ensure doctor owns this consultation
         // Or if admin, allow view?
-        if (user.role !== 'ADMIN' && consultation?.doctorId !== user.id) {
+        if (user.role !== 'ADMIN' && consultation?.doctor_id !== user.id) {
             return (
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                     <h1>Acesso Negado</h1>
@@ -30,7 +31,7 @@ export default async function ConsultationPage({
         if (!consultation) notFound();
     }
 
-    const patient = await PatientService.findById(consultation.patientId);
+    const patient = await PatientService.findById(consultation.patient_id);
     if (!patient) return <div>Paciente não encontrado.</div>;
 
     return (

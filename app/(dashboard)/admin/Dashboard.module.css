@@ -1,0 +1,221 @@
+.dashboardGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.statCard h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #64748b);
+    margin: 0;
+    font-weight: 700;
+}
+
+.statValue {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-primary, #0f172a);
+    line-height: 1;
+}
+
+.statDescription {
+    font-size: 0.85rem;
+    color: var(--text-muted, #64748b);
+}
+
+/* Section cards */
+.sectionCard {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.sectionHeader {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    background: var(--bg-subtle, #f8fafc);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary, #2563eb);
+}
+
+.sectionBody {
+    padding: 1.5rem;
+}
+
+/* Table */
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.dataTable th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted, #64748b);
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    font-weight: 700;
+}
+
+.dataTable td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-light, #f1f5f9);
+    color: var(--text-primary, #0f172a);
+}
+
+.dataTable tr:last-child td {
+    border-bottom: none;
+}
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    gap: 0.3rem;
+}
+
+.badgeWaiting {
+    composes: badge;
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badgeCalled {
+    composes: badge;
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badgeInService {
+    composes: badge;
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* Active doctors list */
+.doctorList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.doctorChip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-subtle, #f8fafc);
+    border-radius: 8px;
+    border: 1px solid var(--border-light, #f1f5f9);
+}
+
+.doctorAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary, #2563eb);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.doctorInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.doctorInfo strong {
+    font-size: 0.85rem;
+    color: var(--text-primary, #0f172a);
+}
+
+.doctorInfo span {
+    font-size: 0.75rem;
+    color: var(--text-muted, #64748b);
+}
+
+/* Empty state */
+.emptyState {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted, #64748b);
+    font-size: 0.9rem;
+}
+
+/* Page header */
+.pageHeader {
+    margin-bottom: 2rem;
+}
+
+.pageHeader h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary, #0f172a);
+    margin: 0 0 0.25rem 0;
+}
+
+.pageHeader p {
+    color: var(--text-muted, #64748b);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Consultation status list */
+.statusList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.statusRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-light, #f1f5f9);
+}
+
+.statusRow:last-child {
+    border-bottom: none;
+}
+
+.statusLabel {
+    font-size: 0.9rem;
+    color: var(--text-primary, #0f172a);
+    text-transform: capitalize;
+}
+
+.statusCount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary, #2563eb);
+}

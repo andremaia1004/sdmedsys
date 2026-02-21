@@ -20,13 +20,12 @@ interface Props {
 export default function ConsultationWorkspace({ consultation, patient }: Props) {
     const router = useRouter();
     const [fields, setFields] = useState({
-        chiefComplaint: consultation.chiefComplaint || '',
-        physicalExam: consultation.physicalExam || '',
+        chief_complaint: consultation.chief_complaint || '',
         diagnosis: consultation.diagnosis || '',
         conduct: consultation.conduct || ''
     });
     const [status, setStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
-    const [isFinished, setIsFinished] = useState(consultation.isFinal || !!consultation.finishedAt);
+    const [isFinished, setIsFinished] = useState(consultation.is_final || !!consultation.finished_at);
     const [finishError, setFinishError] = useState<string | null>(null);
     const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
 
@@ -36,8 +35,7 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
 
         const timer = setTimeout(async () => {
             const hasChanges =
-                fields.chiefComplaint !== consultation.chiefComplaint ||
-                fields.physicalExam !== consultation.physicalExam ||
+                fields.chief_complaint !== consultation.chief_complaint ||
                 fields.diagnosis !== consultation.diagnosis ||
                 fields.conduct !== consultation.conduct;
 
@@ -54,7 +52,7 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
         }, 2000);
 
         return () => clearTimeout(timer);
-    }, [fields, consultation.id, status, isFinished, consultation.chiefComplaint, consultation.physicalExam, consultation.diagnosis, consultation.conduct]);
+    }, [fields, consultation.id, status, isFinished, consultation.chief_complaint, consultation.diagnosis, consultation.conduct]);
 
     const handleFieldChange = (name: keyof typeof fields, value: string) => {
         if (isFinished) return;
@@ -88,12 +86,12 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
     // Fetch Patient History
     useEffect(() => {
         async function fetchHistory() {
-            const [consultations, docs] = await Promise.all([
+            const [consultationsRes, docsRes] = await Promise.all([
                 getPatientTimelineAction(patient.id),
                 fetchPatientDocumentsAction(patient.id)
             ]);
-            setHistory(consultations.filter(c => c.id !== consultation.id));
-            setDocuments(docs);
+            setHistory((consultationsRes.data || []).filter(c => c.id !== consultation.id));
+            setDocuments(docsRes.data || []);
             setIsLoadingHistory(false);
         }
         fetchHistory();
@@ -142,7 +140,7 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                         </div>
                         <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.25rem 0' }}>{patient.name}</h2>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-                            {new Date().getFullYear() - new Date(patient.birthDate).getFullYear()} anos • {new Date(patient.birthDate).toLocaleDateString('pt-BR')}
+                            {new Date().getFullYear() - new Date(patient.birth_date || '').getFullYear()} anos • {new Date(patient.birth_date || '').toLocaleDateString('pt-BR')}
                         </p>
                         <div style={{ marginTop: '0.75rem', padding: '0.35rem 0.75rem', background: '#f1f5f9', color: '#475569', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>
                             CPF: {patient.document}
@@ -172,10 +170,10 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                                             <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#fff', border: '2px solid var(--primary)', zIndex: 1, marginTop: '2px' }} />
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569' }}>
-                                                    {new Date(h.startedAt).toLocaleDateString('pt-BR')}
+                                                    {new Date(h.started_at).toLocaleDateString('pt-BR')}
                                                 </div>
                                                 <div style={{ fontSize: '0.85rem', color: '#1e293b', fontWeight: 600, margin: '2px 0' }}>
-                                                    {h.chiefComplaint || 'Atendimento'}
+                                                    {h.chief_complaint || 'Atendimento'}
                                                 </div>
                                             </div>
                                         </div>
@@ -239,10 +237,9 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                     </div>
 
                     <div style={{ padding: '2rem' }}>
-                        {renderSection('1. Anamnese / Queixa Principal', 'chiefComplaint', 'Descreva o motivo da consulta e histórico do paciente...', 6)}
-                        {renderSection('2. Exame Físico', 'physicalExam', 'Descreva os achados clínicos e sinais vitais...', 5)}
-                        {renderSection('3. Diagnóstico (Hipótese)', 'diagnosis', 'Indique as impressões diagnósticas ou CID-10...', 2)}
-                        {renderSection('4. Plano Terapêutico / Conduta', 'conduct', 'Descreva a conduta, medicações orientadas e próximos passos...', 5)}
+                        {renderSection('1. Anamnese / Queixa Principal', 'chief_complaint', 'Descreva o motivo da consulta e histórico do paciente...', 6)}
+                        {renderSection('2. Diagnóstico (Hipótese)', 'diagnosis', 'Indique as impressões diagnósticas ou CID-10...', 2)}
+                        {renderSection('3. Plano Terapêutico / Conduta', 'conduct', 'Descreva a conduta, medicações orientadas e próximos passos...', 5)}
                     </div>
 
                     <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border)', background: '#f8fafc', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center' }}>

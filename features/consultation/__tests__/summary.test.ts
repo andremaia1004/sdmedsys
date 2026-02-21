@@ -37,8 +37,8 @@ describe('ClinicalSummaryService', () => {
             id: 'e1',
             diagnosis: 'Test Diagnosis',
             conduct: 'Test Conduct',
-            doctorId: 'doc-123',
-            startedAt: '2026-01-30T10:00:00Z',
+            doctor_id: 'doc-123',
+            started_at: '2026-01-30T10:00:00Z',
             // ... other fields
         };
 
@@ -48,7 +48,7 @@ describe('ClinicalSummaryService', () => {
         const summary = await ClinicalSummaryService.getLatestEntryByPatient('p1');
 
         expect(summary).not.toBeNull();
-        expect(summary?.doctorName).toContain('doc-1');
+        expect(summary?.doctor_name).toContain('doc-1');
         expect(summary?.date).toBe('2026-01-30T10:00:00Z');
     });
 

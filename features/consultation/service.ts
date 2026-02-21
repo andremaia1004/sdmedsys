@@ -52,7 +52,7 @@ export class ConsultationService {
         return repo.countByPatient(patientId);
     }
 
-    static async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void> {
+    static async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>): Promise<void> {
         const repo = await getRepository();
         return repo.updateStructuredFields(id, fields);
     }
@@ -62,14 +62,14 @@ export class ConsultationService {
 
         // 1. Fetch consultation to get queue_item_id
         const consultation = await repo.findById(id);
-        if (consultation && consultation.queueItemId) {
+        if (consultation && consultation.queue_item_id) {
             const supabase = await createClient();
 
             // 2. Get appointment_id from queue_item
             const { data: queueItem } = await supabase
                 .from('queue_items')
                 .select('appointment_id')
-                .eq('id', consultation.queueItemId)
+                .eq('id', consultation.queue_item_id)
                 .single();
 
             if (queueItem?.appointment_id) {
@@ -82,7 +82,7 @@ export class ConsultationService {
 
             // 4. Update Queue Status to DONE (Atomic transition)
             const { QueueService } = await import('@/features/queue/service');
-            await QueueService.changeStatus(consultation.queueItemId, 'DONE', 'DOCTOR');
+            await QueueService.changeStatus(consultation.queue_item_id, 'DONE', 'DOCTOR');
         }
 
         return repo.finish(id);

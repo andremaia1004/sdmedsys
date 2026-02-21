@@ -6,6 +6,7 @@ import { PatientAttachment } from '@/features/documents/service.attachments';
 import { AttachmentUploadModal } from './AttachmentUploadModal';
 import { LoadingState, EmptyState } from '@/features/patients/components/TabStates';
 import styles from './PatientAttachments.module.css';
+import { useToast } from '@/components/ui/Toast';
 
 interface Props {
     patientId: string;
@@ -17,14 +18,15 @@ export const PatientAttachments: React.FC<Props> = ({ patientId, role }) => {
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [showUploadModal, setShowUploadModal] = useState(false);
+    const { showToast } = useToast();
 
     const isFullAccess = role === 'ADMIN' || role === 'DOCTOR';
 
     const load = React.useCallback(async () => {
         setLoading(true);
         try {
-            const data = await fetchPatientAttachmentsAction(patientId);
-            setAttachments(data);
+            const res = await fetchPatientAttachmentsAction(patientId);
+            setAttachments(res.data || []);
         } catch (error) {
             console.error('Failed to load attachments:', error);
         } finally {
@@ -44,7 +46,7 @@ export const PatientAttachments: React.FC<Props> = ({ patientId, role }) => {
             if (result.success) {
                 setAttachments(prev => prev.filter(a => a.id !== id));
             } else {
-                alert('Erro ao excluir: ' + (result.error || 'Desconhecido'));
+                showToast('error', result.error || 'Erro ao excluir');
             }
         } catch (error) {
             console.error('Delete error:', error);

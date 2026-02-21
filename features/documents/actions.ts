@@ -6,14 +6,15 @@ import { ClinicalDocument } from './types';
 import { PdfService } from './service.pdf';
 import { PatientService } from '@/features/patients/service';
 import { DoctorService } from '@/features/doctors/service';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
-export async function fetchPatientDocumentsAction(patientId: string): Promise<ClinicalDocument[]> {
+export async function fetchPatientDocumentsAction(patientId: string): Promise<ActionResponse<ClinicalDocument[]>> {
     try {
         await requireRole(['ADMIN', 'DOCTOR']);
-        return await ClinicalDocumentsRegistryService.listByPatient(patientId);
+        const data = await ClinicalDocumentsRegistryService.listByPatient(patientId);
+        return formatSuccess(data);
     } catch (error) {
-        console.error('fetchPatientDocumentsAction Error:', error);
-        return [];
+        return formatError(error);
     }
 }
 
@@ -22,37 +23,30 @@ export async function generatePrescriptionAction(
     consultationId: string | null,
     medications: string,
     instructions: string
-): Promise<{ success: boolean, pdfBase64?: string, error?: string }> {
+): Promise<ActionResponse<string>> {
     try {
         const user = await requireRole(['DOCTOR']);
+        if (!user.clinicId) return { success: false, error: 'Usuário sem clínica vinculada.' };
 
-        if (!user.clinicId) {
-            throw new Error('Usuário sem clínica vinculada.');
-        }
-
-        // 1. Fetch Data
         const patient = await PatientService.findById(patientId);
-        if (!patient) throw new Error('Paciente não encontrado');
+        if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
-        // Ideally fetch Doctor profile name, for now user.id or we need a service
-        const doctor = await DoctorService.findById(user.id); // Assuming this works/exists
+        const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
 
-        // 2. Generate PDF
         const pdfBuffer = await PdfService.generatePrescription({
             patientName: patient.name,
-            doctorName: doctorName,
+            doctorName,
             crm: doctor?.crm,
             medications,
             instructions,
             date: new Date().toISOString()
         });
 
-        // 3. Register Document
         await ClinicalDocumentsRegistryService.createRecord({
             clinicId: user.clinicId,
             patientId,
-            consultationId: consultationId || null, // Ensure null if undefined
+            consultationId: consultationId || null,
             doctorId: user.id,
             type: 'prescription',
             issuedAt: new Date().toISOString(),
@@ -60,15 +54,9 @@ export async function generatePrescriptionAction(
             createdBy: user.id
         });
 
-        return {
-            success: true,
-            pdfBase64: pdfBuffer.toString('base64')
-        };
-
-    } catch (error: unknown) {
-        console.error('generatePrescriptionAction Error:', error);
-        const msg = error instanceof Error ? error.message : 'Erro desconhecido';
-        return { success: false, error: msg };
+        return formatSuccess(pdfBuffer.toString('base64'));
+    } catch (error) {
+        return formatError(error);
     }
 }
 
@@ -78,13 +66,13 @@ export async function generateCertificateAction(
     days: number | undefined,
     cid: string | undefined,
     observation: string | undefined
-): Promise<{ success: boolean, pdfBase64?: string, error?: string }> {
+): Promise<ActionResponse<string>> {
     try {
         const user = await requireRole(['DOCTOR']);
-        if (!user.clinicId) throw new Error('Usuário sem clínica vinculada.');
+        if (!user.clinicId) return { success: false, error: 'Usuário sem clínica vinculada.' };
 
         const patient = await PatientService.findById(patientId);
-        if (!patient) throw new Error('Paciente não encontrado');
+        if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
@@ -110,10 +98,9 @@ export async function generateCertificateAction(
             createdBy: user.id
         });
 
-        return { success: true, pdfBase64: pdfBuffer.toString('base64') };
+        return formatSuccess(pdfBuffer.toString('base64'));
     } catch (error) {
-        console.error('generateCertificateAction Error:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' };
+        return formatError(error);
     }
 }
 
@@ -121,13 +108,13 @@ export async function generateReportAction(
     patientId: string,
     consultationId: string | null,
     content: string
-): Promise<{ success: boolean, pdfBase64?: string, error?: string }> {
+): Promise<ActionResponse<string>> {
     try {
         const user = await requireRole(['DOCTOR']);
-        if (!user.clinicId) throw new Error('Usuário sem clínica vinculada.');
+        if (!user.clinicId) return { success: false, error: 'Usuário sem clínica vinculada.' };
 
         const patient = await PatientService.findById(patientId);
-        if (!patient) throw new Error('Paciente não encontrado');
+        if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
@@ -151,10 +138,9 @@ export async function generateReportAction(
             createdBy: user.id
         });
 
-        return { success: true, pdfBase64: pdfBuffer.toString('base64') };
+        return formatSuccess(pdfBuffer.toString('base64'));
     } catch (error) {
-        console.error('generateReportAction Error:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' };
+        return formatError(error);
     }
 }
 
@@ -163,13 +149,13 @@ export async function generateExamRequestAction(
     consultationId: string | null,
     examList: string,
     justification?: string
-): Promise<{ success: boolean, pdfBase64?: string, error?: string }> {
+): Promise<ActionResponse<string>> {
     try {
         const user = await requireRole(['DOCTOR']);
-        if (!user.clinicId) throw new Error('Usuário sem clínica vinculada.');
+        if (!user.clinicId) return { success: false, error: 'Usuário sem clínica vinculada.' };
 
         const patient = await PatientService.findById(patientId);
-        if (!patient) throw new Error('Paciente não encontrado');
+        if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
@@ -194,10 +180,9 @@ export async function generateExamRequestAction(
             createdBy: user.id
         });
 
-        return { success: true, pdfBase64: pdfBuffer.toString('base64') };
+        return formatSuccess(pdfBuffer.toString('base64'));
     } catch (error) {
-        console.error('generateExamRequestAction Error:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' };
+        return formatError(error);
     }
 }
 
@@ -208,13 +193,13 @@ export async function generateReferralAction(
     reason: string,
     clinicalSummary: string,
     observation?: string
-): Promise<{ success: boolean, pdfBase64?: string, error?: string }> {
+): Promise<ActionResponse<string>> {
     try {
         const user = await requireRole(['DOCTOR']);
-        if (!user.clinicId) throw new Error('Usuário sem clínica vinculada.');
+        if (!user.clinicId) return { success: false, error: 'Usuário sem clínica vinculada.' };
 
         const patient = await PatientService.findById(patientId);
-        if (!patient) throw new Error('Paciente não encontrado');
+        if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
@@ -241,9 +226,8 @@ export async function generateReferralAction(
             createdBy: user.id
         });
 
-        return { success: true, pdfBase64: pdfBuffer.toString('base64') };
+        return formatSuccess(pdfBuffer.toString('base64'));
     } catch (error) {
-        console.error('generateReferralAction Error:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' };
+        return formatError(error);
     }
 }

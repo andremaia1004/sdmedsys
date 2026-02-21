@@ -29,8 +29,8 @@ export class ClinicalSummaryService {
             return {
                 diagnosis: null, // Structured diagnosis not available in consultations table yet
                 conduct: null,
-                doctorName: 'Dr. (ID: ' + (latest.doctorId || '').substring(0, 5) + ')',
-                date: latest.startedAt
+                doctor_name: 'Dr. (ID: ' + (latest.doctor_id || '').substring(0, 5) + ')',
+                date: latest.started_at
             };
         } catch (error) {
             console.error('ClinicalSummaryService.getLatestEntryByPatient error:', error);

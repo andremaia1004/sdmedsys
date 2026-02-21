@@ -16,7 +16,8 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
     // Call actions instead of services for Service Role (bypasses RLS issues)
     let doctors: Doctor[] = [];
     try {
-        doctors = await listDoctorsAction(true); // Active only
+        const res = await listDoctorsAction(true);
+        doctors = res.data || [];
     } catch (e) {
         console.error('SecretaryAgendaPage: Failed to fetch doctors', e);
     }
@@ -45,7 +46,8 @@ export default async function SecretaryAgendaPage(props: { searchParams: Promise
 
     let appointments: Appointment[] = [];
     try {
-        appointments = await fetchAppointmentsAction(selectedDoctorId, startStr, endStr);
+        const res = await fetchAppointmentsAction(selectedDoctorId, startStr, endStr);
+        appointments = res.data || [];
     } catch (e) {
         console.error('SecretaryAgendaPage: Failed to fetch appointments', e);
     }

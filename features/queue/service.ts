@@ -41,10 +41,11 @@ export class QueueService {
 
         const enriched: QueueItemWithPatient[] = [];
         for (const item of items) {
-            const patient = await PatientService.findById(item.patientId);
+            const patient = await PatientService.findById(item.patient_id);
             enriched.push({
                 ...item,
-                patientName: patient ? patient.name : 'Unknown'
+                patient_name: patient ? patient.name : 'Unknown',
+                start_time: null // will be enriched if necessary or accessed from appointments directly
             });
         }
         return enriched;
@@ -55,7 +56,7 @@ export class QueueService {
         return repo.getTVList();
     }
 
-    static async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string): Promise<QueueItem> {
+    static async add(item: Omit<QueueItem, 'id' | 'created_at' | 'updated_at' | 'ticket_code'>, actorRole: string): Promise<QueueItem> {
         const repo = await getRepository();
 
         let prefix = 'A';
@@ -94,7 +95,7 @@ export class QueueService {
         // 3. Role/Assignment Validation (Doctor starting consultation)
         if (newStatus === 'IN_SERVICE') {
             const user = await getCurrentUser();
-            if (currentItem.doctorId && currentItem.doctorId !== user?.id && user?.role !== 'ADMIN') {
+            if (currentItem.doctor_id && currentItem.doctor_id !== user?.id && user?.role !== 'ADMIN') {
                 throw new Error('Apenas o médico designado pode iniciar este atendimento.');
             }
         }
@@ -107,8 +108,8 @@ export class QueueService {
         await logAudit('STATUS_CHANGE', 'QUEUE_ITEM', id, {
             from: currentItem.status,
             to: newStatus,
-            patientId: item.patientId,
-            doctorId: item.doctorId,
+            patientId: item.patient_id,
+            doctorId: item.doctor_id,
             actorRole
         });
 
@@ -126,23 +127,23 @@ export class QueueService {
         const supabase = await createClient();
 
         for (const item of filtered) {
-            const patient = await PatientService.findById(item.patientId);
+            const patient = await PatientService.findById(item.patient_id);
 
             // Enrich with startTime from appointments if available
             let startTime: string | undefined;
-            if (item.appointmentId) {
+            if (item.appointment_id) {
                 const { data: app } = await supabase
                     .from('appointments')
                     .select('start_time')
-                    .eq('id', item.appointmentId)
+                    .eq('id', item.appointment_id)
                     .single();
                 startTime = app?.start_time;
             }
 
             enriched.push({
                 ...item,
-                patientName: patient ? patient.name : 'Unknown',
-                startTime
+                patient_name: patient ? patient.name : 'Unknown',
+                start_time: startTime || null
             });
         }
 
@@ -155,18 +156,19 @@ export class QueueService {
             if (a.status !== 'CALLED' && b.status === 'CALLED') return 1;
 
             // 2. Late Scheduled (status is WAITING at this point)
-            const aIsLate = a.sourceType === 'SCHEDULED' && a.startTime && new Date(a.startTime) < now;
-            const bIsLate = b.sourceType === 'SCHEDULED' && b.startTime && new Date(b.startTime) < now;
+            const aIsLate = !!a.appointment_id && a.start_time && new Date(a.start_time) < now;
+            const bIsLate = !!b.appointment_id && b.start_time && new Date(b.start_time) < now;
 
             if (aIsLate && !bIsLate) return -1;
             if (!aIsLate && bIsLate) return 1;
 
             // 3. Regular Scheduled
-            if (a.sourceType === 'SCHEDULED' && b.sourceType !== 'SCHEDULED') return -1;
-            if (a.sourceType !== 'SCHEDULED' && b.sourceType === 'SCHEDULED') return 1;
+            if (a.appointment_id && !b.appointment_id) return -1;
+            if (!a.appointment_id && b.appointment_id) return 1;
 
             // 4. Tie-breaker: createdAt ASC
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            if (!a.created_at || !b.created_at) return 0;
+            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         });
     }
 }

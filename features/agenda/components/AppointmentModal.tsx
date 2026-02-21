@@ -61,8 +61,9 @@ export default function AppointmentModal({
         Promise.all([
             listDoctorsAction(false),
             getDoctorAction(doctorId)
-        ]).then(([allDocs, currentDoc]) => {
-            let docs = allDocs || [];
+        ]).then(([allDocsRes, currentDocRes]) => {
+            let docs = allDocsRes.data || [];
+            const currentDoc = currentDocRes.data;
             if (currentDoc && !docs.find(d => d.id === currentDoc.id)) {
                 docs = [currentDoc, ...docs];
             }
@@ -103,7 +104,7 @@ export default function AppointmentModal({
         setSearchQuery(q);
         if (q.length > 2) {
             const res = await searchPatientsAction(q);
-            setSearchResults(res);
+            setSearchResults(res.data || []);
         }
     };
 

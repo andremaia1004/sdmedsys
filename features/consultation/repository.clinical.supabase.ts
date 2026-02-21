@@ -85,19 +85,19 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
         return data ? this.mapToClinicalEntry(data) : null;
     }
 
-    async upsert(input: ClinicalEntryInput & { id?: string, clinicId: string }): Promise<ClinicalEntry> {
+    async upsert(input: ClinicalEntryInput & { id?: string, clinic_id: string }): Promise<ClinicalEntry> {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const payload: any = {
-            consultation_id: input.consultationId,
-            patient_id: input.patientId,
-            doctor_user_id: input.doctorUserId,
-            clinic_id: input.clinicId,
-            chief_complaint: input.chiefComplaint,
+            consultation_id: input.consultation_id,
+            patient_id: input.patient_id,
+            doctor_user_id: input.doctor_user_id,
+            clinic_id: input.clinic_id,
+            chief_complaint: input.chief_complaint,
             diagnosis: input.diagnosis,
             conduct: input.conduct,
             observations: input.observations,
-            free_notes: input.freeNotes,
-            is_final: input.isFinal,
+            free_notes: input.free_notes,
+            is_final: input.is_final,
             updated_at: new Date().toISOString()
         };
 
@@ -123,18 +123,18 @@ export class SupabaseClinicalEntryRepository implements IClinicalEntryRepository
     private mapToClinicalEntry(row: any): ClinicalEntry {
         return {
             id: row.id,
-            consultationId: row.consultation_id,
-            patientId: row.patient_id,
-            doctorUserId: row.doctor_user_id,
-            clinicId: row.clinic_id,
-            chiefComplaint: row.chief_complaint,
+            consultation_id: row.consultation_id,
+            patient_id: row.patient_id,
+            doctor_user_id: row.doctor_user_id,
+            clinic_id: row.clinic_id,
+            chief_complaint: row.chief_complaint,
             diagnosis: row.diagnosis,
             conduct: row.conduct,
             observations: row.observations,
-            freeNotes: row.free_notes,
-            isFinal: row.is_final,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at,
+            free_notes: row.free_notes,
+            is_final: row.is_final,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
         };
     }
 }

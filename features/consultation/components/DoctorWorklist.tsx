@@ -15,8 +15,8 @@ export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[
     const [state, formAction] = useActionState(startConsultationAction, { success: false });
     const router = useRouter();
 
-    if (state?.success && state.consultation) {
-        router.push(`/doctor/consultation/${state.consultation.id}`);
+    if (state?.success && state.data) {
+        router.push(`/doctor/consultation/${state.data.id}`);
     }
 
     return (
@@ -26,17 +26,17 @@ export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                             <h2>In Service</h2>
-                            <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{currentPatient.patientName}</p>
-                            <p>Ticket: {currentPatient.ticketCode}</p>
+                            <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{currentPatient.patient_name}</p>
+                            <p>Ticket: {currentPatient.ticket_code}</p>
                         </div>
-                        <Link href={`/patients/${currentPatient.patientId}`}>
+                        <Link href={`/patients/${currentPatient.patient_id}`}>
                             <button style={{ padding: '0.5rem 1rem', cursor: 'pointer', border: '1px solid #1890ff', borderRadius: '4px', background: '#fff' }}>Ver Ficha</button>
                         </Link>
                     </div>
 
                     <form action={formAction}>
                         <input type="hidden" name="queueItemId" value={currentPatient.id} />
-                        <input type="hidden" name="patientId" value={currentPatient.patientId} />
+                        <input type="hidden" name="patientId" value={currentPatient.patient_id} />
                         <button type="submit" style={{ marginTop: '1rem', padding: '0.8rem', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}>
                             Open Consultation Workspace
                         </button>
@@ -50,10 +50,10 @@ export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                             <h2>Waiting for Patient</h2>
-                            <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{calledPatient.patientName}</p>
-                            <p>Ticket: {calledPatient.ticketCode}</p>
+                            <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{calledPatient.patient_name}</p>
+                            <p>Ticket: {calledPatient.ticket_code}</p>
                         </div>
-                        <Link href={`/patients/${calledPatient.patientId}`}>
+                        <Link href={`/patients/${calledPatient.patient_id}`}>
                             <button style={{ padding: '0.5rem 1rem', cursor: 'pointer', border: '1px solid #faad14', borderRadius: '4px', background: '#fff' }}>Ver Ficha</button>
                         </Link>
                     </div>
@@ -68,10 +68,10 @@ export default function DoctorWorklist({ items }: { items: QueueItemWithPatient[
                 {waitingList.map(item => (
                     <li key={item.id} style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <strong style={{ background: '#e6f7ff', padding: '2px 6px', borderRadius: '4px' }}>{item.ticketCode}</strong>
-                            <span style={{ fontSize: '1rem', marginLeft: '4px', marginRight: '8px' }}>{item.sourceType === 'SCHEDULED' ? '📅' : '🏃'}</span>
-                            - {item.patientName}
-                            <Link href={`/patients/${item.patientId}`} style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#0070f3' }}>
+                            <strong style={{ background: '#e6f7ff', padding: '2px 6px', borderRadius: '4px' }}>{item.ticket_code}</strong>
+                            <span style={{ fontSize: '1rem', marginLeft: '4px', marginRight: '8px' }}>{item.appointment_id !== null ? '📅' : '🏃'}</span>
+                            - {item.patient_name}
+                            <Link href={`/patients/${item.patient_id}`} style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#0070f3' }}>
                                 (Ficha)
                             </Link>
                         </div>

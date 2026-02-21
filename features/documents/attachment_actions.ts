@@ -3,37 +3,37 @@
 import { requireRole } from '@/lib/session';
 import { PatientAttachmentService, AttachmentCategory, PatientAttachment } from './service.attachments';
 import { revalidatePath } from 'next/cache';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
-export async function fetchPatientAttachmentsAction(patientId: string): Promise<PatientAttachment[]> {
+export async function fetchPatientAttachmentsAction(patientId: string): Promise<ActionResponse<PatientAttachment[]>> {
     try {
         await requireRole(['ADMIN', 'DOCTOR', 'SECRETARY']);
-        return await PatientAttachmentService.listByPatient(patientId);
+        const data = await PatientAttachmentService.listByPatient(patientId);
+        return formatSuccess(data);
     } catch (error) {
-        console.error('fetchPatientAttachmentsAction Error:', error);
-        return [];
+        return formatError(error);
     }
 }
 
-export async function createAttachmentRecordAction(patientId: string, category: AttachmentCategory, fileName: string, filePath: string, fileType: string) {
+export async function createAttachmentRecordAction(patientId: string, category: AttachmentCategory, fileName: string, filePath: string, fileType: string): Promise<ActionResponse<PatientAttachment>> {
     try {
         await requireRole(['ADMIN', 'DOCTOR', 'SECRETARY']);
         const attachment = await PatientAttachmentService.createRecord(patientId, category, fileName, filePath, fileType);
+        if (!attachment) return { success: false, error: 'Falha ao registrar anexo.' };
         revalidatePath(`/patients/${patientId}`);
-        return { success: true, attachment };
+        return formatSuccess(attachment);
     } catch (error) {
-        console.error('createAttachmentRecordAction Error:', error);
-        return { success: false, error: (error as Error).message };
+        return formatError(error);
     }
 }
 
-export async function deleteAttachmentRecordAction(id: string, patientId: string) {
+export async function deleteAttachmentRecordAction(id: string, patientId: string): Promise<ActionResponse> {
     try {
         await requireRole(['ADMIN', 'DOCTOR']);
-        const success = await PatientAttachmentService.deleteRecord(id);
+        await PatientAttachmentService.deleteRecord(id);
         revalidatePath(`/patients/${patientId}`);
-        return { success };
+        return formatSuccess();
     } catch (error) {
-        console.error('deleteAttachmentRecordAction Error:', error);
-        return { success: false, error: (error as Error).message };
+        return formatError(error);
     }
 }

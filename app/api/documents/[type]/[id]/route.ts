@@ -56,8 +56,8 @@ export async function GET(
         const patientInfo = {
             name: patient.name,
             document: patient.document,
-            birthDate: patient.birthDate,
-            address: patient.address
+            birthDate: patient.birth_date || undefined,
+            address: patient.address || undefined
         };
 
         const doctorInfo = {

@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function KanbanPage() {
     const today = new Date().toISOString().split('T')[0];
-    const items = await fetchDailyDashboardAction(today);
+    const res = await fetchDailyDashboardAction(today);
+    const items = res.data || [];
 
     return (
         <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

@@ -6,17 +6,9 @@ import { logAudit } from '@/lib/audit';
 import { supabaseServer } from '@/lib/supabase-server';
 import { requireRole } from '@/lib/session';
 import { SupabasePatientsRepository } from './repository.supabase';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
-// Server Actions to ensure mutations happen on the server
-// This adds an extra layer of security and allows cache revalidation
-
-export type ActionState = {
-    error?: string;
-    success?: boolean;
-    patient?: Patient;
-};
-
-export async function createPatientAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function createPatientAction(prevState: ActionResponse<Patient>, formData: FormData): Promise<ActionResponse<Patient>> {
     const rawInput: PatientInput = {
         name: formData.get('name') as string,
         document: formData.get('document') as string,
@@ -30,10 +22,8 @@ export async function createPatientAction(prevState: ActionState, formData: Form
         birth_date: formData.get('birth_date') as string || null,
     };
 
-    // Server-side validation
     if (!rawInput.name || !rawInput.document || !rawInput.birth_date) {
-        console.error('Create Patient Error: Missing required fields', rawInput);
-        return { error: 'Campos obrigatórios faltando (Nome, Documento, Nascimento).', success: false };
+        return { success: false, error: 'Campos obrigatórios faltando (Nome, Documento, Nascimento).' };
     }
 
     try {
@@ -41,7 +31,6 @@ export async function createPatientAction(prevState: ActionState, formData: Form
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
 
         const repo = new SupabasePatientsRepository(supabaseServer, clinicId);
-
         const patient = await repo.create(rawInput);
 
         await logAudit('CREATE', 'PATIENT', patient.id, { name: patient.name });
@@ -49,15 +38,13 @@ export async function createPatientAction(prevState: ActionState, formData: Form
         revalidatePath('/patients');
         revalidatePath('/secretary/patients');
         revalidatePath('/admin/patients');
-        return { success: true, patient };
-    } catch (err: unknown) {
-        console.error(err);
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        return { error: `Falha ao criar paciente: ${msg}`, success: false };
+        return formatSuccess(patient);
+    } catch (err) {
+        return formatError(err);
     }
 }
 
-export async function updatePatientAction(id: string, input: PatientInput): Promise<Patient | null> {
+export async function updatePatientAction(id: string, input: PatientInput): Promise<ActionResponse<Patient>> {
     try {
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
@@ -72,33 +59,32 @@ export async function updatePatientAction(id: string, input: PatientInput): Prom
         revalidatePath('/patients');
         revalidatePath('/secretary/patients');
         revalidatePath('/admin/patients');
-        return patient;
+        return formatSuccess(patient ?? undefined);
     } catch (err) {
-        console.error('Update Patient Error:', err);
-        return null;
+        return formatError(err);
     }
 }
 
-export async function searchPatientsAction(query: string): Promise<Patient[]> {
+export async function searchPatientsAction(query: string): Promise<ActionResponse<Patient[]>> {
     try {
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
         const repo = new SupabasePatientsRepository(supabaseServer, clinicId);
-        return await repo.list(query);
+        const data = await repo.list(query);
+        return formatSuccess(data);
     } catch (err) {
-        console.error('Search Patient Error:', err);
-        return [];
+        return formatError(err);
     }
 }
 
-export async function fetchPatientsAction(): Promise<Patient[]> {
+export async function fetchPatientsAction(): Promise<ActionResponse<Patient[]>> {
     try {
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
         const repo = new SupabasePatientsRepository(supabaseServer, clinicId);
-        return await repo.list();
+        const data = await repo.list();
+        return formatSuccess(data);
     } catch (err) {
-        console.error('Fetch Patient Error:', err);
-        return [];
+        return formatError(err);
     }
 }

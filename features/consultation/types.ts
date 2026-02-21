@@ -1,43 +1,42 @@
 export interface ClinicalEntry {
     id: string;
-    consultationId: string | null;
-    patientId: string;
-    doctorUserId: string;
-    clinicId: string;
-    chiefComplaint: string | null;
+    consultation_id: string | null;
+    patient_id: string;
+    doctor_user_id: string;
+    clinic_id: string;
+    chief_complaint: string | null;
     diagnosis: string | null;
     conduct: string | null;
     observations: string | null;
-    freeNotes: string | null;
-    isFinal: boolean;
-    createdAt: string;
-    updatedAt: string;
+    free_notes: string | null;
+    is_final: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface ClinicalSummary {
     diagnosis: string | null;
     conduct: string | null;
-    doctorName: string;
+    doctor_name: string;
     date: string;
 }
 
-export type ClinicalEntryInput = Omit<ClinicalEntry, 'id' | 'createdAt' | 'updatedAt' | 'clinicId'>;
+export type ClinicalEntryInput = Omit<ClinicalEntry, 'id' | 'created_at' | 'updated_at' | 'clinic_id'>;
 
 export interface Consultation {
     id: string;
-    patientId: string;
-    doctorId: string; // Legacy ID from doctors table
-    queueItemId: string;
-    clinicalNotes: string; // DEPRECATED - Use structured fields
-    chiefComplaint: string | null;
-    physicalExam: string | null;
+    clinic_id: string;
+    patient_id: string;
+    doctor_id: string; // Legacy ID from doctors table
+    queue_item_id: string;
+    chief_complaint: string | null;
     diagnosis: string | null;
     conduct: string | null;
-    isFinal?: boolean;
-    startedAt: string;
-    finishedAt: string | null;
-    createdAt: string;
-    updatedAt: string;
+    is_final?: boolean;
+    started_at: string;
+    finished_at: string | null;
+    created_at: string;
+    updated_at: string;
 }
 
-export type ConsultationInput = Pick<Consultation, 'patientId' | 'doctorId' | 'queueItemId'>;
+export type ConsultationInput = Pick<Consultation, 'patient_id' | 'doctor_id' | 'queue_item_id'>;

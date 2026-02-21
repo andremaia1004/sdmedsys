@@ -12,6 +12,7 @@ import { startConsultationFromQueueAction } from '../../consultation/actions';
 import styles from '../styles/Queue.module.css';
 import { PhoneOutgoing, Play, UserX, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/Toast';
 
 interface Props {
     doctorId: string;
@@ -21,12 +22,13 @@ export default function DoctorQueue({ doctorId }: Props) {
     const router = useRouter();
     const [items, setItems] = useState<QueueItemWithPatient[]>([]);
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const queueData = await fetchOperationalQueueAction(doctorId);
-            setItems(queueData || []);
+            const res = await fetchOperationalQueueAction(doctorId);
+            setItems(res.data || []);
         } catch (error) {
             console.error('DoctorQueue Load Error:', error);
         } finally {
@@ -43,7 +45,7 @@ export default function DoctorQueue({ doctorId }: Props) {
         if (result.success) {
             loadData();
         } else {
-            alert(result.error);
+            showToast('error', result.error || 'Erro ao chamar próximo');
         }
     };
 
@@ -56,17 +58,17 @@ export default function DoctorQueue({ doctorId }: Props) {
                 loadData();
             }
         } else {
-            alert(res.error);
+            showToast('error', res.error || 'Erro na operação');
         }
     };
 
     const handleStartConsultation = async (queueItemId: string, patientId: string) => {
         setLoading(true);
         const res = await startConsultationFromQueueAction(queueItemId, patientId);
-        if (res.success && res.consultationId) {
-            router.push(`/doctor/consultations/${res.consultationId}`);
+        if (res.success && res.data) {
+            router.push(`/doctor/consultations/${res.data}`);
         } else {
-            alert(res.error || 'Erro ao iniciar consulta');
+            showToast('error', res.error || 'Erro ao iniciar consulta');
             setLoading(false);
             loadData();
         }
@@ -104,24 +106,24 @@ export default function DoctorQueue({ doctorId }: Props) {
 
                 {items.map(item => {
                     const isCalled = item.status === 'CALLED';
-                    const isLate = item.sourceType === 'SCHEDULED' && item.startTime && new Date(item.startTime) < new Date();
+                    const isLate = !!item.appointment_id && item.start_time && new Date(item.start_time) < new Date();
 
                     return (
                         <div key={item.id} className={`${styles.opsCard} ${isCalled ? styles.called : ''}`}>
-                            <div className={styles.ticketBadge}>{item.ticketCode}</div>
+                            <div className={styles.ticketBadge}>{item.ticket_code}</div>
 
                             <div className={styles.patientInfo}>
-                                <strong>{item.patientName}</strong>
+                                <strong>{item.patient_name}</strong>
                             </div>
 
                             <div>
-                                <span className={`${styles.sourceTag} ${item.sourceType === 'SCHEDULED' ? styles.tagS : styles.tagW}`}>
-                                    {item.sourceType === 'SCHEDULED' ? '📅 Agendado' : '🏃 Encaixe'}
+                                <span className={`${styles.sourceTag} ${!!item.appointment_id ? styles.tagS : styles.tagW}`}>
+                                    {!!item.appointment_id ? '📅 Agendado' : '🏃 Encaixe'}
                                 </span>
                             </div>
 
                             <div className={`${styles.timeInfo} ${isLate ? styles.late : ''}`}>
-                                {item.startTime ? new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                {item.start_time ? new Date(item.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
                                 {isLate && ' (Atrasado)'}
                             </div>
 
@@ -149,7 +151,7 @@ export default function DoctorQueue({ doctorId }: Props) {
                                 {item.status === 'CALLED' && (
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
-                                            onClick={() => handleStartConsultation(item.id, item.patientId)}
+                                            onClick={() => handleStartConsultation(item.id, item.patient_id)}
                                             className={`${styles.inlineBtn} ${styles.btnStart}`}
                                             title="Iniciar Consulta"
                                             style={{

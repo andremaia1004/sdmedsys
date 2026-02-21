@@ -35,17 +35,30 @@ export async function addToQueueAction(formData: FormData) {
         if (!patientId) {
             // Fallback: Create a temp patient? Or Error?
             // Let's create one for smooth MVP flow
-            const newP = await PatientService.create({ name: patientName, document: 'TEMP', phone: '000', birthDate: '' });
+            const newP = await PatientService.create({
+                name: patientName,
+                document: 'TEMP',
+                phone: '000',
+                birth_date: null,
+                email: null,
+                address: null,
+                guardian_name: null,
+                insurance: null,
+                main_complaint: null,
+                emergency_contact: null
+            });
             patientId = newP.id;
         }
 
         const item = await QueueService.add({
-            patientId,
-            doctorId,
+            clinic_id: user.clinicId || '550e8400-e29b-41d4-a716-446655440000',
+            patient_id: patientId,
+            doctor_id: doctorId,
+            appointment_id: null,
             status: 'WAITING'
         }, user.role);
 
-        await logAudit('CREATE', 'QUEUE', item.id, { patientId, doctorId });
+        await logAudit('CREATE', 'QUEUE', item.id, { patient_id: patientId, doctor_id: doctorId });
 
         revalidatePath('/secretary/queue');
         revalidatePath('/doctor/queue');

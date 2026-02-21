@@ -13,6 +13,7 @@ import { Doctor } from '@/features/doctors/types';
 import styles from '../styles/Queue.module.css';
 import { PhoneOutgoing, Play, UserX, UserPlus, RefreshCcw } from 'lucide-react';
 import NewWalkInModal from '@/features/secretary/components/NewWalkInModal';
+import { useToast } from '@/components/ui/Toast';
 
 export default function OperationalQueue() {
     const [items, setItems] = useState<QueueItemWithPatient[]>([]);
@@ -20,16 +21,17 @@ export default function OperationalQueue() {
     const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [isWalkInModalOpen, setIsWalkInModalOpen] = useState(false);
+    const { showToast } = useToast();
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const [queueData, doctorData] = await Promise.all([
+            const [queueRes, doctorRes] = await Promise.all([
                 fetchOperationalQueueAction(selectedDoctorId || undefined),
                 fetchDoctorsAction()
             ]);
-            setItems(queueData || []);
-            if (doctorData && doctorData.length > 0) setDoctors(doctorData);
+            setItems(queueRes.data || []);
+            if (doctorRes.data && doctorRes.data.length > 0) setDoctors(doctorRes.data);
         } catch (error) {
             console.error('OperationalQueue Load Error:', error);
         } finally {
@@ -46,14 +48,14 @@ export default function OperationalQueue() {
         if (result.success) {
             loadData();
         } else {
-            alert(result.error);
+            showToast('error', result.error || 'Erro ao chamar próximo');
         }
     };
 
     const handleAction = async (promise: Promise<{ success: boolean; error?: string }>) => {
         const res = await promise;
         if (res.success) loadData();
-        else alert(res.error);
+        else showToast('error', res.error || 'Erro na operação');
     };
 
     return (
@@ -98,35 +100,35 @@ export default function OperationalQueue() {
 
                 {items.map(item => {
                     const isCalled = item.status === 'CALLED';
-                    const isLate = item.sourceType === 'SCHEDULED' && item.startTime && new Date(item.startTime) < new Date();
+                    const isLate = !!item.appointment_id && item.start_time && new Date(item.start_time) < new Date();
 
                     return (
                         <div key={item.id} className={`${styles.opsCard} ${isCalled ? styles.called : ''}`}>
-                            <div className={styles.ticketBadge}>{item.ticketCode}</div>
+                            <div className={styles.ticketBadge}>{item.ticket_code}</div>
 
                             <div className={styles.patientInfo}>
-                                <strong>{item.patientName}</strong>
+                                <strong>{item.patient_name}</strong>
                             </div>
 
                             <div className={styles.doctorInfo}>
-                                {item.doctorId ? doctors.find(d => d.id === item.doctorId)?.name || 'Médico' : 'Fila Geral'}
+                                {item.doctor_id ? doctors.find(d => d.id === item.doctor_id)?.name || 'Médico' : 'Fila Geral'}
                             </div>
 
                             <div>
-                                <span className={`${styles.sourceTag} ${item.sourceType === 'SCHEDULED' ? styles.tagS : styles.tagW}`}>
-                                    {item.sourceType === 'SCHEDULED' ? '📅 Agendado' : '🏃 Encaixe'}
+                                <span className={`${styles.sourceTag} ${!!item.appointment_id ? styles.tagS : styles.tagW}`}>
+                                    {!!item.appointment_id ? '📅 Agendado' : '🏃 Encaixe'}
                                 </span>
                             </div>
 
                             <div className={`${styles.timeInfo} ${isLate ? styles.late : ''}`}>
-                                {item.startTime ? new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                {item.start_time ? new Date(item.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
                                 {isLate && ' (Atrasado)'}
                             </div>
 
                             <div className={styles.inlineActions}>
                                 {item.status === 'WAITING' && (
                                     <button
-                                        onClick={() => handleAction(callNextAction(item.doctorId))}
+                                        onClick={() => handleAction(callNextAction(item.doctor_id || undefined))}
                                         className={`${styles.inlineBtn} ${styles.btnCall}`}
                                     >
                                         Chamar

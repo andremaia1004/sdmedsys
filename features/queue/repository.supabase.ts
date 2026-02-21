@@ -46,22 +46,25 @@ export class SupabaseQueueRepository implements IQueueRepository {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (data || []).map((row: any) => ({
             id: row.id,
-            ticketCode: row.ticket_code,
+            clinic_id: row.clinic_id || this.clinicId,
+            ticket_code: row.ticket_code,
             status: row.status,
-            doctorId: row.doctor_id,
-            patientId: row.patient_id,
-            patientName: row.patients?.name || '---',
-            createdAt: row.created_at,
-            updatedAt: row.updated_at
+            doctor_id: row.doctor_id,
+            patient_id: row.patient_id,
+            appointment_id: row.appointment_id || null,
+            patient_name: row.patients?.name || '---',
+            start_time: null, // Joined below or handled later
+            created_at: row.created_at,
+            updated_at: row.updated_at
         }));
     }
 
-    async add(item: Omit<QueueItem, 'id' | 'createdAt' | 'updatedAt' | 'ticketCode'>, actorRole: string, prefix: string = 'A'): Promise<QueueItem> {
+    async add(item: Omit<QueueItem, 'id' | 'created_at' | 'updated_at' | 'ticket_code'>, actorRole: string, prefix: string = 'A'): Promise<QueueItem> {
         const { data: newId, error: rpcError } = await this.supabase.rpc('generate_queue_ticket', {
             p_clinic_id: this.clinicId,
-            p_patient_id: item.patientId,
-            p_doctor_id: item.doctorId,
-            p_appointment_id: item.appointmentId,
+            p_patient_id: item.patient_id,
+            p_doctor_id: item.doctor_id,
+            p_appointment_id: item.appointment_id,
             p_status: item.status,
             p_prefix: prefix
         });
@@ -126,13 +129,14 @@ export class SupabaseQueueRepository implements IQueueRepository {
     private mapToQueueItem(row: any): QueueItem {
         return {
             id: row.id,
-            ticketCode: row.ticket_code,
-            appointmentId: row.appointment_id,
-            patientId: row.patient_id,
-            doctorId: row.doctor_id,
+            clinic_id: row.clinic_id || 'unknown',
+            ticket_code: row.ticket_code,
+            appointment_id: row.appointment_id,
+            patient_id: row.patient_id,
+            doctor_id: row.doctor_id,
             status: row.status,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
         };
     }
 }

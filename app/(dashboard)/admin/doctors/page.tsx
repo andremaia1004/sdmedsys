@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { fetchDoctorsAction, createDoctorAction, updateDoctorAction } from '@/app/actions/admin';
 import { Doctor } from '@/features/doctors/types';
 import { UserPlus, UserMinus, ShieldCheck, Mail, Phone, Hash, Award, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 export default function DoctorsAdminPage() {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -16,6 +17,7 @@ export default function DoctorsAdminPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const { showToast } = useToast();
 
     // Form Stats
     const [name, setName] = useState('');
@@ -78,12 +80,12 @@ export default function DoctorsAdminPage() {
                 resetForm();
                 await loadDoctors();
             } else {
-                alert(res.error || 'Erro ao processar (sem detalhes)');
+                showToast('error', res.error || 'Erro ao processar');
             }
         } catch (err: unknown) {
             console.error(err);
-            const msg = err instanceof Error ? err.message : 'Unknown error';
-            alert(msg || 'Erro inesperado na comunicação com o servidor');
+            const msg = err instanceof Error ? err.message : 'Erro inesperado';
+            showToast('error', msg);
         } finally {
             setIsSaving(false);
         }
@@ -122,7 +124,7 @@ export default function DoctorsAdminPage() {
             await updateDoctorAction(doctor.id, { active: !doctor.active });
             await loadDoctors();
         } catch {
-            alert('Erro ao atualizar status');
+            showToast('error', 'Erro ao atualizar status');
         }
     };
 

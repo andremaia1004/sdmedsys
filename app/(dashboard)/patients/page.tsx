@@ -10,7 +10,8 @@ export default async function SharedPatientsPageResource() {
     const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
     let patients: Patient[] = [];
     try {
-        patients = await fetchPatientsAction();
+        const res = await fetchPatientsAction();
+        patients = res.data || [];
     } catch (e) {
         console.error('SharedPatientsPage: Failed to fetch patients', e);
     }

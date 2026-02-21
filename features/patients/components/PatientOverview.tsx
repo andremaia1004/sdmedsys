@@ -73,7 +73,7 @@ export default function PatientOverview({ patient: initialPatient, summary, role
                                 <p>{summary.conduct || 'Não informada'}</p>
                             </div>
                             <div className={styles.doctorInfo}>
-                                <p>Responsável: <strong>{summary.doctorName}</strong></p>
+                                <p>Responsável: <strong>{summary.doctor_name}</strong></p>
                             </div>
                             <div className={styles.viewTimeline}>
                                 <button

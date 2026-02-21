@@ -9,7 +9,7 @@ import { Patient } from '../types';
 import styles from '../styles/Patients.module.css';
 
 export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patient) => void }) {
-    const [state, formAction, isPending] = useActionState(createPatientAction, { error: '' });
+    const [state, formAction, isPending] = useActionState(createPatientAction, { success: false });
 
     // Wizard State
     const [currentStep, setCurrentStep] = useState(1);
@@ -38,10 +38,10 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
     // Reverted: useEffect for step 3 delay moved to handleNext to avoid set-state-in-effect warning
 
     useEffect(() => {
-        if (state?.success && state?.patient) {
-            if (onSuccess) onSuccess(state.patient);
+        if (state?.success && state?.data) {
+            if (onSuccess) onSuccess(state.data as Patient);
         }
-    }, [state?.success, state?.patient, onSuccess]);
+    }, [state?.success, state?.data, onSuccess]);
 
     // Reverted debug alert: This useEffect block was redundant and contained a debug alert.
     // The first useEffect block already handles the success state correctly by calling onSuccess.
@@ -51,23 +51,26 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const [validationError, setValidationError] = useState('');
+
     const validateStep = (step: number) => {
         if (step === 1) {
             if (!formData.name || !formData.document || !formData.birth_date) {
-                alert('Por favor, preencha os campos obrigatórios (Nome, Documento e Data de Nascimento).');
+                setValidationError('Por favor, preencha os campos obrigatórios (Nome, Documento e Data de Nascimento).');
                 return false;
             }
         }
         if (step === 2) {
             if (!formData.phone) {
-                alert('Por favor, informe ao menos um telefone de contato.');
+                setValidationError('Por favor, informe ao menos um telefone de contato.');
                 return false;
             }
             if (formData.address_street && (!formData.address_city || !formData.address_neighborhood)) {
-                alert('Se preencher o endereço, informe ao menos a Rua, Bairro e Cidade.');
+                setValidationError('Se preencher o endereço, informe ao menos a Rua, Bairro e Cidade.');
                 return false;
             }
         }
+        setValidationError('');
         return true;
     };
 
@@ -289,7 +292,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
                         )}
                     </div>
 
-                    {state?.error && (
+                    {(validationError || state?.error) && (
                         <div style={{
                             padding: '0.75rem',
                             backgroundColor: '#fee2e2',
@@ -300,7 +303,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
                             border: '1px solid #fecaca',
                             textAlign: 'center'
                         }}>
-                            {state.error}
+                            {validationError || state.error}
                         </div>
                     )}
                 </div>

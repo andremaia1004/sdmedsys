@@ -3,29 +3,28 @@
 import { PatientTimelineService } from './service.timeline';
 import { TimelineFilters, TimelineResponse } from './types';
 import { getCurrentUser } from '@/lib/session';
+import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
 export async function getClinicalTimelineAction(
     patientId: string,
     page: number = 1,
     limit: number = 20,
     filters?: TimelineFilters
-): Promise<{ data?: TimelineResponse; error?: string }> {
+): Promise<ActionResponse<TimelineResponse>> {
     try {
         const user = await getCurrentUser();
         if (!user) {
-            return { error: 'Unauthorized' };
+            return { success: false, error: 'Acesso não autorizado.' };
         }
 
-        // RBAC: Doctors and Admins only for Clinical Data
         const allowedRoles = ['ADMIN', 'DOCTOR', 'MASTER'];
         if (!allowedRoles.includes(user.role)) {
-            return { error: 'Permission Denied: Clinical data is restricted.' };
+            return { success: false, error: 'Permissão negada: dados clínicos são restritos.' };
         }
 
         const result = await PatientTimelineService.getClinicalTimeline(patientId, page, limit, filters);
-        return { data: result };
-    } catch (err: unknown) {
-        console.error('getClinicalTimelineAction Error:', err);
-        return { error: 'Failed to fetch timeline data.' };
+        return formatSuccess(result);
+    } catch (err) {
+        return formatError(err);
     }
 }

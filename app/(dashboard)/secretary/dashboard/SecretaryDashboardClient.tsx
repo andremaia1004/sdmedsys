@@ -17,8 +17,8 @@ export default function SecretaryDashboard() {
     const loadData = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await fetchDailyDashboardAction(date);
-            setItems(data);
+            const res = await fetchDailyDashboardAction(date);
+            setItems(res.data || []);
         } catch (error) {
             console.error('Failed to load dashboard:', error);
         } finally {

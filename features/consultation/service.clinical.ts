@@ -50,20 +50,20 @@ export class ClinicalEntryService {
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
 
         // Security: Ensure owner is the current user if not provided (though RLS also checks this)
-        const doctorUserId = input.doctorUserId || user.id;
+        const doctorUserId = input.doctor_user_id || user.id;
 
         // check if entry exists and is already final
         if (input.id) {
             const existing = await repo.findById(input.id);
-            if (existing?.isFinal) {
+            if (existing?.is_final) {
                 throw new Error('Cannot edit a finalized clinical record.');
             }
         }
 
         return repo.upsert({
             ...input,
-            doctorUserId,
-            clinicId
+            doctor_user_id: doctorUserId,
+            clinic_id: clinicId
         });
     }
 
@@ -74,11 +74,11 @@ export class ClinicalEntryService {
         const entry = await repo.findById(id);
         if (!entry) throw new Error('Entry not found');
 
-        if (entry.isFinal) return entry;
+        if (entry.is_final) return entry;
 
         return repo.upsert({
             ...entry,
-            isFinal: true
+            is_final: true
         });
     }
 }

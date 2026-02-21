@@ -6,6 +6,6 @@ export interface IConsultationRepository {
     findById(id: string): Promise<Consultation | undefined>;
     listByPatient(patientId: string): Promise<Consultation[]>;
     countByPatient(patientId: string): Promise<number>;
-    updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chiefComplaint' | 'physicalExam' | 'diagnosis' | 'conduct'>>): Promise<void>;
+    updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>): Promise<void>;
     finish(id: string): Promise<void>;
 }

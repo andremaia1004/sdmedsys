@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { fetchSettingsAction, updateSettingsAction } from '@/app/actions/admin';
 import { ClinicSettings } from '@/features/admin/settings/types';
+import { useToast } from '@/components/ui/Toast';
 
 export default function SettingsAdminPage() {
     const [settings, setSettings] = useState<ClinicSettings | null>(null);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const { showToast } = useToast();
 
     useEffect(() => {
         loadSettings();
@@ -35,9 +37,9 @@ export default function SettingsAdminPage() {
         setIsSaving(true);
         try {
             await updateSettingsAction(settings);
-            alert('Configurações atualizadas com sucesso!');
+            showToast('success', 'Configurações atualizadas com sucesso!');
         } catch {
-            alert('Erro ao atualizar configurações');
+            showToast('error', 'Erro ao atualizar configurações');
         } finally {
             setIsSaving(false);
         }
