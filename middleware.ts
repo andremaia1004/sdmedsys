@@ -66,8 +66,47 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // 4. Routing Protection (Primary Gate)
-    const protectedPaths = ['/admin', '/secretary', '/doctor', '/patients', '/tv'];
+    // 4. TV Route Protection (PIN Auth)
+    if (pathname.startsWith('/tv')) {
+        const pin = request.nextUrl.searchParams.get('pin');
+        const hasAuthCookie = request.cookies.has('sdmed_tv_auth');
+        const envPin = process.env.TV_PIN;
+
+        if (!envPin) {
+            console.error('TV_PIN environment variable is not configured');
+            return NextResponse.redirect(new URL('/unauthorized?error=missing_config', request.url));
+        }
+
+        if (hasAuthCookie) {
+            // Let it pass
+            if (pin) {
+                const url = new URL(request.url);
+                url.searchParams.delete('pin');
+                return NextResponse.redirect(url);
+            }
+            return supabaseResponse;
+        }
+
+        if (pin === envPin) {
+            // Valid PIN, set cookie and redirect to clean URL
+            const url = new URL(request.url);
+            url.searchParams.delete('pin');
+            const res = NextResponse.redirect(url);
+            res.cookies.set('sdmed_tv_auth', 'authenticated', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 43200 // 12 hours
+            });
+            return res;
+        }
+
+        // Invalid or no PIN and no cookie
+        return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+
+    // 5. Routing Protection (Primary Gate)
+    const protectedPaths = ['/admin', '/secretary', '/doctor', '/patients'];
     const currentPathIsProtected = protectedPaths.some(prefix => pathname.startsWith(prefix));
 
     if (currentPathIsProtected) {
