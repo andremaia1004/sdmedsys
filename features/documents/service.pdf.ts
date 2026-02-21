@@ -163,4 +163,42 @@ export class PdfService {
             doc.end();
         });
     }
+    static async generateReferral(data: { patientName: string; doctorName: string; date: string; specialty: string; reason: string; clinicalSummary: string; observation?: string; crm?: string }): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const doc = new PDFDocument({ size: 'A4', margin: 50 });
+            const chunks: Buffer[] = [];
+            doc.on('data', chunk => chunks.push(chunk));
+            doc.on('end', () => resolve(Buffer.concat(chunks)));
+            doc.on('error', reject);
+
+            this.drawHeader(doc, 'ENCAMINHAMENTO MÉDICO', data.doctorName, data.crm);
+
+            doc.fontSize(12).font('Helvetica-Bold').text('AO(À) REFERENCIADO(A): ', { continued: true });
+            doc.font('Helvetica').text(data.specialty);
+            doc.moveDown(1.5);
+
+            doc.font('Helvetica-Bold').text('PACIENTE: ', { continued: true });
+            doc.font('Helvetica').text(data.patientName);
+            doc.moveDown(2);
+
+            doc.font('Helvetica-Bold').text('MOTIVO / INDICAÇÃO:');
+            doc.moveDown(0.5);
+            doc.font('Helvetica').fillColor('#334155').text(data.reason, { align: 'justify', lineGap: 6 });
+            doc.moveDown(1.5);
+
+            doc.font('Helvetica-Bold').fillColor('#000').text('RESUMO CLÍNICO:');
+            doc.moveDown(0.5);
+            doc.font('Helvetica').fillColor('#334155').text(data.clinicalSummary, { align: 'justify', lineGap: 6 });
+            doc.moveDown(1.5);
+
+            if (data.observation) {
+                doc.font('Helvetica-Bold').fillColor('#000').text('OBSERVAÇÕES:');
+                doc.moveDown(0.5);
+                doc.font('Helvetica').fillColor('#334155').text(data.observation, { align: 'justify', lineGap: 6 });
+            }
+
+            this.drawFooter(doc, data.doctorName, data.crm);
+            doc.end();
+        });
+    }
 }

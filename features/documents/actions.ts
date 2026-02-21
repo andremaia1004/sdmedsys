@@ -200,3 +200,50 @@ export async function generateExamRequestAction(
         return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' };
     }
 }
+
+export async function generateReferralAction(
+    patientId: string,
+    consultationId: string | null,
+    specialty: string,
+    reason: string,
+    clinicalSummary: string,
+    observation?: string
+): Promise<{ success: boolean, pdfBase64?: string, error?: string }> {
+    try {
+        const user = await requireRole(['DOCTOR']);
+        if (!user.clinicId) throw new Error('Usuário sem clínica vinculada.');
+
+        const patient = await PatientService.findById(patientId);
+        if (!patient) throw new Error('Paciente não encontrado');
+
+        const doctor = await DoctorService.findById(user.id);
+        const doctorName = doctor?.name || 'Médico';
+
+        const pdfBuffer = await PdfService.generateReferral({
+            patientName: patient.name,
+            doctorName,
+            crm: doctor?.crm,
+            date: new Date().toISOString(),
+            specialty,
+            reason,
+            clinicalSummary,
+            observation
+        });
+
+        await ClinicalDocumentsRegistryService.createRecord({
+            clinicId: user.clinicId,
+            patientId,
+            consultationId: consultationId || null,
+            doctorId: user.id,
+            type: 'referral',
+            issuedAt: new Date().toISOString(),
+            meta: { specialty, reasonSample: reason.substring(0, 100) },
+            createdBy: user.id
+        });
+
+        return { success: true, pdfBase64: pdfBuffer.toString('base64') };
+    } catch (error) {
+        console.error('generateReferralAction Error:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' };
+    }
+}
