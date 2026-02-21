@@ -2,13 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { PatientService } from '../service';
 
 describe('PatientService', () => {
-    beforeEach(() => {
-        vi.stubEnv('USE_SUPABASE', 'false');
-    });
-
-    afterEach(() => {
-        vi.unstubAllEnvs();
-    });
 
     it('should list all initial mock patients', async () => {
         const patients = await PatientService.list();

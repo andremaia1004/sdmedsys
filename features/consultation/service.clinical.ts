@@ -6,23 +6,16 @@ import { createClient } from '@/lib/supabase-auth';
 import { supabaseServer } from '@/lib/supabase-server';
 
 const getClinicalRepository = async (): Promise<IClinicalEntryRepository | null> => {
-    const useSupabase = process.env.USE_SUPABASE === 'true';
+    const user = await getCurrentUser();
+    const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
+    const clinicId = user?.clinicId || defaultClinicId;
 
-    if (useSupabase) {
-        const user = await getCurrentUser();
-        const authMode = process.env.AUTH_MODE || 'stub';
-        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
-        const clinicId = user?.clinicId || defaultClinicId;
-
-        if (authMode === 'supabase' && user) {
-            const client = await createClient();
-            return new SupabaseClinicalEntryRepository(client, clinicId);
-        }
-
-        return new SupabaseClinicalEntryRepository(supabaseServer, clinicId);
+    if (user) {
+        const client = await createClient();
+        return new SupabaseClinicalEntryRepository(client, clinicId);
     }
 
-    return null; // Mock not implemented for clinical entries yet
+    return new SupabaseClinicalEntryRepository(supabaseServer, clinicId);
 };
 
 export class ClinicalEntryService {

@@ -2,28 +2,12 @@ import { ClinicSettings } from './types';
 import { ISettingsRepository } from './repository.types';
 import { SupabaseSettingsRepository } from './repository.supabase';
 import { getCurrentUser } from '@/lib/session';
-import { createClient } from '@/lib/supabase-auth';
 import { supabaseServer } from '@/lib/supabase-server';
 
 const getRepository = async (): Promise<ISettingsRepository> => {
-    const useSupabase = process.env.USE_SUPABASE === 'true';
-
-    if (useSupabase) {
-        const user = await getCurrentUser();
-        const authMode = process.env.AUTH_MODE || 'stub';
-        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
-        const clinicId = user?.clinicId || defaultClinicId;
-
-        if (authMode === 'supabase' && user) {
-            const client = await createClient();
-            return new SupabaseSettingsRepository(client, clinicId);
-        }
-
-        return new SupabaseSettingsRepository(supabaseServer, clinicId);
-    }
-
-    const { MockSettingsRepository } = await import('./repository.mock');
-    return new MockSettingsRepository();
+    const user = await getCurrentUser();
+    const clinicId = user?.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+    return new SupabaseSettingsRepository(supabaseServer, clinicId);
 };
 
 export class SettingsService {
@@ -37,7 +21,6 @@ export class SettingsService {
             console.warn('SettingsService: Failed to fetch settings, using defaults.', e);
         }
 
-        // Return defaults if not found or error
         return {
             id: 'default',
             clinicId: 'default',

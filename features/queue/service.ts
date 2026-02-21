@@ -1,6 +1,5 @@
 import { QueueItem, QueueStatus, QueueItemWithPatient } from './types';
 import { IQueueRepository } from './repository.types';
-import { MockQueueRepository } from './repository.mock';
 import { SupabaseQueueRepository } from './repository.supabase';
 import { PatientService } from '../patients/service';
 import { getCurrentUser } from '@/lib/session';
@@ -8,30 +7,16 @@ import { createClient } from '@/lib/supabase-auth';
 import { supabaseServer } from '@/lib/supabase-server';
 
 const getRepository = async (): Promise<IQueueRepository> => {
-    const useSupabase = process.env.USE_SUPABASE === 'true';
+    const user = await getCurrentUser();
+    const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
+    const clinicId = user?.clinicId || defaultClinicId;
 
-    if (useSupabase) {
-        const user = await getCurrentUser();
-        const authMode = process.env.AUTH_MODE || 'stub';
-        const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
-        const clinicId = user?.clinicId || defaultClinicId;
-
-        // Special case for TV: If accessing from TV, we might NOT have a session if it's public.
-        // But TV usually uses a PIN and the middleware handles session?
-        // Let's assume for now that if they are authenticated or have a PIN cookie, we can use the appropriate client.
-        // Actually, TV usually wants Service Role because it's a "display" with limited input.
-        // However, RLS Phase 2 policy allows Reading TV list for Anon? 
-        // No, requirements say: "Garantir que /tv continue público apenas via middleware PIN e que o endpoint de TV use um caminho server-side que não vaze nomes."
-
-        if (authMode === 'supabase' && user) {
-            const client = await createClient();
-            return new SupabaseQueueRepository(client, clinicId);
-        }
-
-        return new SupabaseQueueRepository(supabaseServer, clinicId);
+    if (user) {
+        const client = await createClient();
+        return new SupabaseQueueRepository(client, clinicId);
     }
 
-    return new MockQueueRepository();
+    return new SupabaseQueueRepository(supabaseServer, clinicId);
 };
 
 export class QueueService {

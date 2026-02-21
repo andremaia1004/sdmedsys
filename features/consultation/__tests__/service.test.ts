@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ConsultationService } from '../service';
 import { QueueService } from '@/features/queue/service';
-import { MockConsultationRepository } from '../repository.mock';
-
 // Mock QueueService
 vi.mock('@/features/queue/service', () => ({
     QueueService: {

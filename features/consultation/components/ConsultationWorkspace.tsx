@@ -4,13 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Consultation } from '../types';
 import { Patient } from '@/features/patients/types';
-import { saveConsultationFieldsAction, finishConsultationAction, getPatientTimelineAction } from '../actions';
-import { fetchPatientDocumentsAction } from '@/features/documents/actions';
-import { ClinicalDocument } from '@/features/documents/types';
+import { saveConsultationFieldsAction, finishConsultationAction } from '../actions';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { CheckCircle, AlertTriangle, FileText, User, FilePlus, Activity, ClipboardList, Scroll } from 'lucide-react';
+import { CheckCircle, AlertTriangle, FileText, FilePlus } from 'lucide-react';
 import { ClinicalDocumentModal } from '@/features/documents/components/ClinicalDocumentModal';
+import { PatientHistoryPanel } from './PatientHistoryPanel';
 
 interface Props {
     consultation: Consultation;
@@ -79,24 +78,6 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
         }
     };
 
-    const [history, setHistory] = useState<Consultation[]>([]);
-    const [documents, setDocuments] = useState<ClinicalDocument[]>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(true);
-
-    // Fetch Patient History
-    useEffect(() => {
-        async function fetchHistory() {
-            const [consultationsRes, docsRes] = await Promise.all([
-                getPatientTimelineAction(patient.id),
-                fetchPatientDocumentsAction(patient.id)
-            ]);
-            setHistory((consultationsRes.data || []).filter(c => c.id !== consultation.id));
-            setDocuments(docsRes.data || []);
-            setIsLoadingHistory(false);
-        }
-        fetchHistory();
-    }, [patient.id, consultation.id]);
-
     const renderSection = (label: string, name: keyof typeof fields, placeholder: string, rows: number = 4) => (
         <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>
@@ -131,94 +112,8 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
     return (
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', minHeight: 'calc(100vh - 120px)' }}>
 
-            {/* Left Panel: Patient Info & Clinical Summary */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '1rem', height: 'fit-content' }}>
-                <Card>
-                    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', color: 'var(--primary)', border: '2px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                            <User size={32} />
-                        </div>
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.25rem 0' }}>{patient.name}</h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-                            {new Date().getFullYear() - new Date(patient.birth_date || '').getFullYear()} anos • {new Date(patient.birth_date || '').toLocaleDateString('pt-BR')}
-                        </p>
-                        <div style={{ marginTop: '0.75rem', padding: '0.35rem 0.75rem', background: '#f1f5f9', color: '#475569', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>
-                            CPF: {patient.document}
-                        </div>
-                    </div>
-                </Card>
-
-                <Card header="Histórico do Paciente">
-                    <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-                        {/* Consultations Subsection */}
-                        <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>
-                                <FileText size={14} /> Atendimentos
-                            </div>
-                            {isLoadingHistory ? (
-                                <div style={{ textAlign: 'center', padding: '1rem', color: '#64748b', fontSize: '0.85rem' }}>Carregando...</div>
-                            ) : history.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '1rem', color: '#64748b', fontSize: '0.85rem' }}>Nenhum anterior.</div>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {history.map((h, idx) => (
-                                        <div key={h.id} style={{ display: 'flex', gap: '0.75rem', position: 'relative' }}>
-                                            {idx !== history.length - 1 && (
-                                                <div style={{ position: 'absolute', left: '7.5px', top: '15px', bottom: '-15px', width: '1px', background: '#e2e8f0' }} />
-                                            )}
-                                            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#fff', border: '2px solid var(--primary)', zIndex: 1, marginTop: '2px' }} />
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569' }}>
-                                                    {new Date(h.started_at).toLocaleDateString('pt-BR')}
-                                                </div>
-                                                <div style={{ fontSize: '0.85rem', color: '#1e293b', fontWeight: 600, margin: '2px 0' }}>
-                                                    {h.chief_complaint || 'Atendimento'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Documents Subsection */}
-                        <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>
-                                <FilePlus size={14} /> Documentos
-                            </div>
-                            {documents.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '1rem', color: '#64748b', fontSize: '0.85rem' }}>Nenhum emitido.</div>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                    {documents.map(doc => (
-                                        <div key={doc.id} style={{ padding: '0.75rem', borderRadius: '8px', background: '#f8fafc', border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                            <div style={{ color: 'var(--primary)', background: '#fff', padding: '0.4rem', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                                                {doc.type === 'prescription' && <FileText size={16} />}
-                                                {doc.type === 'certificate' && <Activity size={16} />}
-                                                {doc.type === 'exam_request' && <ClipboardList size={16} />}
-                                                {doc.type === 'report' && <Scroll size={16} />}
-                                            </div>
-                                            <div>
-                                                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1e293b' }}>
-                                                    {doc.type === 'prescription' && 'Receituário'}
-                                                    {doc.type === 'certificate' && 'Atestado'}
-                                                    {doc.type === 'exam_request' && 'Pedido de Exame'}
-                                                    {doc.type === 'report' && 'Laudo'}
-                                                </div>
-                                                <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                                                    {new Date(doc.issuedAt).toLocaleDateString('pt-BR')}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                    </div>
-                </Card>
-            </div>
+            {/* Left Panel: Patient Info & Clinical Summary separated out */}
+            <PatientHistoryPanel patient={patient} consultationId={consultation.id} />
 
             {/* Right Panel: Structured Clinical Forms */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
