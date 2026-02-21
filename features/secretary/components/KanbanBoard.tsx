@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { DashboardItem } from '../service.dashboard';
 import { checkInAction, updateQueueStatusAction, markNoShowAction } from '../actions';
 import styles from '../styles/Dashboard.module.css';
 
 interface KanbanBoardProps {
     items: DashboardItem[];
-    onUpdate: () => void;
+    onUpdate?: () => void;
 }
 
 const COLUMNS = [
@@ -21,6 +22,7 @@ const COLUMNS = [
 ];
 
 export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
+    const router = useRouter();
 
     const getItemsByColumn = (colId: string) => {
         switch (colId) {
@@ -37,7 +39,10 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
 
     const handleAction = async (action: () => Promise<{ success: boolean }>) => {
         const { success } = await action();
-        if (success) onUpdate();
+        if (success) {
+            if (onUpdate) onUpdate();
+            else router.refresh();
+        }
     };
 
     return (

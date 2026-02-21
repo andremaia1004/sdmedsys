@@ -15,7 +15,7 @@ export default async function KanbanPage() {
                 <p style={{ margin: '0.25rem 0 0', color: '#6c757d', fontSize: '0.9rem' }}>Arraste ou use as ações para gerenciar o fluxo</p>
             </div>
             <div style={{ flex: 1, overflow: 'hidden' }}>
-                <KanbanBoard items={items} onUpdate={() => { }} />
+                <KanbanBoard items={items} />
             </div>
         </div>
     );

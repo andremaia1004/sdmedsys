@@ -68,11 +68,11 @@ export default function LoginPage() {
             </Card>
 
             <div className={styles.hints}>
-                <p><strong>Modo de Teste (AUTH_MODE=stub)</strong></p>
+                <p><strong>Credenciais de Teste</strong></p>
                 <ul className={styles.hintList}>
-                    <li><code>admin</code> (Admin)</li>
-                    <li><code>sec</code> (Secretaria)</li>
-                    <li><code>doc</code> (Médico)</li>
+                    <li><code>admin@sdmed.com</code> / <code>Test@123456</code> (Admin)</li>
+                    <li><code>secretary@sdmed.com</code> / <code>Test@123456</code> (Secretaria)</li>
+                    <li><code>doctor@sdmed.com</code> / <code>Test@123456</code> (Médico)</li>
                 </ul>
             </div>
         </div>
