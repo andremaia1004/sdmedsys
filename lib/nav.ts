@@ -20,6 +20,11 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             title: 'Operação (Atalhos)',
             items: [
                 {
+                    label: 'Painel Administrativo',
+                    href: '/admin',
+                    rolesAllowed: ['ADMIN'],
+                },
+                {
                     label: 'Painel do dia',
                     href: '/secretary/dashboard',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
