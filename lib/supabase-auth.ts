@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 
 // Server Client for Auth (handles Cookies)
 export async function createClient() {
+    console.log('DEBUG: lib/supabase-auth.ts:createClient - start');
     // Defensive check for Environment Variables to prevent crashing during SSR if missing
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -13,7 +14,9 @@ export async function createClient() {
         }
     }
 
+    console.log('DEBUG: lib/supabase-auth.ts:createClient - awaiting cookies()');
     const cookieStore = await cookies();
+    console.log('DEBUG: lib/supabase-auth.ts:createClient - cookies() resolved');
 
     return createServerClient(
         url || 'https://missing-url.supabase.co',

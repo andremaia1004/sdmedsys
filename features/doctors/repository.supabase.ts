@@ -42,6 +42,20 @@ export class SupabaseDoctorsRepository implements IDoctorsRepository {
         return this.mapToDoctor(data);
     }
 
+    async findByProfileId(profileId: string): Promise<Doctor | undefined> {
+        const { data, error } = await this.supabase
+            .from('doctors')
+            .select('*')
+            .eq('profile_id', profileId)
+            .eq('clinic_id', this.clinicId)
+            .maybeSingle();
+
+        if (error) console.error('[SupabaseDoctorsRepository] findByProfileId Error:', error);
+
+        if (error || !data) return undefined;
+        return this.mapToDoctor(data);
+    }
+
     async create(input: DoctorInput): Promise<Doctor> {
         const { data, error } = await this.supabase
             .from('doctors')

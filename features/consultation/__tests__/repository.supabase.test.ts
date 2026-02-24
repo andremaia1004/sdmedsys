@@ -32,21 +32,21 @@ describe('SupabaseConsultationRepository', () => {
         // Mock the resolved value
         mockBuilder.then.mockImplementation((resolve) => resolve({ error: null, count: 0 }));
 
-        await expect(repo.updateStructuredFields('id-1', { diagnosis: 'Test' }))
+        await expect(repo.updateStructuredFields('id-1', { diagnosis: 'Test' }, 'doctor-123'))
             .rejects.toThrow('Consultation not found or access denied');
     });
 
     it('should throw error if finish affects 0 rows', async () => {
         mockBuilder.then.mockImplementation((resolve) => resolve({ error: null, count: 0 }));
 
-        await expect(repo.finish('id-1'))
+        await expect(repo.finish('id-1', 'doctor-123'))
             .rejects.toThrow('Consultation not found or access denied');
     });
 
     it('should succeed if updateStructuredFields affects 1 row', async () => {
         mockBuilder.then.mockImplementation((resolve) => resolve({ error: null, count: 1 }));
 
-        await expect(repo.updateStructuredFields('id-1', { diagnosis: 'Test' }))
+        await expect(repo.updateStructuredFields('id-1', { diagnosis: 'Test' }, 'doctor-123'))
             .resolves.not.toThrow();
     });
 });

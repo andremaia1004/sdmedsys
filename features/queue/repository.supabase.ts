@@ -13,7 +13,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
             .from('queue_items')
             .select('*')
             .eq('clinic_id', this.clinicId)
-            .not('status', 'in', '("DONE","CANCELED")')
+            .not('status', 'eq', 'DONE')
+            .not('status', 'eq', 'CANCELED')
             .order('created_at', { ascending: true });
 
         if (doctorId) {
@@ -21,6 +22,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
         }
 
         const { data, error } = await query;
+
+        console.log(`DEBUG: QueueRepository.list - clinicId: ${this.clinicId}, doctorId: ${doctorId}, results: ${data?.length || 0}`);
 
         if (error) {
             console.error('Supabase Error (list queue):', error);

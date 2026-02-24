@@ -1,0 +1,193 @@
+﻿
+Running 2 tests using 1 worker
+
+  Ô£ÿ  1 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (7.6s)
+  Ô£ÿ  2 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (retry #1) (5.3s)
+  Ô£ÿ  3 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (retry #2) (5.2s)
+  Ô£ÿ  4 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:43:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (30.0s)
+  Ô£ÿ  5 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:43:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #1) (25.5s)
+  Ô£ÿ  6 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:43:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #2) (25.1s)
+
+
+  1) [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('h3')
+    Expected substring: [32m"Registrar Novo Atendimento"[39m
+    Error: strict mode violation: locator('h3') resolved to 5 elements:
+        1) <h3 class="layout_navTitle__GFemM">Opera├º├úo</h3> aka getByRole('heading', { name: 'Opera├º├úo' })
+        2) <h3 class="layout_navTitle__GFemM">Cadastros</h3> aka getByRole('heading', { name: 'Cadastros' })
+        3) <h3>­ƒôà Hora Marcada</h3> aka getByRole('heading', { name: '­ƒôà Hora Marcada' })
+        4) <h3>­ƒÅâ Chegada (Eventual)</h3> aka getByRole('heading', { name: '­ƒÅâ Chegada (Eventual)' })
+        5) <h3>Registrar Novo Atendimento (Chegada)</h3> aka getByRole('heading', { name: 'Registrar Novo Atendimento (' })
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('h3')[22m
+
+
+      21 |
+      22 |         // Esperar o modal abrir
+    > 23 |         await expect(page.locator('h3')).toContainText('Registrar Novo Atendimento');
+         |                                          ^
+      24 |
+      25 |         // Buscar paciente
+      26 |         await page.fill('input[placeholder="Nome ou CPF..."]', 'Andre Maia');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:23:42
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium\error-context.md
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('h3')
+    Expected substring: [32m"Registrar Novo Atendimento"[39m
+    Error: strict mode violation: locator('h3') resolved to 5 elements:
+        1) <h3 class="layout_navTitle__GFemM">Opera├º├úo</h3> aka getByRole('heading', { name: 'Opera├º├úo' })
+        2) <h3 class="layout_navTitle__GFemM">Cadastros</h3> aka getByRole('heading', { name: 'Cadastros' })
+        3) <h3>­ƒôà Hora Marcada</h3> aka getByRole('heading', { name: '­ƒôà Hora Marcada' })
+        4) <h3>­ƒÅâ Chegada (Eventual)</h3> aka getByRole('heading', { name: '­ƒÅâ Chegada (Eventual)' })
+        5) <h3>Registrar Novo Atendimento (Chegada)</h3> aka getByRole('heading', { name: 'Registrar Novo Atendimento (' })
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('h3')[22m
+
+
+      21 |
+      22 |         // Esperar o modal abrir
+    > 23 |         await expect(page.locator('h3')).toContainText('Registrar Novo Atendimento');
+         |                                          ^
+      24 |
+      25 |         // Buscar paciente
+      26 |         await page.fill('input[placeholder="Nome ou CPF..."]', 'Andre Maia');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:23:42
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry1\error-context.md
+
+    attachment #2: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('h3')
+    Expected substring: [32m"Registrar Novo Atendimento"[39m
+    Error: strict mode violation: locator('h3') resolved to 5 elements:
+        1) <h3 class="layout_navTitle__GFemM">Opera├º├úo</h3> aka getByRole('heading', { name: 'Opera├º├úo' })
+        2) <h3 class="layout_navTitle__GFemM">Cadastros</h3> aka getByRole('heading', { name: 'Cadastros' })
+        3) <h3>­ƒôà Hora Marcada</h3> aka getByRole('heading', { name: '­ƒôà Hora Marcada' })
+        4) <h3>­ƒÅâ Chegada (Eventual)</h3> aka getByRole('heading', { name: '­ƒÅâ Chegada (Eventual)' })
+        5) <h3>Registrar Novo Atendimento (Chegada)</h3> aka getByRole('heading', { name: 'Registrar Novo Atendimento (' })
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('h3')[22m
+
+
+      21 |
+      22 |         // Esperar o modal abrir
+    > 23 |         await expect(page.locator('h3')).toContainText('Registrar Novo Atendimento');
+         |                                          ^
+      24 |
+      25 |         // Buscar paciente
+      26 |         await page.fill('input[placeholder="Nome ou CPF..."]', 'Andre Maia');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:23:42
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry2\error-context.md
+
+  2) [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:43:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]')
+    Expected substring: [32m"Andre Maia"[39m
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]')[22m
+
+
+      55 |
+      56 |         // Verificar se h├í pacientes na fila
+    > 57 |         await expect(page.locator('div[class*="opsCard"]')).toContainText('Andre Maia', { timeout: 20000 });
+         |                                                             ^
+      58 |
+      59 |         // O m├®dico deve "Chamar" e depois "Atender"
+      60 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' });
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:57:61
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium\error-context.md
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]')
+    Expected substring: [32m"Andre Maia"[39m
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]')[22m
+
+
+      55 |
+      56 |         // Verificar se h├í pacientes na fila
+    > 57 |         await expect(page.locator('div[class*="opsCard"]')).toContainText('Andre Maia', { timeout: 20000 });
+         |                                                             ^
+      58 |
+      59 |         // O m├®dico deve "Chamar" e depois "Atender"
+      60 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' });
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:57:61
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\error-context.md
+
+    attachment #2: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]')
+    Expected substring: [32m"Andre Maia"[39m
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]')[22m
+
+
+      55 |
+      56 |         // Verificar se h├í pacientes na fila
+    > 57 |         await expect(page.locator('div[class*="opsCard"]')).toContainText('Andre Maia', { timeout: 20000 });
+         |                                                             ^
+      58 |
+      59 |         // O m├®dico deve "Chamar" e depois "Atender"
+      60 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' });
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:57:61
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry2\error-context.md
+
+  2 failed
+    [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende 
+    [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:43:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 

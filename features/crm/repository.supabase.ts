@@ -29,6 +29,7 @@ export class SupabaseCrmRepository implements ICrmRepository {
             throw new Error('Falha ao carregar CRM.');
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (data || []).map((row: any) => ({
             id: row.id,
             clinic_id: row.clinic_id,

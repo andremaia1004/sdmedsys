@@ -21,7 +21,8 @@ export async function fetchDoctorsAction(): Promise<ActionResponse<Doctor[]>> {
 
 export async function fetchOperationalQueueAction(doctorId?: string): Promise<ActionResponse<QueueItemWithPatient[]>> {
     try {
-        await requireRole(['ADMIN', 'SECRETARY']);
+        console.log('DEBUG: fetchOperationalQueueAction - doctorId:', doctorId);
+        await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const data = await QueueService.getOperationalQueue(doctorId);
         return formatSuccess(data);
     } catch (error) {
@@ -31,43 +32,58 @@ export async function fetchOperationalQueueAction(doctorId?: string): Promise<Ac
 
 export async function callNextAction(doctorId?: string): Promise<ActionResponse<QueueItemWithPatient>> {
     try {
-        const user = await requireRole(['ADMIN', 'SECRETARY']);
+        console.log('DEBUG: callNextAction - start', doctorId);
+        const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
+        console.log('DEBUG: callNextAction - role verified', user.role);
 
         const queue = await QueueService.getOperationalQueue(doctorId);
         const nextItem = queue.find(i => i.status === 'WAITING');
 
         if (!nextItem) {
+            console.log('DEBUG: callNextAction - no waiting item');
             return { success: false, error: 'Não há pacientes aguardando na fila.' };
         }
+        console.log('DEBUG: callNextAction - next item found', nextItem.id);
 
         await QueueService.changeStatus(nextItem.id, 'CALLED', user.role);
+        console.log('DEBUG: callNextAction - status changed to CALLED');
 
         await logAudit('CALL_NEXT', 'QUEUE_ITEM', nextItem.id, {
             patient_id: nextItem.patient_id,
             doctor_id: nextItem.doctor_id || doctorId
-        });
+        }, user);
 
+        console.log('DEBUG: callNextAction - revalidating paths');
         revalidatePath('/secretary/queue/ops');
         revalidatePath('/doctor/queue');
         revalidatePath('/tv');
 
+        console.log('DEBUG: callNextAction - success');
         return formatSuccess(nextItem);
     } catch (error) {
+        console.error('DEBUG: callNextAction - error:', error);
         return formatError(error);
     }
 }
 
 export async function quickStartAction(id: string): Promise<ActionResponse> {
     try {
+        console.log('DEBUG: quickStartAction - start', id);
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
-        await QueueService.changeStatus(id, 'IN_SERVICE', user.role);
+        console.log('DEBUG: quickStartAction - role verified', user.role);
+        await QueueService.changeStatus(id, 'IN_SERVICE', user.role, user.id);
+        console.log('DEBUG: quickStartAction - status changed to IN_SERVICE');
 
-        await logAudit('START_SERVICE', 'QUEUE_ITEM', id, { actor: user.id });
+        await logAudit('START_SERVICE', 'QUEUE_ITEM', id, { actor: user.id }, user);
 
+        console.log('DEBUG: quickStartAction - revalidating paths');
         revalidatePath('/secretary/queue/ops');
         revalidatePath('/doctor/queue');
+
+        console.log('DEBUG: quickStartAction - success');
         return formatSuccess();
     } catch (error) {
+        console.error('DEBUG: quickStartAction - error:', error);
         return formatError(error);
     }
 }

@@ -1,0 +1,98 @@
+﻿
+Running 2 tests using 1 worker
+
+  Ô£ô  1 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (22.5s)
+  Ô£ÿ  2 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:46:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (30.0s)
+  Ô£ÿ  3 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:46:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #1) (30.3s)
+  Ô£ÿ  4 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:46:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #2) (30.1s)
+
+
+  1) [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:46:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 25000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' })[22m
+
+
+      60 |         // Na fila do m├®dico usamos .opsCard (que acabamos de restaurar)
+      61 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' });
+    > 62 |         await expect(patientCard).toBeVisible({ timeout: 25000 });
+         |                                   ^
+      63 |
+      64 |         // Localizar bot├Áes dentro do card
+      65 |         const callBtn = patientCard.locator('button:has-text("Chamar")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:62:35
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium\error-context.md
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 25000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' })[22m
+
+
+      60 |         // Na fila do m├®dico usamos .opsCard (que acabamos de restaurar)
+      61 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' });
+    > 62 |         await expect(patientCard).toBeVisible({ timeout: 25000 });
+         |                                   ^
+      63 |
+      64 |         // Localizar bot├Áes dentro do card
+      65 |         const callBtn = patientCard.locator('button:has-text("Chamar")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:62:35
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\error-context.md
+
+    attachment #2: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 25000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' })[22m
+
+
+      60 |         // Na fila do m├®dico usamos .opsCard (que acabamos de restaurar)
+      61 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' });
+    > 62 |         await expect(patientCard).toBeVisible({ timeout: 25000 });
+         |                                   ^
+      63 |
+      64 |         // Localizar bot├Áes dentro do card
+      65 |         const callBtn = patientCard.locator('button:has-text("Chamar")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:62:35
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry2\error-context.md
+
+  1 failed
+    [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:46:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 
+  1 passed (2.1m)

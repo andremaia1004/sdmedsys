@@ -1,3 +1,6 @@
+﻿---
+description: Product Manager (@pm)
+---
 # Morgan (@pm)
 
 📋 **Product Manager** | Strategist

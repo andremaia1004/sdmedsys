@@ -11,11 +11,7 @@ const getRepository = async (): Promise<IQueueRepository> => {
     const defaultClinicId = '550e8400-e29b-41d4-a716-446655440000';
     const clinicId = user?.clinicId || defaultClinicId;
 
-    if (user) {
-        const client = await createClient();
-        return new SupabaseQueueRepository(client, clinicId);
-    }
-
+    // Use service role client to bypass SSR client hangs in server actions
     return new SupabaseQueueRepository(supabaseServer, clinicId);
 };
 
@@ -56,7 +52,7 @@ export class QueueService {
         return repo.add(item, actorRole, prefix);
     }
 
-    static async changeStatus(id: string, newStatus: QueueStatus, actorRole: string): Promise<QueueItem> {
+    static async changeStatus(id: string, newStatus: QueueStatus, actorRole: string, actorId?: string): Promise<QueueItem> {
         const repo = await getRepository();
 
         // 1. Fetch current item for validation
@@ -90,13 +86,19 @@ export class QueueService {
 
         // 5. Audit the transition
         const { logAudit } = await import('@/lib/audit');
-        await logAudit('STATUS_CHANGE', 'QUEUE_ITEM', id, {
-            from: currentItem.status,
-            to: newStatus,
-            patientId: item.patient_id,
-            doctorId: item.doctor_id,
-            actorRole
-        });
+        await logAudit(
+            'STATUS_CHANGE',
+            'QUEUE_ITEM',
+            id,
+            {
+                from: currentItem.status,
+                to: newStatus,
+                patientId: item.patient_id,
+                doctorId: item.doctor_id,
+                actorRole
+            },
+            actorId ? { id: actorId, role: actorRole as any, name: 'System', email: '' } : undefined
+        );
 
         return item;
     }
@@ -108,29 +110,35 @@ export class QueueService {
         // Filter only WAITING and CALLED for the operational view
         const filtered = items.filter(i => i.status === 'WAITING' || i.status === 'CALLED');
 
-        const enriched: QueueItemWithPatient[] = [];
-        const supabase = await createClient();
+        if (filtered.length === 0) return [];
 
-        for (const item of filtered) {
-            const patient = await PatientService.findById(item.patient_id);
+        // Use supabaseServer instead of createClient to avoid SSR hangs
+        const supabase = supabaseServer;
 
-            // Enrich with startTime from appointments if available
-            let startTime: string | undefined;
-            if (item.appointment_id) {
-                const { data: app } = await supabase
-                    .from('appointments')
-                    .select('start_time')
-                    .eq('id', item.appointment_id)
-                    .single();
-                startTime = app?.start_time;
-            }
+        // 1. Fetch all patients in one query
+        const patientIds = Array.from(new Set(filtered.map(i => i.patient_id)));
+        const { data: patientsData } = await supabase
+            .from('patients')
+            .select('id, name')
+            .in('id', patientIds);
 
-            enriched.push({
-                ...item,
-                patient_name: patient ? patient.name : 'Unknown',
-                start_time: startTime || null
-            });
-        }
+        const patientMap = new Map(patientsData?.map(p => [p.id, p.name]) || []);
+
+        // 2. Fetch all appointments in one query
+        const appIds = filtered.map(i => i.appointment_id).filter(Boolean) as string[];
+        const { data: appsData } = await supabase
+            .from('appointments')
+            .select('id, start_time')
+            .in('id', appIds);
+
+        const appMap = new Map(appsData?.map(a => [a.id, a.start_time]) || []);
+
+        // 3. Assemble enriched items
+        const enriched: QueueItemWithPatient[] = filtered.map(item => ({
+            ...item,
+            patient_name: patientMap.get(item.patient_id) || 'Unknown',
+            start_time: item.appointment_id ? (appMap.get(item.appointment_id) || null) : null
+        }));
 
         const now = new Date();
 

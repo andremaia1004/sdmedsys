@@ -66,13 +66,8 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         return this.mapToConsultation(data);
     }
 
-    async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>): Promise<void> {
-        // 1. Get auth session for doctor_user_id
-        const { data: { user } } = await this.supabase.auth.getUser();
-        if (!user) throw new Error('Unauthorized');
-        const authUid = user.id;
-
-        // 2. Resolve consultation to verify ownership and patient_id
+    async updateStructuredFields(id: string, fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>, doctorUserId: string): Promise<void> {
+        // 1. Resolve consultation to verify ownership and patient_id
         const { data: consultation, error: fetchErr } = await this.supabase
             .from('consultations')
             .select('patient_id, doctor_id')
@@ -80,12 +75,12 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
             .eq('clinic_id', this.clinicId)
             .single();
 
-        if (fetchErr || !consultation || consultation.doctor_id !== authUid) {
-            console.error(`Update failed: Consultation ${id} not found, clinic mismatch, or not owner`);
+        if (fetchErr || !consultation || consultation.doctor_id !== doctorUserId) {
+            console.error(`Update failed: Consultation ${id} not found, clinic mismatch, or not owner. AuthUID: ${doctorUserId}. Consultation DoctorID: ${consultation?.doctor_id}`);
             throw new Error('Consultation not found or access denied');
         }
 
-        // 3. Find existing entry
+        // 2. Find existing entry
         const { data: existingEntry } = await this.supabase
             .from('clinical_entries')
             .select('id, is_final')
@@ -114,7 +109,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
                     ...payload,
                     consultation_id: id,
                     patient_id: consultation.patient_id,
-                    doctor_user_id: authUid, // Must match RLS
+                    doctor_user_id: doctorUserId, // Must match RLS
                     is_final: false
                 }]);
         }
@@ -125,11 +120,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
         }
     }
 
-    async finish(id: string): Promise<void> {
-        const { data: { user } } = await this.supabase.auth.getUser();
-        if (!user) throw new Error('Unauthorized');
-        const authUid = user.id;
-
+    async finish(id: string, doctorUserId: string): Promise<void> {
         // Finalize consultation
         const { error: cError, count } = await this.supabase
             .from('consultations')
@@ -138,7 +129,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
                 updated_at: new Date().toISOString()
             }, { count: 'exact' })
             .eq('id', id)
-            .eq('doctor_id', authUid)
+            .eq('doctor_id', doctorUserId)
             .eq('clinic_id', this.clinicId);
 
         if (cError || count === 0) {
@@ -154,7 +145,7 @@ export class SupabaseConsultationRepository implements IConsultationRepository {
                 updated_at: new Date().toISOString()
             })
             .eq('consultation_id', id)
-            .eq('doctor_user_id', authUid)
+            .eq('doctor_user_id', doctorUserId)
             .eq('clinic_id', this.clinicId);
 
         if (ceError) {

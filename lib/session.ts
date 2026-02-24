@@ -33,24 +33,26 @@ async function getStubUser(): Promise<UserSession | null> {
 // 2. Supabase Implementation
 async function getSupabaseUser(): Promise<UserSession | null> {
     try {
+        console.log('DEBUG: getSupabaseUser - start');
         const supabase = await createClient();
+        console.log('DEBUG: getSupabaseUser - client created');
+
         const { data: { user }, error } = await supabase.auth.getUser();
+        console.log('DEBUG: getSupabaseUser - user resolved:', user?.id);
 
-        if (error || !user) {
-            return null; // Not logged in
-        }
+        if (error || !user) return null;
 
-        // Fetch Profile to get Role
-        const { data: profile, error: profileError } = await supabase
+        // Use supabaseServer for the profile check to be safer/faster
+        const { supabaseServer } = await import('./supabase-server');
+        const { data: profile } = await supabaseServer
             .from('profiles')
             .select('role, clinic_id, email')
             .eq('id', user.id)
-            .maybeSingle(); // Use maybeSingle to avoid errors on missing profile
+            .maybeSingle();
 
-        if (profileError || !profile) {
-            console.warn('Profile not found for user:', user.id);
-            return null;
-        }
+        console.log('DEBUG: getSupabaseUser - profile resolved:', profile?.role);
+
+        if (!profile) return null;
 
         return {
             id: user.id,
@@ -60,7 +62,7 @@ async function getSupabaseUser(): Promise<UserSession | null> {
             email: user.email
         };
     } catch (e) {
-        console.warn('Session: Failed to get supabase user', e);
+        console.warn('DEBUG: Session Error:', e);
         return null;
     }
 }

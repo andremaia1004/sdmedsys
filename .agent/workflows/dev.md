@@ -1,3 +1,6 @@
+﻿---
+description: Full Stack Developer (@dev)
+---
 # Dex (@dev)
 
 💻 **Full Stack Developer** | Builder

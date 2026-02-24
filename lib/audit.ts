@@ -1,5 +1,5 @@
 import { supabaseServer } from './supabase-server';
-import { getCurrentUser } from './session';
+import { getCurrentUser, UserSession } from './session';
 
 export type AuditAction =
     | 'CREATE'
@@ -35,10 +35,11 @@ export async function logAudit(
     action: AuditAction,
     entity: AuditEntity,
     entityId?: string,
-    metadata: Record<string, unknown> = {}
+    metadata: Record<string, unknown> = {},
+    providedUser?: UserSession | null
 ) {
     try {
-        const user = await getCurrentUser();
+        const user = providedUser !== undefined ? providedUser : await getCurrentUser();
 
         // STRATEGY: Fail Closed.
         // We do NOT default to a legacy clinic. If we don't know the clinic, we don't log to the DB

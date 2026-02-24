@@ -16,6 +16,7 @@ export function CrmCardEditModal({ card, onClose, onSave }: Props) {
 
     useEffect(() => {
         if (card) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setNotes(card.notes || '');
         }
     }, [card]);

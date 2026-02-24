@@ -1,0 +1,145 @@
+﻿
+Running 2 tests using 1 worker
+
+BROWSER [error]: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <RenderFromTemplateContext>
+      <ScrollAndFocusHandler segmentPath={[...]}>
+        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
+          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+            <LoadingBoundary loading={null}>
+              <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+                <RedirectBoundary>
+                  <RedirectErrorBoundary router={{...}}>
+                    <InnerLayoutRouter url="/secretary..." tree={[...]} cacheNode={{lazyData:null, ...}} ...>
+                      <Page>
+                        <SecretaryDashboard>
+                          <div className="Dashboard_...">
+                            <div className="Dashboard_...">
+                              <div>
+                              <div className="Dashboard_...">
+                                <input
+                                  type="date"
+                                  value="2026-02-24"
+                                  onChange={function onChange}
+                                  className="Dashboard_datePicker__GlqOc"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                                <input
+                                  type="text"
+                                  placeholder="Buscar paciente ou ticket..."
+                                  value=""
+                                  onChange={function onChange}
+                                  className="Dashboard_search__L4QtR"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                                ...
+                            ...
+                      ...
+
+  Ô£ô  1 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (19.9s)
+  Ô£ÿ  2 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:63:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (30.0s)
+  Ô£ÿ  3 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:63:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #1) (30.2s)
+  Ô£ÿ  4 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:63:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #2) (30.1s)
+
+
+  1) [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:63:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' }).first()
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' }).first()[22m
+
+
+      83 |         // Verificar se h├í pacientes na fila
+      84 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' }).first();
+    > 85 |         await expect(patientCard).toBeVisible({ timeout: 30000 });
+         |                                   ^
+      86 |
+      87 |         // Localizar bot├Áes dentro do card
+      88 |         const callBtn = patientCard.locator('button:has-text("Chamar")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:85:35
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium\error-context.md
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' }).first()
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' }).first()[22m
+
+
+      83 |         // Verificar se h├í pacientes na fila
+      84 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' }).first();
+    > 85 |         await expect(patientCard).toBeVisible({ timeout: 30000 });
+         |                                   ^
+      86 |
+      87 |         // Localizar bot├Áes dentro do card
+      88 |         const callBtn = patientCard.locator('button:has-text("Chamar")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:85:35
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\error-context.md
+
+    attachment #2: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' }).first()
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+    [2m  - waiting for locator('div[class*="opsCard"]').filter({ hasText: 'Andre Maia' }).first()[22m
+
+
+      83 |         // Verificar se h├í pacientes na fila
+      84 |         const patientCard = page.locator('div[class*="opsCard"]', { hasText: 'Andre Maia' }).first();
+    > 85 |         await expect(patientCard).toBeVisible({ timeout: 30000 });
+         |                                   ^
+      86 |
+      87 |         // Localizar bot├Áes dentro do card
+      88 |         const callBtn = patientCard.locator('button:has-text("Chamar")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:85:35
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry2\error-context.md
+
+  1 failed
+    [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:63:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 
+  1 passed (2.0m)

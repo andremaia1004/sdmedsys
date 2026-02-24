@@ -52,6 +52,7 @@ export async function startConsultationFromAppointmentAction(appointmentId: stri
                 clinic_id: sessionUser.clinicId || '550e8400-e29b-41d4-a716-446655440000'
             }, 'DOCTOR');
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             queueItem = { ...newItem, patient_name: '' } as any;
         }
 
@@ -93,29 +94,40 @@ export async function saveConsultationFieldsAction(
     fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>
 ): Promise<ActionResponse> {
     try {
+        console.log('DEBUG: saveConsultationFieldsAction - start', consultationId);
         await requireRole(['DOCTOR']);
+        console.log('DEBUG: saveConsultationFieldsAction - role verified');
         await ConsultationService.updateStructuredFields(consultationId, fields);
+        console.log('DEBUG: saveConsultationFieldsAction - fields updated');
 
         revalidatePath(`/doctor/consultations/${consultationId}`);
         return formatSuccess();
     } catch (err) {
+        console.error('DEBUG: saveConsultationFieldsAction - error:', err);
         return formatError(err);
     }
 }
 
-export async function finishConsultationAction(id: string): Promise<ActionResponse> {
+export async function finishConsultationAction(id: string, fields?: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>): Promise<ActionResponse> {
     try {
-        await requireRole(['DOCTOR']);
+        console.log('DEBUG: finishConsultationAction - start', id);
+        const user = await requireRole(['DOCTOR']);
+        console.log('DEBUG: finishConsultationAction - role verified');
+
+        if (fields) {
+            console.log('DEBUG: finishConsultationAction - saving fields first');
+            await ConsultationService.updateStructuredFields(id, fields);
+        }
 
         await ConsultationService.finish(id);
 
         await logAudit('STATUS_CHANGE', 'CONSULTATION', id, { status: 'FINISHED' });
 
+        revalidatePath('/secretary/queue/ops');
         revalidatePath('/doctor/queue');
-        revalidatePath('/doctor/consultation');
         return formatSuccess();
-    } catch (err) {
-        return formatError(err);
+    } catch (error) {
+        return formatError(error);
     }
 }
 

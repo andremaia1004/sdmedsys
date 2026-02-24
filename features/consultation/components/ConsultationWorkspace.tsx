@@ -60,21 +60,23 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
     };
 
     const handleFinish = async () => {
-        if (!confirm('Tem certeza que deseja finalizar o atendimento? Esta ação não pode ser desfeita e o prontuário será bloqueado.')) return;
+        console.log('DEBUG: handleFinish - start');
+        if (!confirm('Tem certeza que deseja finalizar o atendimento? Esta ação não pode ser desfeita e o prontuário será bloqueado.')) {
+            console.log('DEBUG: handleFinish - canceled by user');
+            return;
+        }
 
         setFinishError(null);
         setStatus('saving');
 
-        // Ensure final state is saved
-        await saveConsultationFieldsAction(consultation.id, fields);
-
-        const res = await finishConsultationAction(consultation.id);
+        const res = await finishConsultationAction(consultation.id, fields);
         if (res.success) {
             setIsFinished(true);
             router.push('/doctor/queue');
         } else {
-            setFinishError(res.error || 'Erro ao finalizar consulta.');
-            setStatus('saved');
+            console.error('Finalization failed:', res.error);
+            setFinishError('Erro ao finalizar consulta. Verifique os dados e tente novamente.');
+            setStatus('unsaved');
         }
     };
 

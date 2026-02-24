@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createWalkInAction } from '@/features/secretary/actions';
 import { searchPatientsAction } from '@/features/patients/actions';
+import { listDoctorsAction } from '@/features/doctors/actions';
 import { Patient } from '@/features/patients/types';
+import { Doctor } from '@/features/doctors/types';
 import styles from '@/features/secretary/styles/Dashboard.module.css';
 import { useToast } from '@/components/ui/Toast';
 
@@ -16,8 +18,23 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const [patientQuery, setPatientQuery] = useState('');
     const [patients, setPatients] = useState<Patient[]>([]);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
+
+    useEffect(() => {
+        const loadDoctors = async () => {
+            const res = await listDoctorsAction(true);
+            if (res.success && res.data) {
+                setDoctors(res.data);
+                if (res.data.length > 0) {
+                    setSelectedDoctorId(res.data[0].id);
+                }
+            }
+        };
+        loadDoctors();
+    }, []);
 
     const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
@@ -31,11 +48,9 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     };
 
     const handleCreate = async () => {
-        if (!selectedPatient) return;
+        if (!selectedPatient || !selectedDoctorId) return;
         setLoading(true);
-        // Using a more robust check or fetching a real doctorId if needed. 
-        // For now, focusing on build passing.
-        const result = await createWalkInAction(selectedPatient.id, 'default-doctor');
+        const result = await createWalkInAction(selectedPatient.id, selectedDoctorId);
         if (result.success) {
             onSuccess();
             onClose();
@@ -78,11 +93,30 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
                     </div>
                 )}
 
+                <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                    <label>Especialista:</label>
+                    <select
+                        value={selectedDoctorId}
+                        onChange={(e) => setSelectedDoctorId(e.target.value)}
+                        className={styles.search}
+                        style={{ width: '100%', marginTop: '0.5rem', padding: '0.5rem' }}
+                        disabled={doctors.length === 0}
+                    >
+                        {doctors.length === 0 ? (
+                            <option value="">Carregando médicos...</option>
+                        ) : (
+                            doctors.map(d => (
+                                <option key={d.id} value={d.id}>{d.name} {d.specialty ? `(${d.specialty})` : ''}</option>
+                            ))
+                        )}
+                    </select>
+                </div>
+
                 <div className={styles.modalActions}>
                     <button onClick={onClose} className={styles.cancelBtn}>Cancelar</button>
                     <button
                         onClick={handleCreate}
-                        disabled={!selectedPatient || loading}
+                        disabled={!selectedPatient || !selectedDoctorId || loading}
                         className={styles.confirmBtn}
                     >
                         {loading ? 'Registrando...' : 'Adicionar à Fila'}

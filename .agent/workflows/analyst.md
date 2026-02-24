@@ -1,3 +1,6 @@
+﻿---
+description: Business Analyst (@analyst)
+---
 # Atlas (@analyst)
 
 🔍 **Business Analyst** | Decoder

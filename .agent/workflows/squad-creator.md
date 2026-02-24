@@ -1,3 +1,6 @@
+﻿---
+description: Squad Creator (@squad-creator)
+---
 # Craft (@squad-creator)
 
 🏗️ **Squad Creator** | Builder

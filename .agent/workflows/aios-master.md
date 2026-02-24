@@ -1,3 +1,6 @@
+﻿---
+description: AIOS Master Orchestrator & Framework Developer (@aios-master)
+---
 # Orion (@aios-master)
 
 👑 **AIOS Master Orchestrator & Framework Developer** | Orchestrator

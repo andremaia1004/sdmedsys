@@ -230,6 +230,7 @@
     letter-spacing: -0.02em;
 }
 
+/* TV Board Animations */
 @keyframes tvPulse {
     0% {
         transform: scale(1);
@@ -245,4 +246,147 @@
         transform: scale(1);
         box-shadow: 0 0 0 rgba(220, 38, 38, 0);
     }
+}
+
+/* Operational / Doctor View Styles */
+.opsView {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.mainAction {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.secondaryAction {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.doctorFilter {
+    padding: 0.6rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #1e293b;
+}
+
+.opsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.opsCard {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
+    position: relative;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.opsCard.called {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+    background: #eff6ff;
+}
+
+.ticketBadge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.patientInfo {
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.doctorInfo {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.sourceTag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.tagS {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.tagW {
+    background: #fff7ed;
+    color: #f59e0b;
+}
+
+.timeInfo {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.timeInfo.late {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.inlineActions {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.inlineBtn {
+    flex: 1;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
 }

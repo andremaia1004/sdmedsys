@@ -149,7 +149,11 @@ export class SecretaryDashboardService {
 
     static async createWalkIn(patientId: string, doctorId: string, notes?: string): Promise<boolean> {
         const user = await getCurrentUser();
-        if (!user || !user.clinicId) return false;
+        console.log('DEBUG: createWalkIn - user:', user?.id, 'role:', user?.role, 'clinicId:', user?.clinicId);
+        if (!user || !user.clinicId) {
+            console.error('CreateWalkIn failed: No user or clinicId');
+            throw new Error('Usuário não autenticado ou sem clínica associada.');
+        }
 
         const supabase = await createClient();
 
@@ -163,13 +167,27 @@ export class SecretaryDashboardService {
         const ticketSeq = (count || 0) + 1;
         const ticketCode = `T-${ticketSeq.toString().padStart(3, '0')}`;
 
+        // 1.5 Fetch Patient Name
+        const { data: patientData } = await supabase
+            .from('patients')
+            .select('name')
+            .eq('id', patientId)
+            .single();
+        const patientName = patientData?.name || 'Desconhecido';
+
         // 2. Create WALK_IN Appointment
+        const now = new Date();
+        const endTime = new Date(now.getTime() + 30 * 60000); // 30 minutes later
+
         const { data: appointment, error: appError } = await supabase
             .from('appointments')
             .insert([{
                 clinic_id: user.clinicId,
                 patient_id: patientId,
+                patient_name: patientName,
                 doctor_id: doctorId,
+                start_time: now.toISOString(),
+                end_time: endTime.toISOString(),
                 status: 'ARRIVED',
                 notes: notes
             }])
@@ -178,7 +196,7 @@ export class SecretaryDashboardService {
 
         if (appError) {
             console.error('DashboardService: Create WALK_IN error', appError);
-            return false;
+            throw new Error(`Erro ao criar agendamento: ${appError.message}`);
         }
 
         // 3. Create Queue Item
@@ -194,10 +212,11 @@ export class SecretaryDashboardService {
             }]);
 
         if (queueError) {
-            console.error('DashboardService: Create QueueItem error', queueError);
-            return false;
+            console.error('DEBUG: DashboardService: Create QueueItem error', queueError);
+            throw new Error(`Erro ao entrar na fila: ${queueError.message}`);
         }
 
+        console.log('DEBUG: createWalkIn success - appointment:', appointment.id, 'queue_item:', ticketCode);
         await logAudit('CHECK_IN', 'APPOINTMENT', appointment.id, { ticketCode, kind: 'WALK_IN' });
         return true;
     }

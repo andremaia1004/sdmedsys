@@ -29,6 +29,11 @@ export class DoctorService {
         return repo.findById(id);
     }
 
+    static async findByProfileId(profileId: string): Promise<Doctor | undefined> {
+        const repo = await getRepository();
+        return repo.findByProfileId(profileId);
+    }
+
     static async create(input: DoctorInput): Promise<Doctor> {
         const repo = await getRepository();
         return repo.create(input);

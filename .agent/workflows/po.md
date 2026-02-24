@@ -1,3 +1,6 @@
+﻿---
+description: Product Owner (@po)
+---
 # Pax (@po)
 
 🎯 **Product Owner** | Balancer

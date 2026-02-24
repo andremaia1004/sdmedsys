@@ -100,7 +100,8 @@ export default function DoctorQueue({ doctorId }: Props) {
 
                 {!loading && items.length === 0 && (
                     <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
-                        Nenhum paciente na fila.
+                        <p>Nenhum paciente na fila.</p>
+                        <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Verifique se o modo Supabase está ativo e se há agendamentos para hoje.</p>
                     </div>
                 )}
 

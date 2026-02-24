@@ -1,0 +1,206 @@
+{
+  "queue": [
+    {
+      "id": "52873cfe-3372-4b42-a398-f2f0e0988164",
+      "ticket_code": "A001",
+      "appointment_id": "75907a66-13ba-49a1-a18c-67f2637266bd",
+      "patient_id": "84e0d1f5-f1b7-4642-8ae1-7452af6ce1e4",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "CALLED",
+      "created_at": "2026-02-21T16:04:54.787082+00:00",
+      "updated_at": "2026-02-21T16:05:46.468088+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "0b05a5a1-1dbe-4515-82e4-b81a8a191eda",
+      "ticket_code": "T-002",
+      "appointment_id": "5af7dfd6-35a4-44c5-a52c-b6d93c09e36e",
+      "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "WAITING",
+      "created_at": "2026-02-23T18:29:02.740556+00:00",
+      "updated_at": "2026-02-23T18:29:02.740556+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "c0ec306c-9af1-447b-8a50-7fecfc9bf8c2",
+      "ticket_code": "A001",
+      "appointment_id": "4f453d96-0899-47de-98a7-be9ec7dae32c",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "CALLED",
+      "created_at": "2026-02-23T13:56:14.969152+00:00",
+      "updated_at": "2026-02-23T18:43:27.909273+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "8f2b90e5-80d0-4273-ad50-9ce89e264cd0",
+      "ticket_code": "T-003",
+      "appointment_id": "4f453d96-0899-47de-98a7-be9ec7dae32c",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "CALLED",
+      "created_at": "2026-02-23T18:42:06.013041+00:00",
+      "updated_at": "2026-02-23T18:44:09.06103+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  ],
+  "doctors": [
+    {
+      "id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "profile_id": "36d57546-0833-4a7f-ac75-e8ffd8ad6c22",
+      "name": "Andre Maia",
+      "specialty": "Clinico Geral",
+      "active": true,
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "created_at": "2026-02-06T14:26:45.563097+00:00",
+      "updated_at": "2026-02-06T14:26:45.563097+00:00",
+      "crm": "05555",
+      "phone": "99991633858",
+      "email": "andre@sdmed.com"
+    },
+    {
+      "id": "6a3296c6-7c99-4d62-95be-b0a972e29d39",
+      "profile_id": "1e28b3e1-d908-4bea-8a09-cb88b0784e38",
+      "name": "Teste 02 ",
+      "specialty": "Cardiologista",
+      "active": true,
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "created_at": "2026-02-06T17:53:29.315759+00:00",
+      "updated_at": "2026-02-18T20:00:52.445991+00:00",
+      "crm": "33363",
+      "phone": "99991633858",
+      "email": "teste@sdmed.com"
+    },
+    {
+      "id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "profile_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "name": "Dr. Test Automation",
+      "specialty": "Endocrinologista",
+      "active": true,
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "created_at": "2026-02-21T16:50:48.76386+00:00",
+      "updated_at": "2026-02-21T21:38:40.995625+00:00",
+      "crm": "CRM-12345",
+      "phone": null,
+      "email": null
+    }
+  ],
+  "users": [
+    {
+      "id": "1e28b3e1-d908-4bea-8a09-cb88b0784e38",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "teste@sdmed.com",
+      "email_confirmed_at": "2026-02-06T17:53:29.039104Z",
+      "phone": "",
+      "confirmed_at": "2026-02-06T17:53:29.039104Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "name": "Teste 02 "
+      },
+      "identities": null,
+      "created_at": "2026-02-06T17:53:28.99234Z",
+      "updated_at": "2026-02-18T20:00:52.356903Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "36d57546-0833-4a7f-ac75-e8ffd8ad6c22",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "andre@sdmed.com",
+      "email_confirmed_at": "2026-02-06T14:26:44.944947Z",
+      "phone": "",
+      "confirmed_at": "2026-02-06T14:26:44.944947Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "name": "Andre Maia"
+      },
+      "identities": null,
+      "created_at": "2026-02-06T14:26:44.905802Z",
+      "updated_at": "2026-02-06T14:26:44.94871Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "doctor@sdmed.com",
+      "email_confirmed_at": "2026-01-29T20:41:23.08817Z",
+      "phone": "",
+      "confirmed_at": "2026-01-29T20:41:23.08817Z",
+      "last_sign_in_at": "2026-02-23T18:52:57.350687Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true
+      },
+      "identities": null,
+      "created_at": "2026-01-29T20:41:23.082847Z",
+      "updated_at": "2026-02-23T18:52:57.353212Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "2d6483af-acd5-47a7-af4d-6dc9ad2d59e1",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "secretary@sdmed.com",
+      "email_confirmed_at": "2026-01-29T20:41:22.339418Z",
+      "phone": "",
+      "confirmed_at": "2026-01-29T20:41:22.339418Z",
+      "last_sign_in_at": "2026-02-23T18:56:34.096813Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true
+      },
+      "identities": null,
+      "created_at": "2026-01-29T20:41:22.331377Z",
+      "updated_at": "2026-02-23T18:56:34.104732Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "657fa922-f202-4612-92e9-1d76c3b042bd",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "admin@sdmed.com",
+      "email_confirmed_at": "2026-01-29T20:41:21.090488Z",
+      "phone": "",
+      "confirmed_at": "2026-01-29T20:41:21.090488Z",
+      "last_sign_in_at": "2026-02-23T19:14:45.249488Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true
+      },
+      "identities": null,
+      "created_at": "2026-01-29T20:41:21.065399Z",
+      "updated_at": "2026-02-23T19:14:45.315407Z",
+      "is_anonymous": false
+    }
+  ]
+}

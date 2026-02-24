@@ -9,6 +9,7 @@ export async function loginAction(prevState: ActionState, formData: FormData) {
     const authMode = process.env.AUTH_MODE || 'stub';
     const emailOrUsername = formData.get('username') as string;
     const password = formData.get('password') as string;
+    console.log('DEBUG: loginAction - start', { emailOrUsername, authMode });
 
     // 1. Stub Mode
     if (authMode !== 'supabase') {

@@ -1,0 +1,183 @@
+﻿
+Running 2 tests using 1 worker
+
+  Ô£ÿ  1 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (12.3s)
+  Ô£ÿ  2 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (retry #1) (8.5s)
+  Ô£ÿ  3 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende (retry #2) (8.0s)
+  Ô£ÿ  4 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:45:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (6.9s)
+  Ô£ÿ  5 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:45:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #1) (8.0s)
+  Ô£ÿ  6 [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:45:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente (retry #2) (6.8s)
+
+
+  1) [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/.*secretary/[39m
+    Received string:  [31m"http://localhost:3000/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 ├ù unexpected value "http://localhost:3000/login"[22m
+
+
+      11 |
+      12 |         // Verificar se redirecionou para o dashboard da secret├íria
+    > 13 |         await expect(page).toHaveURL(/.*secretary/);
+         |                            ^
+      14 |         await expect(page.locator('h1')).toContainText('Painel Operacional do Dia');
+      15 |
+      16 |         // 2. Adicionar Novo Atendimento (Walk-in)
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:13:28
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium\error-context.md
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('h1')
+    Expected substring: [32m"Painel Operacional do Dia"[39m
+    Received string:    [31m"Agenda Semanal"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1')[22m
+    [2m    - locator resolved to <h1>Agenda Semanal</h1>[22m
+    [2m    - unexpected value "Agenda Semanal"[22m
+
+
+      12 |         // Verificar se redirecionou para o dashboard da secret├íria
+      13 |         await expect(page).toHaveURL(/.*secretary/);
+    > 14 |         await expect(page.locator('h1')).toContainText('Painel Operacional do Dia');
+         |                                          ^
+      15 |
+      16 |         // 2. Adicionar Novo Atendimento (Walk-in)
+      17 |         await page.click('button:has-text("Novo Atendimento")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:14:42
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry1\error-context.md
+
+    attachment #2: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('h1')
+    Expected substring: [32m"Painel Operacional do Dia"[39m
+    Received string:    [31m"Agenda Semanal"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1')[22m
+    [2m    3 ├ù locator resolved to <h1>Agenda Semanal</h1>[22m
+    [2m      - unexpected value "Agenda Semanal"[22m
+
+
+      12 |         // Verificar se redirecionou para o dashboard da secret├íria
+      13 |         await expect(page).toHaveURL(/.*secretary/);
+    > 14 |         await expect(page.locator('h1')).toContainText('Painel Operacional do Dia');
+         |                                          ^
+      15 |
+      16 |         // 2. Adicionar Novo Atendimento (Walk-in)
+      17 |         await page.click('button:has-text("Novo Atendimento")');
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:14:42
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-a0180-├íria-agenda-e-M├®dico-atende-chromium-retry2\error-context.md
+
+  2) [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:45:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Atender")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Atender")').first()[22m
+
+
+      68 |             // Se j├í estiver em atendimento ou algo assim, tentamos ir direto
+      69 |             await page.goto('/doctor/queue'); // Refresh
+    > 70 |             await expect(page.locator('button:has-text("Atender")').first()).toBeVisible();
+         |                                                                              ^
+      71 |             await page.locator('button:has-text("Atender")').first().click();
+      72 |         }
+      73 |
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:70:78
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium\error-context.md
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Atender")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Atender")').first()[22m
+
+
+      68 |             // Se j├í estiver em atendimento ou algo assim, tentamos ir direto
+      69 |             await page.goto('/doctor/queue'); // Refresh
+    > 70 |             await expect(page.locator('button:has-text("Atender")').first()).toBeVisible();
+         |                                                                              ^
+      71 |             await page.locator('button:has-text("Atender")').first().click();
+      72 |         }
+      73 |
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:70:78
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\error-context.md
+
+    attachment #2: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Atender")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Atender")').first()[22m
+
+
+      68 |             // Se j├í estiver em atendimento ou algo assim, tentamos ir direto
+      69 |             await page.goto('/doctor/queue'); // Refresh
+    > 70 |             await expect(page.locator('button:has-text("Atender")').first()).toBeVisible();
+         |                                                                              ^
+      71 |             await page.locator('button:has-text("Atender")').first().click();
+      72 |         }
+      73 |
+        at E:\SDMED Sys\playwright-tests\clinic-flow.spec.ts:70:78
+
+    Error Context: test-results\clinic-flow-SDMED-Sys---Fl-202d1-to-M├®dico-atende-o-paciente-chromium-retry2\error-context.md
+
+  2 failed
+    [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:5:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ Secret├íria agenda e M├®dico atende 
+    [chromium] ÔÇ║ playwright-tests\clinic-flow.spec.ts:45:9 ÔÇ║ SDMED Sys - Fluxo Completo de Atendimento ÔÇ║ M├®dico atende o paciente 

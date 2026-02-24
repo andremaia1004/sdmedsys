@@ -1,0 +1,70 @@
+{
+  "fixed_items": [
+    {
+      "id": "52873cfe-3372-4b42-a398-f2f0e0988164",
+      "ticket_code": "A001",
+      "appointment_id": "75907a66-13ba-49a1-a18c-67f2637266bd",
+      "patient_id": "84e0d1f5-f1b7-4642-8ae1-7452af6ce1e4",
+      "doctor_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "status": "CALLED",
+      "created_at": "2026-02-21T16:04:54.787082+00:00",
+      "updated_at": "2026-02-23T23:58:15.107792+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "0b05a5a1-1dbe-4515-82e4-b81a8a191eda",
+      "ticket_code": "T-002",
+      "appointment_id": "5af7dfd6-35a4-44c5-a52c-b6d93c09e36e",
+      "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+      "doctor_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "status": "WAITING",
+      "created_at": "2026-02-23T18:29:02.740556+00:00",
+      "updated_at": "2026-02-23T23:58:15.107792+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "c0ec306c-9af1-447b-8a50-7fecfc9bf8c2",
+      "ticket_code": "A001",
+      "appointment_id": "4f453d96-0899-47de-98a7-be9ec7dae32c",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "status": "CALLED",
+      "created_at": "2026-02-23T13:56:14.969152+00:00",
+      "updated_at": "2026-02-23T23:58:15.107792+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "8f2b90e5-80d0-4273-ad50-9ce89e264cd0",
+      "ticket_code": "T-003",
+      "appointment_id": "4f453d96-0899-47de-98a7-be9ec7dae32c",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "status": "CALLED",
+      "created_at": "2026-02-23T18:42:06.013041+00:00",
+      "updated_at": "2026-02-23T23:58:15.107792+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "ca2bf812-62d5-43e9-857e-b1c51426e7d8",
+      "ticket_code": "T-004",
+      "appointment_id": "06012a54-a5aa-4cce-b869-3f7f62075b7f",
+      "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+      "doctor_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "status": "WAITING",
+      "created_at": "2026-02-23T19:43:38.606505+00:00",
+      "updated_at": "2026-02-23T23:58:15.107792+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "id": "920e2a26-d3dc-47bb-b98a-dbc144350a59",
+      "ticket_code": "T-005",
+      "appointment_id": "2298a9c3-e7f9-434c-945f-8259b9bf2bdf",
+      "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+      "doctor_id": "74817a06-4d74-4534-b5f6-75f6a3b9c709",
+      "status": "WAITING",
+      "created_at": "2026-02-23T20:19:04.920083+00:00",
+      "updated_at": "2026-02-23T23:58:15.107792+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  ]
+}
