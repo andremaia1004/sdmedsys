@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
-import { User, FileText, FilePlus, Activity, ClipboardList, Scroll } from 'lucide-react';
+import { User, FileText, FilePlus, Activity, ClipboardList, Scroll, Download } from 'lucide-react';
 import { Patient } from '@/features/patients/types';
 import { Consultation } from '@/features/consultation/types';
 import { ClinicalDocument } from '@/features/documents/types';
@@ -103,18 +103,39 @@ export function PatientHistoryPanel({ patient, consultationId }: Props) {
                                             {doc.type === 'certificate' && <Activity size={16} />}
                                             {doc.type === 'exam_request' && <ClipboardList size={16} />}
                                             {doc.type === 'report' && <Scroll size={16} />}
+                                            {doc.type === 'referral' && <FileText size={16} />}
                                         </div>
-                                        <div>
+                                        <div style={{ flex: 1 }}>
                                             <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1e293b' }}>
                                                 {doc.type === 'prescription' && 'Receituário'}
                                                 {doc.type === 'certificate' && 'Atestado'}
                                                 {doc.type === 'exam_request' && 'Pedido de Exame'}
                                                 {doc.type === 'report' && 'Laudo'}
+                                                {doc.type === 'referral' && 'Encaminhamento'}
                                             </div>
                                             <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
                                                 {new Date(doc.issuedAt).toLocaleDateString('pt-BR')}
                                             </div>
                                         </div>
+                                        <button
+                                            title="Imprimir"
+                                            onClick={() => window.open(`/api/documents/${doc.type}/${doc.id}`, '_blank')}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                color: 'var(--primary)',
+                                                cursor: 'pointer',
+                                                padding: '4px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                borderRadius: '4px',
+                                                transition: 'background 0.2s'
+                                            }}
+                                            onMouseOver={(e) => e.currentTarget.style.background = '#eff6ff'}
+                                            onMouseOut={(e) => e.currentTarget.style.background = 'none'}
+                                        >
+                                            <Download size={14} />
+                                        </button>
                                     </div>
                                 ))}
                             </div>

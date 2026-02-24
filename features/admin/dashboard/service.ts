@@ -15,17 +15,15 @@ export interface DashboardStats {
     };
 }
 
-async function getClient() {
-    const user = await getCurrentUser();
-    const authMode = process.env.AUTH_MODE || 'stub';
-    if (authMode === 'supabase' && user) {
-        return createClient();
-    }
-    return supabaseServer;
-}
-
 export async function fetchDashboardStats(): Promise<DashboardStats> {
-    const client = await getClient();
+    const user = await getCurrentUser();
+    if (!user || !user.clinicId) {
+        throw new Error('Unauthorized or no clinic context');
+    }
+
+    const client = supabaseServer; // Always use server client for dashboards for consistency and security (service role if needed)
+    const clinicId = user.clinicId;
+
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
@@ -33,34 +31,59 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     // 1. Consultations today by status
     const { data: consultations } = await client
         .from('consultations')
-        .select('id, finished_at')
+        .select('id, doctor_id, finished_at')
+        .eq('clinic_id', clinicId)
         .gte('started_at', startOfDay)
         .lt('started_at', endOfDay);
 
-    const consultationCounts: Record<string, number> = { em_andamento: 0, finalizadas: 0 };
+    const consultationCounts: Record<string, number> = {
+        'Em Atendimento': 0,
+        'Concluídas': 0
+    };
+
     (consultations || []).forEach(c => {
         if (c.finished_at) {
-            consultationCounts.finalizadas++;
+            consultationCounts['Concluídas']++;
         } else {
-            consultationCounts.em_andamento++;
+            consultationCounts['Em Atendimento']++;
         }
     });
 
-    const consultations_today = Object.entries(consultationCounts).map(([status, count]) => ({
-        status,
-        count
-    }));
+    // Add Scheduled and Canceled from appointments
+    const { data: appointments } = await client
+        .from('appointments')
+        .select('id, status')
+        .eq('clinic_id', clinicId)
+        .gte('start_time', startOfDay)
+        .lt('start_time', endOfDay);
+
+    const apptCounts: Record<string, number> = {
+        'Agendadas': 0,
+        'Canceladas': 0
+    };
+
+    (appointments || []).forEach(a => {
+        if (a.status === 'SCHEDULED' || a.status === 'CONFIRMED') apptCounts['Agendadas']++;
+        if (a.status === 'CANCELED') apptCounts['Canceladas']++;
+    });
+
+    const consultations_today = [
+        ...Object.entries(apptCounts).map(([status, count]) => ({ status, count })),
+        ...Object.entries(consultationCounts).map(([status, count]) => ({ status, count }))
+    ];
 
     // 2. Queue by doctor (active items)
     const { data: queueItems } = await client
         .from('queue_items')
         .select('id, doctor_id, status')
+        .eq('clinic_id', clinicId)
         .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
         .gte('created_at', startOfDay);
 
     const { data: doctors } = await client
         .from('doctors')
         .select('id, name, specialty')
+        .eq('clinic_id', clinicId)
         .eq('active', true);
 
     const doctorMap = new Map<string, { name: string; waiting: number; called: number; in_service: number }>();
@@ -90,7 +113,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     // 3. Active doctors (those with queue items or consultations today)
     const activeDoctorIds = new Set<string>();
     (queueItems || []).forEach(q => activeDoctorIds.add(q.doctor_id));
-    (consultations || []).forEach((c: Record<string, string>) => {
+    (consultations || []).forEach((c) => {
         if (c.doctor_id) activeDoctorIds.add(c.doctor_id);
     });
 
@@ -101,11 +124,13 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     // 4. Totals
     const { count: patientsTotal } = await client
         .from('patients')
-        .select('id', { count: 'exact', head: true });
+        .select('id', { count: 'exact', head: true })
+        .eq('clinic_id', clinicId);
 
     const { count: appointmentsToday } = await client
         .from('appointments')
         .select('id', { count: 'exact', head: true })
+        .eq('clinic_id', clinicId)
         .gte('start_time', startOfDay)
         .lt('start_time', endOfDay);
 

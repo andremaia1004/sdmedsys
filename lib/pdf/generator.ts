@@ -1,4 +1,8 @@
 import PDFDocument from 'pdfkit';
+import path from 'path';
+
+const FONT_REGULAR = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Regular.ttf');
+const FONT_BOLD = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Bold.ttf');
 
 export interface DocumentHeader {
     clinicName: string;
@@ -24,8 +28,12 @@ export function createBasePDF(header: DocumentHeader) {
         bufferPages: true
     });
 
+    // Set default font to our bundled one
+    doc.font(FONT_REGULAR);
+
     // Header
-    doc.fontSize(16).text(header.clinicName, { align: 'center' });
+    doc.font(FONT_BOLD).fontSize(16).text(header.clinicName, { align: 'center' });
+    doc.font(FONT_REGULAR);
     if (header.clinicAddress) {
         doc.fontSize(9).text(header.clinicAddress, { align: 'center' });
     }
@@ -45,7 +53,8 @@ export function addFooter(doc: PDFKit.PDFDocument, doctor: DoctorInfo) {
 
     doc.moveTo(150, bottom).lineTo(445, bottom).stroke('#000000');
     doc.moveDown(0.5);
-    doc.fontSize(10).text(doctor.name, 50, bottom + 10, { align: 'center' });
+    doc.font(FONT_BOLD).fontSize(10).text(doctor.name, 50, bottom + 10, { align: 'center' });
+    doc.font(FONT_REGULAR);
     if (doctor.crm) {
         doc.fontSize(9).text(`CRM: ${doctor.crm}`, { align: 'center' });
     } else {

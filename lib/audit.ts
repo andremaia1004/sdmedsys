@@ -24,6 +24,7 @@ export type AuditAction =
     | 'DOWNLOAD_PRESCRIPTION'
     | 'DOWNLOAD_CERTIFICATE'
     | 'DOWNLOAD_REPORT'
+    | 'DOWNLOAD_DOCUMENT'
     | 'OTHER';
 export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'QUEUE_ITEM' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS' | 'CLINICAL_ENTRY' | 'DOCUMENT';
 
