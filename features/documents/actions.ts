@@ -82,7 +82,7 @@ export async function generateCertificateAction(
             doctorName,
             crm: doctor?.crm,
             date: new Date().toISOString(),
-            days,
+            days: days || 0,
             cid,
             observation
         });
