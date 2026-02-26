@@ -6,6 +6,7 @@ import { ClinicalDocument } from './types';
 import { PdfService } from './service.pdf';
 import { PatientService } from '@/features/patients/service';
 import { DoctorService } from '@/features/doctors/service';
+import { SettingsService } from '@/features/admin/settings/service';
 import { ActionResponse, formatSuccess, formatError } from '@/lib/action-response';
 
 export async function fetchPatientDocumentsAction(patientId: string): Promise<ActionResponse<ClinicalDocument[]>> {
@@ -34,13 +35,23 @@ export async function generatePrescriptionAction(
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
 
+        const settings = await SettingsService.get();
+        const clinicInfo = {
+            name: settings.clinicName,
+            logoUrl: settings.logoUrl,
+            phone: settings.phone,
+            website: settings.website,
+            address: settings.address
+        };
+
         const pdfBuffer = await PdfService.generatePrescription({
             patientName: patient.name,
             doctorName,
             crm: doctor?.crm,
+            clinic: clinicInfo,
             medications,
             instructions,
-            date: new Date().toISOString()
+            date: new Date().toLocaleDateString('pt-BR')
         });
 
         await ClinicalDocumentsRegistryService.createRecord({
@@ -77,11 +88,21 @@ export async function generateCertificateAction(
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
 
+        const settings = await SettingsService.get();
+        const clinicInfo = {
+            name: settings.clinicName,
+            logoUrl: settings.logoUrl,
+            phone: settings.phone,
+            website: settings.website,
+            address: settings.address
+        };
+
         const pdfBuffer = await PdfService.generateCertificate({
             patientName: patient.name,
             doctorName,
             crm: doctor?.crm,
-            date: new Date().toISOString(),
+            clinic: clinicInfo,
+            date: new Date().toLocaleDateString('pt-BR'),
             days: days || 0,
             cid,
             observation
@@ -119,11 +140,21 @@ export async function generateReportAction(
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
 
+        const settings = await SettingsService.get();
+        const clinicInfo = {
+            name: settings.clinicName,
+            logoUrl: settings.logoUrl,
+            phone: settings.phone,
+            website: settings.website,
+            address: settings.address
+        };
+
         const pdfBuffer = await PdfService.generateReport({
             patientName: patient.name,
             doctorName,
             crm: doctor?.crm,
-            date: new Date().toISOString(),
+            clinic: clinicInfo,
+            date: new Date().toLocaleDateString('pt-BR'),
             content
         });
 
@@ -160,11 +191,21 @@ export async function generateExamRequestAction(
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
 
+        const settings = await SettingsService.get();
+        const clinicInfo = {
+            name: settings.clinicName,
+            logoUrl: settings.logoUrl,
+            phone: settings.phone,
+            website: settings.website,
+            address: settings.address
+        };
+
         const pdfBuffer = await PdfService.generateExamRequest({
             patientName: patient.name,
             doctorName,
             crm: doctor?.crm,
-            date: new Date().toISOString(),
+            clinic: clinicInfo,
+            date: new Date().toLocaleDateString('pt-BR'),
             examList,
             justification
         });
@@ -204,11 +245,21 @@ export async function generateReferralAction(
         const doctor = await DoctorService.findById(user.id);
         const doctorName = doctor?.name || 'Médico';
 
+        const settings = await SettingsService.get();
+        const clinicInfo = {
+            name: settings.clinicName,
+            logoUrl: settings.logoUrl,
+            phone: settings.phone,
+            website: settings.website,
+            address: settings.address
+        };
+
         const pdfBuffer = await PdfService.generateReferral({
             patientName: patient.name,
             doctorName,
             crm: doctor?.crm,
-            date: new Date().toISOString(),
+            clinic: clinicInfo,
+            date: new Date().toLocaleDateString('pt-BR'),
             specialty,
             reason,
             clinicalSummary,

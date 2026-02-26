@@ -6,6 +6,10 @@ export interface ClinicSettings {
     appointmentDurationMinutes: number;
     queuePrefix: string;
     tvRefreshSeconds: number;
+    logoUrl?: string;
+    address?: string;
+    phone?: string;
+    website?: string;
     createdAt: string;
     updatedAt: string;
 }

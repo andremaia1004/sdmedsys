@@ -6,47 +6,41 @@ import path from 'path';
 const FONT_REGULAR = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Regular.ttf');
 const FONT_BOLD = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Bold.ttf');
 
-export interface PrescriptionData {
+export interface BaseDocumentData {
     patientName: string;
     doctorName: string;
     crm?: string;
-    medications: string;
-    instructions: string;
     date: string;
+    clinic?: {
+        name?: string;
+        logoUrl?: string;
+        phone?: string;
+        website?: string;
+        address?: string;
+    };
 }
 
-export interface CertificateData {
-    patientName: string;
-    doctorName: string;
-    crm?: string;
-    date: string;
+export interface PrescriptionData extends BaseDocumentData {
+    medications: string;
+    instructions: string;
+}
+
+export interface CertificateData extends BaseDocumentData {
     days: number;
     cid?: string;
     observation?: string;
 }
 
-export interface ReportData {
-    patientName: string;
-    doctorName: string;
-    crm?: string;
-    date: string;
+export interface ReportData extends BaseDocumentData {
     content: string;
 }
 
-export interface ExamRequestData {
-    patientName: string;
-    doctorName: string;
-    crm?: string;
-    date: string;
+export interface ExamRequestData extends BaseDocumentData {
     examList: string;
     justification?: string;
 }
 
-export interface ReferralData {
-    patientName: string;
-    doctorName: string;
-    crm?: string;
-    date: string;
+export interface ReferralData extends BaseDocumentData {
     specialty: string;
     reason: string;
     clinicalSummary?: string;
@@ -54,48 +48,79 @@ export interface ReferralData {
 }
 
 export class PdfService {
-    private static drawHeader(doc: PDFKit.PDFDocument, title: string, doctorName: string, crm?: string) {
-        // Logo / Branding Area (Arial fonts are very similar to Helvetica)
-        doc.fillColor('#0f172a').font(FONT_BOLD).fontSize(20).text('SDMED', 50, 45, { continued: true });
-        doc.fillColor('#3b82f6').font(FONT_BOLD).text('SYS');
+    private static async drawHeader(doc: PDFKit.PDFDocument, title: string, data: BaseDocumentData) {
+        let currentX = 50;
 
-        doc.fillColor('#64748b').font(FONT_REGULAR).fontSize(8)
-            .text('SISTEMA DE GESTÃO MÉDICA INTELIGENTE', 50, 68);
+        // Logo
+        if (data.clinic?.logoUrl) {
+            try {
+                const response = await fetch(data.clinic.logoUrl);
+                if (response.ok) {
+                    const arrayBuffer = await response.arrayBuffer();
+                    const logoBuffer = Buffer.from(arrayBuffer);
+                    doc.image(logoBuffer, 50, 40, { fit: [50, 50], valign: 'center' });
+                    currentX = 110;
+                }
+            } catch (err) {
+                console.error('Failed to load clinic logo for PDF:', err);
+            }
+        }
+
+        // Clinic Name
+        const clinicName = data.clinic?.name || 'SDMED SYS';
+        doc.fillColor('#0f172a').font(FONT_BOLD).fontSize(16).text(clinicName, currentX, 45);
+
+        // Contact Info under Clinic Name
+        doc.fillColor('#64748b').font(FONT_REGULAR).fontSize(8);
+        let contactText = '';
+        if (data.clinic?.phone) contactText += `Tel: ${data.clinic.phone}  `;
+        if (data.clinic?.website) contactText += `|  ${data.clinic.website}`;
+
+        if (contactText) {
+            doc.text(contactText, currentX, 65);
+        } else {
+            doc.text('SISTEMA DE GESTÃO MÉDICA INTELIGENTE', currentX, 65);
+        }
 
         // Header Decoration
-        doc.moveTo(50, 85).lineTo(545, 85).lineWidth(1).strokeColor('#e2e8f0').stroke();
+        doc.moveTo(50, 95).lineTo(545, 95).lineWidth(1).strokeColor('#e2e8f0').stroke();
 
         // Document Title
-        doc.fillColor('#1e293b').font(FONT_BOLD).fontSize(16).text(title, 50, 105, { align: 'center' });
+        doc.fillColor('#1e293b').font(FONT_BOLD).fontSize(16).text(title, 50, 115, { align: 'center' });
         doc.moveDown(1.5);
 
         // Header Metadata (Doctor Info)
         const currentY = doc.y;
         doc.fillColor('#475569').font(FONT_REGULAR).fontSize(10);
-        doc.text(`Profissional: ${doctorName}`, 300, 140, { align: 'right', width: 245 });
-        if (crm) {
-            doc.text(`CRM: ${crm}`, 300, 155, { align: 'right', width: 245 });
+        doc.text(`Profissional: ${data.doctorName}`, 300, 150, { align: 'right', width: 245 });
+        if (data.crm) {
+            doc.text(`CRM: ${data.crm}`, 300, 165, { align: 'right', width: 245 });
         }
-        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 300, 170, { align: 'right', width: 245 });
+        doc.text(`Data: ${data.date}`, 300, 180, { align: 'right', width: 245 });
 
-        doc.y = currentY + 30; // Reset Y to start content
+        doc.y = currentY + 40; // Reset Y to start content
     }
 
-    private static drawFooter(doc: PDFKit.PDFDocument, doctorName: string, crm?: string) {
+    private static drawFooter(doc: PDFKit.PDFDocument, data: BaseDocumentData) {
         const bottom = doc.page.height - 120;
 
         // Signature Line
         doc.moveTo(172, bottom).lineTo(422, bottom).lineWidth(0.5).strokeColor('#94a3b8').stroke();
 
-        doc.fillColor('#1e293b').font(FONT_BOLD).fontSize(10).text(`Dr(a). ${doctorName}`, 50, bottom + 10, { align: 'center' });
-        doc.fillColor('#64748b').font(FONT_REGULAR).fontSize(9).text(crm ? `CRM: ${crm}` : 'CRM não informado', { align: 'center' });
+        doc.fillColor('#1e293b').font(FONT_BOLD).fontSize(10).text(`Dr(a). ${data.doctorName}`, 50, bottom + 10, { align: 'center' });
+        doc.fillColor('#64748b').font(FONT_REGULAR).fontSize(9).text(data.crm ? `CRM: ${data.crm}` : 'CRM não informado', { align: 'center' });
+
+        // Address at the very bottom
+        if (data.clinic?.address) {
+            doc.fontSize(8).fillColor('#94a3b8').text(data.clinic.address, 50, doc.page.height - 55, { align: 'center' });
+        }
 
         // Date and Info
         doc.fontSize(8).fillColor('#94a3b8').text('Documento eletrônico gerado pelo SDMED System • Validação via QR Code ou Assinatura Digital', 50, doc.page.height - 40, { align: 'center' });
     }
 
     static async generatePrescription(data: PrescriptionData): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
@@ -103,7 +128,7 @@ export class PdfService {
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
                 doc.on('error', reject);
 
-                this.drawHeader(doc, 'RECEITUÁRIO MÉDICO', data.doctorName, data.crm);
+                await this.drawHeader(doc, 'RECEITUÁRIO MÉDICO', data);
 
                 // Patient Area
                 doc.fontSize(13).fillColor('#1e293b').font(FONT_REGULAR).text('PACIENTE:', { continued: true });
@@ -125,7 +150,7 @@ export class PdfService {
                     doc.font(FONT_REGULAR).fontSize(11).text(data.instructions, { align: 'justify' });
                 }
 
-                this.drawFooter(doc, data.doctorName, data.crm);
+                this.drawFooter(doc, data);
                 doc.end();
             } catch (err) {
                 reject(err);
@@ -134,7 +159,7 @@ export class PdfService {
     }
 
     static async generateCertificate(data: CertificateData): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
@@ -142,7 +167,7 @@ export class PdfService {
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
                 doc.on('error', reject);
 
-                this.drawHeader(doc, 'ATESTADO MÉDICO', data.doctorName, data.crm);
+                await this.drawHeader(doc, 'ATESTADO MÉDICO', data);
 
                 doc.font(FONT_REGULAR).fontSize(12).fillColor('#334155');
                 const text = `Atesto para os devidos fins que o(a) Sr(a). ${data.patientName} foi atendido(a) sob meus cuidados profissionais no dia ${data.date}.`;
@@ -165,7 +190,7 @@ export class PdfService {
                     doc.font(FONT_REGULAR).fontSize(11).text(data.observation, { align: 'justify' });
                 }
 
-                this.drawFooter(doc, data.doctorName, data.crm);
+                this.drawFooter(doc, data);
                 doc.end();
             } catch (err) {
                 reject(err);
@@ -174,7 +199,7 @@ export class PdfService {
     }
 
     static async generateReport(data: ReportData): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
@@ -182,7 +207,7 @@ export class PdfService {
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
                 doc.on('error', reject);
 
-                this.drawHeader(doc, 'LAUDO MÉDICO', data.doctorName, data.crm);
+                await this.drawHeader(doc, 'LAUDO MÉDICO', data);
 
                 doc.fontSize(12).font(FONT_BOLD).text('PACIENTE: ', { continued: true })
                     .font(FONT_REGULAR).text(data.patientName);
@@ -192,7 +217,7 @@ export class PdfService {
                 doc.moveDown(0.5);
                 doc.font(FONT_REGULAR).fontSize(11).fillColor('#334155').text(data.content, { align: 'justify', lineGap: 5 });
 
-                this.drawFooter(doc, data.doctorName, data.crm);
+                this.drawFooter(doc, data);
                 doc.end();
             } catch (err) {
                 reject(err);
@@ -201,7 +226,7 @@ export class PdfService {
     }
 
     static async generateExamRequest(data: ExamRequestData): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
@@ -209,7 +234,7 @@ export class PdfService {
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
                 doc.on('error', reject);
 
-                this.drawHeader(doc, 'SOLICITAÇÃO DE EXAMES', data.doctorName, data.crm);
+                await this.drawHeader(doc, 'SOLICITAÇÃO DE EXAMES', data);
 
                 doc.fontSize(12).font(FONT_BOLD).text('PACIENTE: ', { continued: true })
                     .font(FONT_REGULAR).text(data.patientName);
@@ -225,7 +250,7 @@ export class PdfService {
                     doc.font(FONT_REGULAR).text(data.justification, { align: 'justify' });
                 }
 
-                this.drawFooter(doc, data.doctorName, data.crm);
+                this.drawFooter(doc, data);
                 doc.end();
             } catch (err) {
                 reject(err);
@@ -234,7 +259,7 @@ export class PdfService {
     }
 
     static async generateReferral(data: ReferralData): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
@@ -242,7 +267,7 @@ export class PdfService {
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
                 doc.on('error', reject);
 
-                this.drawHeader(doc, 'GUIA DE ENCAMINHAMENTO', data.doctorName, data.crm);
+                await this.drawHeader(doc, 'GUIA DE ENCAMINHAMENTO', data);
 
                 doc.fontSize(12).font(FONT_BOLD).text('PACIENTE: ', { continued: true })
                     .font(FONT_REGULAR).text(data.patientName);
@@ -267,7 +292,7 @@ export class PdfService {
                     doc.font(FONT_REGULAR).fontSize(11).text(data.observation, { align: 'justify' });
                 }
 
-                this.drawFooter(doc, data.doctorName, data.crm);
+                this.drawFooter(doc, data);
                 doc.end();
             } catch (err) {
                 reject(err);

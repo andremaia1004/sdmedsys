@@ -66,15 +66,6 @@ export default function LoginPage() {
                     )}
                 </form>
             </Card>
-
-            <div className={styles.hints}>
-                <p><strong>Credenciais de Teste</strong></p>
-                <ul className={styles.hintList}>
-                    <li><code>admin@sdmed.com</code> / <code>Test@123456</code> (Admin)</li>
-                    <li><code>secretary@sdmed.com</code> / <code>Test@123456</code> (Secretaria)</li>
-                    <li><code>doctor@sdmed.com</code> / <code>Test@123456</code> (Médico)</li>
-                </ul>
-            </div>
         </div>
     );
 }

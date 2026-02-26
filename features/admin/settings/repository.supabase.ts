@@ -34,6 +34,10 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         if (input.appointmentDurationMinutes !== undefined) updateData.appointment_duration_minutes = input.appointmentDurationMinutes;
         if (input.queuePrefix !== undefined) updateData.queue_prefix = input.queuePrefix;
         if (input.tvRefreshSeconds !== undefined) updateData.tv_refresh_seconds = input.tvRefreshSeconds;
+        if (input.logoUrl !== undefined) updateData.logo_url = input.logoUrl;
+        if (input.address !== undefined) updateData.address = input.address;
+        if (input.phone !== undefined) updateData.phone = input.phone;
+        if (input.website !== undefined) updateData.website = input.website;
 
         const { data, error } = await this.supabase
             .from('clinic_settings')
@@ -57,6 +61,10 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
             appointmentDurationMinutes: row.appointment_duration_minutes,
             queuePrefix: row.queue_prefix,
             tvRefreshSeconds: row.tv_refresh_seconds,
+            logoUrl: row.logo_url,
+            address: row.address,
+            phone: row.phone,
+            website: row.website,
             createdAt: row.created_at,
             updatedAt: row.updated_at
         };

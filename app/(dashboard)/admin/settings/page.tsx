@@ -56,10 +56,79 @@ export default function SettingsAdminPage() {
             <form onSubmit={handleSave}>
                 <Card header="Identificação e Geral" style={{ marginBottom: '1.5rem' }}>
                     <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                        {/* Logo Upload Section */}
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            {settings.logoUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={settings.logoUrl} alt="Logo da Clínica" style={{ width: '80px', height: '80px', objectFit: 'contain', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.5rem' }} />
+                            ) : (
+                                <div style={{ width: '80px', height: '80px', border: '1px dashed #cbd5e1', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '12px', textAlign: 'center' }}>
+                                    Sem<br />Logo
+                                </div>
+                            )}
+                            <div style={{ flex: 1 }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '0.875rem' }}>Logo da Clínica</label>
+                                <input
+                                    type="file"
+                                    accept="image/png, image/jpeg"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+
+                                        setIsSaving(true);
+                                        const { createClient } = await import('@supabase/supabase-js');
+                                        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+                                        const fileExt = file.name.split('.').pop();
+                                        const fileName = `${settings.clinicId}-${Date.now()}.${fileExt}`;
+
+                                        const { error, data } = await supabase.storage
+                                            .from('clinic_assets')
+                                            .upload(fileName, file, { upsert: true });
+
+                                        if (error) {
+                                            console.error('Upload error', error);
+                                            showToast('error', 'Erro ao fazer upload da logomarca');
+                                            setIsSaving(false);
+                                            return;
+                                        }
+
+                                        const { data: { publicUrl } } = supabase.storage.from('clinic_assets').getPublicUrl(fileName);
+                                        setSettings({ ...settings, logoUrl: publicUrl });
+                                        setIsSaving(false);
+                                        showToast('success', 'Logo enviada! Clique em salvar para confirmar.');
+                                    }}
+                                    style={{ fontSize: '0.875rem' }}
+                                />
+                                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>Recomendado: Imagem PNG com fundo transparente</p>
+                            </div>
+                        </div>
+
                         <Input
                             label="Nome da Clínica"
                             value={settings.clinicName}
                             onChange={e => setSettings({ ...settings, clinicName: e.target.value })}
+                        />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <Input
+                                label="Telefone de Contato"
+                                value={settings.phone || ''}
+                                onChange={e => setSettings({ ...settings, phone: e.target.value })}
+                                placeholder="(00) 00000-0000"
+                            />
+                            <Input
+                                label="Website"
+                                value={settings.website || ''}
+                                onChange={e => setSettings({ ...settings, website: e.target.value })}
+                                placeholder="https://www.suaclinica.com.br"
+                            />
+                        </div>
+                        <Input
+                            label="Endereço Completo"
+                            value={settings.address || ''}
+                            onChange={e => setSettings({ ...settings, address: e.target.value })}
+                            placeholder="Rua Exemplo, 123, Bairro, Cidade - UF"
                         />
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <Input
