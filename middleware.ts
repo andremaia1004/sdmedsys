@@ -73,7 +73,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // 4. TV Route Protection (PIN Auth)
-    if (pathname.startsWith('/tv')) {
+    if (pathname.startsWith('/tv') && !pathname.startsWith('/tv/login')) {
         const pin = request.nextUrl.searchParams.get('pin');
         const hasAuthCookie = request.cookies.has('sdmed_tv_auth');
         const envPin = process.env.TV_PIN;
@@ -108,7 +108,8 @@ export async function middleware(request: NextRequest) {
         }
 
         // Invalid or no PIN and no cookie
-        return NextResponse.redirect(new URL('/unauthorized', request.url));
+        // Better UX: Send them to a PIN login page instead of the scary Access Denied error
+        return NextResponse.redirect(new URL('/tv/login', request.url));
     }
 
     // 5. Routing Protection (Primary Gate)
