@@ -6,30 +6,9 @@ import { createClient } from '@/lib/supabase-auth';
 import { ActionState } from '@/lib/types/server-actions';
 
 export async function loginAction(prevState: ActionState, formData: FormData) {
-    const authMode = process.env.AUTH_MODE || 'stub';
     const emailOrUsername = formData.get('username') as string;
     const password = formData.get('password') as string;
-    console.log('DEBUG: loginAction - start', { emailOrUsername, authMode });
 
-    // 1. Stub Mode
-    if (authMode !== 'supabase') {
-        const cookieStore = await cookies();
-
-        let role = 'SECRETARY';
-        // Simple mapping for Stub
-        if (emailOrUsername.includes('admin')) role = 'ADMIN';
-        if (emailOrUsername.includes('doc')) role = 'DOCTOR';
-
-        // Use 'sec' or anything else -> SECRETARY
-
-        cookieStore.set('mock_role', role);
-
-        if (role === 'ADMIN') redirect('/admin');
-        if (role === 'DOCTOR') redirect('/doctor');
-        redirect('/secretary');
-    }
-
-    // 2. Supabase Mode
     const supabase = await createClient();
 
     // We assume input is email for Supabase
@@ -62,14 +41,6 @@ export async function loginAction(prevState: ActionState, formData: FormData) {
 }
 
 export async function logoutAction() {
-    const authMode = process.env.AUTH_MODE || 'stub';
-
-    if (authMode !== 'supabase') {
-        const cookieStore = await cookies();
-        cookieStore.delete('mock_role');
-        redirect('/login');
-    }
-
     const supabase = await createClient();
     await supabase.auth.signOut();
     redirect('/login');

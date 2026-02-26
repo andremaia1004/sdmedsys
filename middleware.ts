@@ -5,7 +5,6 @@ import { Role } from '@/lib/types/auth';
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const authMode = process.env.AUTH_MODE || 'stub';
 
     // 1. TV Protection (Removed for public access)
     // No longer required as per user request
@@ -15,39 +14,38 @@ export async function middleware(request: NextRequest) {
     let userRole: string | undefined;
     let userId: string | undefined;
 
-    if (authMode === 'supabase' && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-            {
-                cookies: {
-                    getAll() { return request.cookies.getAll(); },
-                    setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-                        supabaseResponse = NextResponse.next({ request });
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            supabaseResponse.cookies.set(name, value, options)
-                        );
-                    },
-                },
-            }
-        );
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.error('Supabase environment variables missing');
+        return NextResponse.redirect(new URL('/unauthorized?error=missing_config', request.url));
+    }
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            userId = user.id;
-            // Get role from profile
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', user.id)
-                .single();
-            userRole = profile?.role;
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        {
+            cookies: {
+                getAll() { return request.cookies.getAll(); },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+                    supabaseResponse = NextResponse.next({ request });
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        supabaseResponse.cookies.set(name, value, options)
+                    );
+                },
+            },
         }
-    } else {
-        // Stub Mode
-        userId = 'stub-id';
-        userRole = request.cookies.get('mock_role')?.value;
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        userId = user.id;
+        // Get role from profile
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+        userRole = profile?.role;
     }
 
     // 3. Legacy Patient Redirects & Forwarding
