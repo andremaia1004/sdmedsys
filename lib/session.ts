@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase-auth';
 
 import { Role, UserSession } from './types/auth';
@@ -42,9 +43,7 @@ async function getSupabaseUser(): Promise<UserSession | null> {
 
         if (error || !user) return null;
 
-        // Use supabaseServer for the profile check to be safer/faster
-        const { supabaseServer } = await import('./supabase-server');
-        const { data: profile } = await supabaseServer
+        const { data: profile } = await supabase
             .from('profiles')
             .select('role, clinic_id, email')
             .eq('id', user.id)
@@ -81,10 +80,10 @@ export async function getCurrentUser(): Promise<UserSession | null> {
 export async function requireRole(allowedRoles: Role[]) {
     const user = await getCurrentUser();
     if (!user) {
-        throw new Error('Unauthorized: No active session');
+        redirect('/login');
     }
     if (!allowedRoles.includes(user.role)) {
-        throw new Error(`Forbidden: Role ${user.role} is not allowed. Required: ${allowedRoles.join(', ')}`);
+        redirect('/unauthorized');
     }
     return user;
 }
