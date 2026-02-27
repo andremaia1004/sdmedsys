@@ -26,6 +26,8 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
     }
 
     async update(input: Partial<ClinicSettings>): Promise<ClinicSettings> {
+        // First check if settings exist
+        const existing = await this.get();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateData: any = { updated_at: new Date().toISOString() };
 
@@ -39,15 +41,35 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         if (input.phone !== undefined) updateData.phone = input.phone;
         if (input.website !== undefined) updateData.website = input.website;
 
-        const { data, error } = await this.supabase
-            .from('clinic_settings')
-            .update(updateData)
-            .eq('clinic_id', this.clinicId)
-            .select()
-            .single();
+        if (!existing) {
+            // Document doesn't exist, we must INSERT
+            updateData.clinic_id = this.clinicId;
+            const { data, error } = await this.supabase
+                .from('clinic_settings')
+                .insert([updateData])
+                .select()
+                .single();
 
-        if (error) throw new Error(error.message);
-        return this.mapToSettings(data);
+            if (error) {
+                console.error("Supabase settings insert error:", error);
+                throw new Error(error.message);
+            }
+            return this.mapToSettings(data);
+        } else {
+            // Document exists, we UPDATE
+            const { data, error } = await this.supabase
+                .from('clinic_settings')
+                .update(updateData)
+                .eq('clinic_id', this.clinicId)
+                .select()
+                .single();
+
+            if (error) {
+                console.error("Supabase settings update error:", error);
+                throw new Error(error.message);
+            }
+            return this.mapToSettings(data);
+        }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
