@@ -2,10 +2,12 @@
 
 import { useActionState, useEffect, useState } from 'react';
 import { createPatientAction } from '../actions';
+import { listDoctorsAction } from '@/features/doctors/actions';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Patient } from '../types';
+import { Doctor } from '@/features/doctors/types';
 import styles from '../styles/Patients.module.css';
 
 export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patient) => void }) {
@@ -29,8 +31,21 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
         // Clinical
         insurance: '',
         emergency_contact: '',
-        main_complaint: ''
+        main_complaint: '',
+        doctor_id: '',
     });
+
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+
+    useEffect(() => {
+        async function loadDoctors() {
+            const res = await listDoctorsAction(true);
+            if (res.success && res.data) {
+                setDoctors(res.data);
+            }
+        }
+        loadDoctors();
+    }, []);
 
     // Safety state to prevent double-click "Next" -> "Finish" race condition
     const [isSubmissionReady, setIsSubmissionReady] = useState(false);
@@ -228,6 +243,34 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
                                 <Input label="Convênio / Pagamento" name="insurance" value={formData.insurance} onChange={handleChange} placeholder="Ex: Unimed, Particular, etc." fullWidth />
                                 <Input label="Contato de Emergência" name="emergency_contact" value={formData.emergency_contact} onChange={handleChange} placeholder="Nome e Telefone" fullWidth />
                             </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#333' }}>
+                                        Médico Responsável
+                                    </label>
+                                    <select
+                                        name="doctor_id"
+                                        value={formData.doctor_id}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, doctor_id: e.target.value }))}
+                                        style={{
+                                            padding: '0.625rem 0.75rem',
+                                            borderRadius: '6px',
+                                            border: '1px solid #ccc',
+                                            fontSize: '1rem',
+                                            backgroundColor: '#fff',
+                                            width: '100%',
+                                            fontFamily: 'inherit'
+                                        }}
+                                    >
+                                        <option value="">Nenhum (Opcional)</option>
+                                        {doctors.map(doc => (
+                                            <option key={doc.id} value={doc.id}>
+                                                {doc.name} {doc.specialty ? `- ${doc.specialty}` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                             <div style={{ marginTop: '1.5rem' }}>
                                 <Textarea label="Queixa Principal / Motivo" name="main_complaint" value={formData.main_complaint} onChange={handleChange} placeholder="Motivo do cadastro ou queixa inicial" fullWidth />
                             </div>
@@ -244,7 +287,7 @@ export default function PatientForm({ onSuccess }: { onSuccess?: (patient: Patie
 
                         const step1Fields = ['name', 'document', 'birth_date', 'guardian_name'];
                         const step2Fields = ['phone', 'email', 'address_zip', 'address_street', 'address_number', 'address_neighborhood', 'address_city'];
-                        const step3Fields = ['insurance', 'emergency_contact', 'main_complaint'];
+                        const step3Fields = ['insurance', 'emergency_contact', 'main_complaint', 'doctor_id'];
 
                         // We also skip individual address parts because we send the combined 'address' field
                         const addressParts = ['address_zip', 'address_street', 'address_number', 'address_neighborhood', 'address_city'];

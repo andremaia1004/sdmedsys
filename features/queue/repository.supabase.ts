@@ -33,13 +33,18 @@ export class SupabaseQueueRepository implements IQueueRepository {
         return data.map(this.mapToQueueItem);
     }
 
-    async getTVList(): Promise<QueueItemWithPatient[]> {
-        const { data, error } = await this.supabase
+    async getTVList(doctorId?: string): Promise<QueueItemWithPatient[]> {
+        let query = this.supabase
             .from('queue_items')
             .select('id, ticket_code, status, doctor_id, patient_id, created_at, updated_at, patients(name)')
             .eq('clinic_id', this.clinicId)
-            .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
-            .order('updated_at', { ascending: false });
+            .in('status', ['WAITING', 'CALLED', 'IN_SERVICE']);
+
+        if (doctorId) {
+            query = query.or(`doctor_id.eq.${doctorId},doctor_id.is.null`);
+        }
+
+        const { data, error } = await query.order('updated_at', { ascending: false });
 
         if (error) {
             console.error('Supabase Error (TV list):', error);
@@ -56,6 +61,7 @@ export class SupabaseQueueRepository implements IQueueRepository {
             patient_id: row.patient_id,
             appointment_id: row.appointment_id || null,
             patient_name: row.patients?.name || '---',
+            priority: row.priority || 'NORMAL',
             start_time: null, // Joined below or handled later
             created_at: row.created_at,
             updated_at: row.updated_at
@@ -69,7 +75,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
             p_doctor_id: item.doctor_id,
             p_appointment_id: item.appointment_id,
             p_status: item.status,
-            p_prefix: prefix
+            p_prefix: prefix,
+            p_priority: item.priority || 'NORMAL'
         });
 
         if (rpcError) {
@@ -138,6 +145,7 @@ export class SupabaseQueueRepository implements IQueueRepository {
             patient_id: row.patient_id,
             doctor_id: row.doctor_id,
             status: row.status,
+            priority: row.priority || 'NORMAL',
             created_at: row.created_at,
             updated_at: row.updated_at,
         };

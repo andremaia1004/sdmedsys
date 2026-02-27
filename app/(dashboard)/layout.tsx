@@ -2,6 +2,7 @@ import { logoutAction } from '@/app/actions/auth';
 import { getCurrentUser } from '@/lib/session';
 import styles from './layout.module.css';
 import { LogOut } from 'lucide-react';
+import { SettingsService } from '@/features/admin/settings/service';
 
 import SidebarNav from './SidebarNav';
 
@@ -11,6 +12,7 @@ export default async function DashboardLayout({
     children: React.ReactNode;
 }) {
     const user = await getCurrentUser();
+    const settings = await SettingsService.get();
     const role = user?.role || 'SECRETARY';
 
     // Map roles to Portuguese
@@ -24,7 +26,12 @@ export default async function DashboardLayout({
         <div className={styles.layout}>
             <aside className={styles.sidebar}>
                 <div className={styles.logoContainer}>
-                    <span className={styles.logoText}>SDMED<span className={styles.logoAccent}>SYS</span></span>
+                    {settings.logoUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={settings.logoUrl} alt={settings.clinicName} className={styles.clinicLogo} />
+                    ) : (
+                        <span className={styles.logoText}>SDMED<span className={styles.logoAccent}>SYS</span></span>
+                    )}
                 </div>
 
                 <SidebarNav role={role} />

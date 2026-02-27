@@ -27,10 +27,10 @@
 .tvContainer {
     height: 100vh;
     display: grid;
-    grid-template-columns: 65% 35%;
+    grid-template-columns: 68% 32%;
     gap: 0;
-    background-color: #0b1120;
-    /* Deep blue almost black */
+    background-color: #020617;
+    /* Slate 950 */
     color: white;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow: hidden;
@@ -44,8 +44,8 @@
     align-items: center;
     padding: 0;
     position: relative;
-    background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0b1120 70%);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: radial-gradient(circle at 50% 40%, #0f172a 0%, #020617 80%);
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .callingLabel {
@@ -125,6 +125,26 @@
     color: #cbd5e1;
     /* Slate 300 */
     line-height: 1.2;
+}
+
+.tvPriorityBadge {
+    background: #dc2626;
+    color: white;
+    padding: 0.2rem 1rem;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+    animation: tvPulse 1.5s infinite ease-in-out;
+}
+
+.tvPriorityBadgeSmall {
+    background: #dc2626;
+    color: white;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 900;
 }
 
 .sideDisplay {
@@ -219,7 +239,13 @@
     letter-spacing: 0.05em;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
+}
+
+.tvClinicLogo {
+    height: 40px;
+    max-width: 150px;
+    object-fit: contain;
 }
 
 .clock {
@@ -337,6 +363,19 @@
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 6px;
+}
+
+.priorityBadge {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    margin-left: 8px;
+    border: 1px solid #fecaca;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .patientInfo {

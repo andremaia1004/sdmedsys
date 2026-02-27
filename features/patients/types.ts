@@ -11,6 +11,7 @@ export interface Patient {
     main_complaint: string | null;
     emergency_contact: string | null;
     birth_date: string | null; // ISO Date YYYY-MM-DD
+    doctor_id: string | null; // UUID from doctors table
     created_at: string | null;
     updated_at: string | null;
 }

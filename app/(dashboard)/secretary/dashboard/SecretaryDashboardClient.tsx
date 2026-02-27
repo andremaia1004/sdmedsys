@@ -74,7 +74,10 @@ export default function SecretaryDashboard() {
                                 <div key={item.id} className={styles.appCard}>
                                     <div className={styles.appInfo}>
                                         <strong>{item.start_time ? new Date(item.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</strong>
-                                        <span>{item.patient_name}</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span>{item.patient_name}</span>
+                                            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>🩺 {item.doctor_name}</span>
+                                        </div>
                                     </div>
                                     <div className={styles.appActions}>
                                         <button onClick={async () => {

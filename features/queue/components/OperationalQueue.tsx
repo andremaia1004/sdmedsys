@@ -108,6 +108,9 @@ export default function OperationalQueue() {
 
                             <div className={styles.patientInfo}>
                                 <strong>{item.patient_name}</strong>
+                                {item.priority === 'PRIORITY' && (
+                                    <span className={styles.priorityBadge}>PR</span>
+                                )}
                             </div>
 
                             <div className={styles.doctorInfo}>

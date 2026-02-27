@@ -8,6 +8,7 @@ export interface QueueItem {
     patient_id: string; // Required now, reference to Patient
     doctor_id: string | null; // Optional if general queue, but keeping linked for MVP
     status: QueueStatus;
+    priority: 'NORMAL' | 'PRIORITY';
     created_at: string | null;
     updated_at: string | null;
 }

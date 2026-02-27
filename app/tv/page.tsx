@@ -5,13 +5,13 @@ import { QueueItemWithPatient } from '@/features/queue/types';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TVPage() {
+export default async function TVPage({ searchParams }: { searchParams: { doctorId?: string } }) {
     let items: QueueItemWithPatient[] = [];
     let settings = null;
 
     try {
         const [fetchedItems, fetchedSettings] = await Promise.all([
-            fetchTVQueueAction(),
+            fetchTVQueueAction(searchParams.doctorId),
             fetchPublicSettingsAction()
         ]);
         items = fetchedItems || [];
@@ -23,7 +23,8 @@ export default async function TVPage() {
     return (
         <TVBoard
             items={items}
-            clinicName={settings?.clinicName || 'SDMED SYS'}
+            clinicName={settings?.clinicName}
+            logoUrl={settings?.logoUrl}
             refreshSeconds={settings?.tvRefreshSeconds || 30}
         />
     );

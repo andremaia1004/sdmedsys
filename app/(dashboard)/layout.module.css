@@ -26,6 +26,12 @@
     padding: 0 0.75rem;
 }
 
+.clinicLogo {
+    max-width: 100%;
+    max-height: 50px;
+    object-fit: contain;
+}
+
 .logoText {
     font-size: 1.5rem;
     font-weight: 850;

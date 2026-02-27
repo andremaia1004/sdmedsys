@@ -32,9 +32,9 @@ export class QueueService {
         return enriched;
     }
 
-    static async getTVList(): Promise<Partial<QueueItemWithPatient>[]> {
+    static async getTVList(doctorId?: string): Promise<Partial<QueueItemWithPatient>[]> {
         const repo = await getRepository();
-        return repo.getTVList();
+        return repo.getTVList(doctorId);
     }
 
     static async add(item: Omit<QueueItem, 'id' | 'created_at' | 'updated_at' | 'ticket_code'>, actorRole: string): Promise<QueueItem> {
@@ -148,7 +148,11 @@ export class QueueService {
             if (a.status === 'CALLED' && b.status !== 'CALLED') return -1;
             if (a.status !== 'CALLED' && b.status === 'CALLED') return 1;
 
-            // 2. Late Scheduled (status is WAITING at this point)
+            // 2. Priority tickets (PR)
+            if (a.priority === 'PRIORITY' && b.priority !== 'PRIORITY') return -1;
+            if (a.priority !== 'PRIORITY' && b.priority === 'PRIORITY') return 1;
+
+            // 3. Late Scheduled (status is WAITING at this point)
             const aIsLate = !!a.appointment_id && a.start_time && new Date(a.start_time) < now;
             const bIsLate = !!b.appointment_id && b.start_time && new Date(b.start_time) < now;
 

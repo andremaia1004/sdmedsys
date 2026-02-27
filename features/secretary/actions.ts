@@ -49,10 +49,10 @@ export async function markNoShowAction(appointmentId: string): Promise<ActionRes
     }
 }
 
-export async function createWalkInAction(patientId: string, doctorId: string, notes?: string): Promise<ActionResponse> {
+export async function createWalkInAction(patientId: string, doctorId: string, priority: 'NORMAL' | 'PRIORITY' = 'NORMAL', notes?: string): Promise<ActionResponse> {
     try {
         await requireRole(['SECRETARY', 'ADMIN']);
-        const success = await SecretaryDashboardService.createWalkIn(patientId, doctorId, notes);
+        const success = await SecretaryDashboardService.createWalkIn(patientId, doctorId, priority, notes);
         if (!success) {
             return formatError(new Error('Falha ao registrar atendimento na base de dados'));
         }

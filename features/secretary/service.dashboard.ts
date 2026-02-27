@@ -8,6 +8,7 @@ export interface DashboardItem {
     patient_id: string;
     patient_name: string;
     doctor_id: string;
+    doctor_name: string;
     start_time: string | null;
     appointment_status: AppointmentStatus;
     queue_item_id: string | null;
@@ -28,6 +29,7 @@ export class SecretaryDashboardService {
                 patient_id,
                 patient_name,
                 doctor_id,
+                doctors ( name ),
                 start_time,
                 status,
                 queue_items (
@@ -51,6 +53,7 @@ export class SecretaryDashboardService {
             patient_id: row.patient_id,
             patient_name: row.patient_name || 'Desconhecido',
             doctor_id: row.doctor_id,
+            doctor_name: (row.doctors as any)?.name || 'Médico',
             start_time: row.start_time,
             appointment_status: row.status as AppointmentStatus,
             queue_item_id: row.queue_items?.[0]?.id || null,
@@ -59,7 +62,7 @@ export class SecretaryDashboardService {
         }));
     }
 
-    static async markArrived(appointmentId: string): Promise<boolean> {
+    static async markArrived(appointmentId: string, priority: 'NORMAL' | 'PRIORITY' = 'NORMAL'): Promise<boolean> {
         const user = await getCurrentUser();
         if (!user || !user.clinicId) return false;
 
@@ -100,7 +103,8 @@ export class SecretaryDashboardService {
                 patient_id: appointment.patient_id,
                 doctor_id: appointment.doctor_id,
                 ticket_code: ticketCode,
-                status: 'WAITING'
+                status: 'WAITING',
+                priority: priority
             }]);
 
         if (queueError) {
@@ -147,7 +151,7 @@ export class SecretaryDashboardService {
         return !error;
     }
 
-    static async createWalkIn(patientId: string, doctorId: string, notes?: string): Promise<boolean> {
+    static async createWalkIn(patientId: string, doctorId: string, priority: 'NORMAL' | 'PRIORITY' = 'NORMAL', notes?: string): Promise<boolean> {
         const user = await getCurrentUser();
         console.log('DEBUG: createWalkIn - user:', user?.id, 'role:', user?.role, 'clinicId:', user?.clinicId);
         if (!user || !user.clinicId) {
@@ -208,7 +212,8 @@ export class SecretaryDashboardService {
                 patient_id: patientId,
                 doctor_id: doctorId,
                 ticket_code: ticketCode,
-                status: 'WAITING'
+                status: 'WAITING',
+                priority: priority
             }]);
 
         if (queueError) {

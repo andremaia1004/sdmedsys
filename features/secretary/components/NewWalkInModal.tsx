@@ -20,6 +20,7 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
+    const [priority, setPriority] = useState<'NORMAL' | 'PRIORITY'>('NORMAL');
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
 
@@ -50,7 +51,7 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const handleCreate = async () => {
         if (!selectedPatient || !selectedDoctorId) return;
         setLoading(true);
-        const result = await createWalkInAction(selectedPatient.id, selectedDoctorId);
+        const result = await createWalkInAction(selectedPatient.id, selectedDoctorId, priority);
         if (result.success) {
             onSuccess();
             onClose();
@@ -110,6 +111,34 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
                             ))
                         )}
                     </select>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem', marginTop: '1rem' }}>
+                    <label>Tipo de Atendimento:</label>
+                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 500 }}>
+                            <input
+                                type="radio"
+                                name="priority"
+                                value="NORMAL"
+                                checked={priority === 'NORMAL'}
+                                onChange={() => setPriority('NORMAL')}
+                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            Normal
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, color: '#dc2626' }}>
+                            <input
+                                type="radio"
+                                name="priority"
+                                value="PRIORITY"
+                                checked={priority === 'PRIORITY'}
+                                onChange={() => setPriority('PRIORITY')}
+                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            ⭐ PRIORIDADE (PR)
+                        </label>
+                    </div>
                 </div>
 
                 <div className={styles.modalActions}>

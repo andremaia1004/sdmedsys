@@ -7,8 +7,9 @@ import { Patient } from '@/features/patients/types';
 import { saveConsultationFieldsAction, finishConsultationAction } from '../actions';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { CheckCircle, AlertTriangle, FileText, FilePlus } from 'lucide-react';
+import { CheckCircle, AlertTriangle, FileText, FilePlus, Paperclip } from 'lucide-react';
 import { ClinicalDocumentModal } from '@/features/documents/components/ClinicalDocumentModal';
+import { AttachmentUploadModal } from '@/features/documents/components/AttachmentUploadModal';
 import { PatientHistoryPanel } from './PatientHistoryPanel';
 
 interface Props {
@@ -27,6 +28,7 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
     const [isFinished, setIsFinished] = useState(consultation.is_final || !!consultation.finished_at);
     const [finishError, setFinishError] = useState<string | null>(null);
     const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
 
     // Auto-save Logic for Structured Fields
     useEffect(() => {
@@ -154,6 +156,24 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                                 </Button>
 
                                 <Button
+                                    variant="secondary"
+                                    onClick={() => setIsUploadOpen(true)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}
+                                >
+                                    <Paperclip size={18} />
+                                    Anexar Arquivo
+                                </Button>
+
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setIsUploadOpen(true)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}
+                                >
+                                    <Paperclip size={18} />
+                                    Anexar Arquivo
+                                </Button>
+
+                                <Button
                                     variant="primary"
                                     onClick={handleFinish}
                                     disabled={status === 'saving'}
@@ -184,6 +204,29 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                 consultationId={consultation.id}
                 patientName={patient.name}
             />
+
+            {isUploadOpen && (
+                <AttachmentUploadModal
+                    patientId={patient.id}
+                    role="DOCTOR"
+                    onClose={() => setIsUploadOpen(false)}
+                    onSuccess={() => {
+                        setIsUploadOpen(false);
+                    }}
+                />
+            )}
+
+            {isUploadOpen && (
+                <AttachmentUploadModal
+                    patientId={patient.id}
+                    role="DOCTOR"
+                    onClose={() => setIsUploadOpen(false)}
+                    onSuccess={() => {
+                        setIsUploadOpen(false);
+                        // Optional: trigger a refresh of history panel if it shows attachments
+                    }}
+                />
+            )}
         </div>
     );
 }

@@ -8,12 +8,16 @@ export class SupabasePatientsRepository implements IPatientsRepository {
         private clinicId: string
     ) { }
 
-    async list(query?: string): Promise<Patient[]> {
+    async list(query?: string, doctorId?: string): Promise<Patient[]> {
         let builder = this.supabase
             .from('patients')
             .select('*')
             .eq('clinic_id', this.clinicId)
             .order('name', { ascending: true });
+
+        if (doctorId) {
+            builder = builder.eq('doctor_id', doctorId);
+        }
 
         if (query) {
             const q = query.trim();
@@ -91,7 +95,8 @@ export class SupabasePatientsRepository implements IPatientsRepository {
                 main_complaint: input.main_complaint,
                 emergency_contact: input.emergency_contact,
                 birth_date: input.birth_date,
-                clinic_id: this.clinicId
+                clinic_id: this.clinicId,
+                doctor_id: input.doctor_id
             }])
             .select()
             .single();
@@ -120,6 +125,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
                 main_complaint: input.main_complaint,
                 emergency_contact: input.emergency_contact,
                 birth_date: input.birth_date,
+                doctor_id: input.doctor_id,
                 updated_at: new Date().toISOString(),
                 // clinic_id technically shouldn't change, but we could add it to eq
             })
@@ -153,6 +159,7 @@ export class SupabasePatientsRepository implements IPatientsRepository {
             created_at: row.created_at,
             updated_at: row.updated_at,
             clinic_id: row.clinic_id,
+            doctor_id: row.doctor_id,
         };
     }
 }

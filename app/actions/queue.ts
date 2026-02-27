@@ -39,6 +39,7 @@ export async function addToQueueAction(formData: FormData) {
                 name: patientName,
                 document: 'TEMP',
                 phone: '000',
+                doctor_id: doctorId,
                 birth_date: null,
                 email: null,
                 address: null,
@@ -55,7 +56,8 @@ export async function addToQueueAction(formData: FormData) {
             patient_id: patientId,
             doctor_id: doctorId,
             appointment_id: null,
-            status: 'WAITING'
+            status: 'WAITING',
+            priority: 'NORMAL'
         }, user.role);
 
         await logAudit('CREATE', 'QUEUE', item.id, { patient_id: patientId, doctor_id: doctorId });
@@ -108,13 +110,13 @@ export async function fetchQueueAction(doctorId?: string): Promise<QueueItemWith
     }
 }
 
-export async function fetchTVQueueAction(): Promise<QueueItemWithPatient[]> {
+export async function fetchTVQueueAction(doctorId?: string): Promise<QueueItemWithPatient[]> {
     try {
         // TV is public, use default clinic or extract from config?
         // For now using default clinic
         const clinicId = '550e8400-e29b-41d4-a716-446655440000';
         const repo = new SupabaseQueueRepository(supabaseServer, clinicId);
-        return await repo.getTVList();
+        return await repo.getTVList(doctorId);
     } catch (e) {
         console.error('fetchTVQueueAction Error:', e);
         return [];

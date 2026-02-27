@@ -71,6 +71,7 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
                                     </span>
                                 </div>
                                 <h4 className={styles.patientName}>{item.patient_name}</h4>
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>🩺 {item.doctor_name}</div>
 
                                 <div className={styles.actions}>
                                     {item.appointment_status === 'SCHEDULED' && (

@@ -9,10 +9,12 @@ import { Building2, Activity, ArrowRight } from 'lucide-react';
 export default function TVBoard({
     items = [],
     clinicName = 'SDMED SYS',
+    logoUrl,
     refreshSeconds = 30
 }: {
     items?: QueueItemWithPatient[],
     clinicName?: string,
+    logoUrl?: string,
     refreshSeconds?: number
 }) {
     const router = useRouter();
@@ -61,11 +63,16 @@ export default function TVBoard({
                 <div className={`${styles.ticketCard} ${calling ? styles.pulse : ''}`}>
                     <div className={styles.ticketNumber}>
                         {currentCalled?.ticket_code || '---'}
-                        {currentCalled?.appointment_id !== undefined && (
-                            <span style={{ fontSize: '1.5rem', marginLeft: '1rem', verticalAlign: 'middle' }}>
-                                {!!currentCalled?.appointment_id ? '📅' : '🏃'}
-                            </span>
-                        )}
+                        <div style={{ display: 'inline-flex', gap: '0.5rem', marginLeft: '1rem', verticalAlign: 'middle' }}>
+                            {currentCalled?.priority === 'PRIORITY' && (
+                                <span className={styles.tvPriorityBadge}>PR</span>
+                            )}
+                            {currentCalled?.appointment_id !== undefined && (
+                                <span style={{ fontSize: '1.5rem' }}>
+                                    {!!currentCalled?.appointment_id ? '📅' : '🏃'}
+                                </span>
+                            )}
+                        </div>
                     </div>
                     <div className={styles.patientName}>{currentCalled?.patient_name || 'Aguardando...'}</div>
                 </div>
@@ -78,6 +85,9 @@ export default function TVBoard({
                         <div key={item.id} className={styles.nextItem}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span className={styles.nextTicket}>{item.ticket_code}</span>
+                                {item.priority === 'PRIORITY' && (
+                                    <span className={styles.tvPriorityBadgeSmall}>PR</span>
+                                )}
                                 <span style={{ fontSize: '0.9rem' }}>{!!item.appointment_id ? '📅' : '🏃'}</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -96,7 +106,12 @@ export default function TVBoard({
 
             <footer className={styles.tvFooter}>
                 <div className={styles.clinicName}>
-                    <Building2 size={24} color="var(--accent)" />
+                    {logoUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={logoUrl} alt={clinicName} className={styles.tvClinicLogo} />
+                    ) : (
+                        <Building2 size={24} color="var(--accent)" />
+                    )}
                     {clinicName}
                 </div>
                 <div className={styles.clock}>

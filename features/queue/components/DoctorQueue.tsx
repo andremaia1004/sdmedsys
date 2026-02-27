@@ -115,6 +115,9 @@ export default function DoctorQueue({ doctorId }: Props) {
 
                             <div className={styles.patientInfo}>
                                 <strong>{item.patient_name}</strong>
+                                {item.priority === 'PRIORITY' && (
+                                    <span className={styles.priorityBadge}>PR</span>
+                                )}
                             </div>
 
                             <div>
