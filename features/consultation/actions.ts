@@ -49,7 +49,8 @@ export async function startConsultationFromAppointmentAction(appointmentId: stri
                 doctor_id: doctorId,
                 appointment_id: appointmentId,
                 status: 'WAITING',
-                clinic_id: sessionUser.clinicId || '550e8400-e29b-41d4-a716-446655440000'
+                clinic_id: sessionUser.clinicId || '550e8400-e29b-41d4-a716-446655440000',
+                priority: 'NORMAL'
             }, 'DOCTOR');
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -70,7 +70,8 @@ export async function createAppointmentAction(prevState: ActionResponse<Appointm
                     doctor_id: appointment.doctor_id,
                     appointment_id: appointment.id,
                     status: 'WAITING',
-                    clinic_id: user?.clinicId || '550e8400-e29b-41d4-a716-446655440000'
+                    clinic_id: user?.clinicId || '550e8400-e29b-41d4-a716-446655440000',
+                    priority: 'NORMAL'
                 }, role);
 
                 revalidatePath('/queue');
