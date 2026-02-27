@@ -77,8 +77,7 @@ export default function SettingsAdminPage() {
                                         if (!file) return;
 
                                         setIsSaving(true);
-                                        const { createClient } = await import('@supabase/supabase-js');
-                                        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+                                        const { supabase } = await import('@/lib/supabase');
 
                                         const fileExt = file.name.split('.').pop();
                                         const fileName = `${settings.clinicId}-${Date.now()}.${fileExt}`;
