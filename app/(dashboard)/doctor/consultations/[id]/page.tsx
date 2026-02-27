@@ -17,10 +17,22 @@ export default async function ConsultationPage({
     const res = await getConsultationAction(id);
     const consultation = res.data;
 
-    if (!consultation || consultation.doctor_id !== user.id) {
+    let doctorIdContext = user.id;
+
+    if (user.role === 'DOCTOR') {
+        const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+        const { supabaseServer } = await import('@/lib/supabase-server');
+        const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, user.clinicId || '550e8400-e29b-41d4-a716-446655440000');
+        const doctor = await doctorsRepo.findByProfileId(user.id);
+        if (doctor) {
+            doctorIdContext = doctor.id;
+        }
+    }
+
+    if (!consultation || consultation.doctor_id !== doctorIdContext) {
         // Strict security: ensure doctor owns this consultation
         // Or if admin, allow view?
-        if (user.role !== 'ADMIN' && consultation?.doctor_id !== user.id) {
+        if (user.role !== 'ADMIN' && consultation?.doctor_id !== doctorIdContext) {
             return (
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                     <h1>Acesso Negado</h1>
