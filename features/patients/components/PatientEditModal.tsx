@@ -68,6 +68,7 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
                 guardian_name: formData.guardian_name !== undefined ? (formData.guardian_name || null) : patient.guardian_name,
                 emergency_contact: formData.emergency_contact !== undefined ? (formData.emergency_contact || null) : patient.emergency_contact,
                 main_complaint: formData.main_complaint !== undefined ? (formData.main_complaint || null) : patient.main_complaint,
+                doctor_id: patient.doctor_id,
             };
 
             const res = await updatePatientAction(patient.id, input);
