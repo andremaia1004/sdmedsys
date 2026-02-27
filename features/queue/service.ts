@@ -78,8 +78,21 @@ export class QueueService {
         // 3. Role/Assignment Validation (Doctor starting consultation)
         if (newStatus === 'IN_SERVICE') {
             const user = await getCurrentUser();
-            if (currentItem.doctor_id && currentItem.doctor_id !== user?.id && user?.role !== 'ADMIN') {
-                throw new Error('Apenas o médico designado pode iniciar este atendimento.');
+            if (currentItem.doctor_id && user?.role !== 'ADMIN') {
+                let isDesignatedDoctor = false;
+                if (user?.role === 'DOCTOR') {
+                    const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+                    const { supabaseServer } = await import('@/lib/supabase-server');
+                    const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, user.clinicId || '550e8400-e29b-41d4-a716-446655440000');
+                    const doctor = await doctorsRepo.findByProfileId(user.id);
+                    if (doctor && doctor.id === currentItem.doctor_id) {
+                        isDesignatedDoctor = true;
+                    }
+                }
+
+                if (!isDesignatedDoctor) {
+                    throw new Error('Apenas o médico designado pode iniciar este atendimento.');
+                }
             }
         }
 
