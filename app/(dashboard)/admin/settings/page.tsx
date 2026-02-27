@@ -82,7 +82,7 @@ export default function SettingsAdminPage() {
                                         const fileExt = file.name.split('.').pop();
                                         const fileName = `${settings.clinicId}-${Date.now()}.${fileExt}`;
 
-                                        const { error, data } = await supabase.storage
+                                        const { error } = await supabase.storage
                                             .from('clinic_assets')
                                             .upload(fileName, file, { upsert: true });
 

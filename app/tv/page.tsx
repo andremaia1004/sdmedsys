@@ -5,13 +5,14 @@ import { QueueItemWithPatient } from '@/features/queue/types';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TVPage({ searchParams }: { searchParams: { doctorId?: string } }) {
+export default async function TVPage({ searchParams }: { searchParams: Promise<{ doctorId?: string }> }) {
+    const { doctorId } = await searchParams;
     let items: QueueItemWithPatient[] = [];
     let settings = null;
 
     try {
         const [fetchedItems, fetchedSettings] = await Promise.all([
-            fetchTVQueueAction(searchParams.doctorId),
+            fetchTVQueueAction(doctorId),
             fetchPublicSettingsAction()
         ]);
         items = fetchedItems || [];
