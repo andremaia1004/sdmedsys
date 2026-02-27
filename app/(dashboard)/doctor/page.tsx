@@ -11,11 +11,20 @@ export const dynamic = 'force-dynamic';
 export default async function DoctorDashboard() {
     const user = await requireRole(['DOCTOR', 'ADMIN']);
 
+    let doctorIdContext: string | undefined = undefined;
+    if (user.role === 'DOCTOR') {
+        const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+        const { supabaseServer } = await import('@/lib/supabase-server');
+        const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, user.clinicId || '550e8400-e29b-41d4-a716-446655440000');
+        const doctor = await doctorsRepo.findByProfileId(user.id);
+        if (doctor) doctorIdContext = doctor.id;
+    }
+
     // Fetch Data
     const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })).toISOString().split('T')[0];
     const [queue, appointments] = await Promise.all([
-        QueueService.getOperationalQueue(user.id),
-        AppointmentService.list(user.id, `${today}T00:00:00-03:00`, `${today}T23:59:59-03:00`)
+        QueueService.getOperationalQueue(doctorIdContext),
+        AppointmentService.list(doctorIdContext, `${today}T00:00:00-03:00`, `${today}T23:59:59-03:00`)
     ]);
 
     // Metrics

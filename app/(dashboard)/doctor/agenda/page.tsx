@@ -38,8 +38,17 @@ export default async function DoctorAgendaPage({
         endStr = endOfWeek.toLocaleDateString('en-CA');
     }
 
+    let doctorIdContext: string | undefined = undefined;
+    if (user.role === 'DOCTOR') {
+        const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+        const { supabaseServer } = await import('@/lib/supabase-server');
+        const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, user.clinicId || '550e8400-e29b-41d4-a716-446655440000');
+        const doctor = await doctorsRepo.findByProfileId(user.id);
+        if (doctor) doctorIdContext = doctor.id;
+    }
+
     // Fetch appointments for this doctor only
-    const appointments = await AppointmentService.list(user.id, `${startStr}T00:00:00`, `${endStr}T23:59:59`);
+    const appointments = await AppointmentService.list(doctorIdContext, `${startStr}T00:00:00`, `${endStr}T23:59:59`);
 
     return (
         <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
@@ -96,13 +105,13 @@ export default async function DoctorAgendaPage({
             {view === 'day' ? (
                 <DailyCalendar
                     appointments={appointments}
-                    doctorId={user.id}
+                    doctorId={doctorIdContext || ""}
                     date={startStr}
                 />
             ) : (
                 <WeeklyCalendar
                     appointments={appointments}
-                    doctorId={user.id}
+                    doctorId={doctorIdContext || ""}
                     role={user.role}
                     baseDate={startStr}
                 />
