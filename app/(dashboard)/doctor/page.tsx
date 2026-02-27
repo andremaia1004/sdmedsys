@@ -12,12 +12,19 @@ export default async function DoctorDashboard() {
     const user = await requireRole(['DOCTOR', 'ADMIN']);
 
     let doctorIdContext: string | undefined = undefined;
+    let doctorNameContext: string = user.name;
+    let doctorSpecialtyContext: string = 'Clínico Geral';
+
     if (user.role === 'DOCTOR') {
         const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
         const { supabaseServer } = await import('@/lib/supabase-server');
         const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, user.clinicId || '550e8400-e29b-41d4-a716-446655440000');
         const doctor = await doctorsRepo.findByProfileId(user.id);
-        if (doctor) doctorIdContext = doctor.id;
+        if (doctor) {
+            doctorIdContext = doctor.id;
+            if (doctor.name) doctorNameContext = doctor.name;
+            if (doctor.specialty) doctorSpecialtyContext = doctor.specialty;
+        }
     }
 
     // Fetch Data
@@ -48,7 +55,7 @@ export default async function DoctorDashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
                     <h1 style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.025em', color: 'var(--primary)', marginBottom: '0.5rem' }}>
-                        Bom dia, <span style={{ color: 'var(--primary-dark)' }}>Dr. {user.name.split(' ')[0]}</span>
+                        Bom dia, <span style={{ color: 'var(--primary-dark)' }}>Dr. {doctorNameContext.split(' ')[0]}</span>
                     </h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
                         {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -237,11 +244,11 @@ export default async function DoctorDashboard() {
                         <div style={{ padding: '1.25rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
                                 <div style={{ width: '48px', height: '48px', background: 'var(--primary)', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 700 }}>
-                                    {user.name.charAt(0)}
+                                    {doctorNameContext.charAt(0).toUpperCase()}
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>Dr. {user.name}</div>
-                                    <div style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 600 }}>Disponível • Clínico Geral</div>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>Dr. {doctorNameContext}</div>
+                                    <div style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 600 }}>Disponível • {doctorSpecialtyContext}</div>
                                 </div>
                                 <Settings size={20} style={{ color: '#94a3b8', cursor: 'pointer' }} />
                             </div>
