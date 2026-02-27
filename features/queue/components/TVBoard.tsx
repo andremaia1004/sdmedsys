@@ -63,18 +63,20 @@ export default function TVBoard({
                 <div className={`${styles.ticketCard} ${calling ? styles.pulse : ''}`}>
                     <div className={styles.ticketNumber}>
                         {currentCalled?.ticket_code || '---'}
-                        <div style={{ display: 'inline-flex', gap: '0.5rem', marginLeft: '1rem', verticalAlign: 'middle' }}>
-                            {currentCalled?.priority === 'PRIORITY' && (
-                                <span className={styles.tvPriorityBadge}>PR</span>
-                            )}
-                            {currentCalled?.appointment_id !== undefined && (
-                                <span style={{ fontSize: '1.5rem' }}>
-                                    {!!currentCalled?.appointment_id ? '📅' : '🏃'}
-                                </span>
-                            )}
-                        </div>
                     </div>
                     <div className={styles.patientName}>{currentCalled?.patient_name || 'Aguardando...'}</div>
+
+                    {currentCalled && (
+                        <div className={styles.doctorHighlight}>
+                            <div className={styles.doctorLabel}>MÉDICO</div>
+                            <div className={styles.doctorValue}>
+                                {currentCalled.doctor_name || 'Médico de Plantão'}
+                                {currentCalled.doctor_specialty && (
+                                    <span className={styles.specialtyTag}> — {currentCalled.doctor_specialty}</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -83,21 +85,22 @@ export default function TVBoard({
                 <div className={styles.nextList}>
                     {waiting.map(item => (
                         <div key={item.id} className={styles.nextItem}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className={styles.nextLeft}>
                                 <span className={styles.nextTicket}>{item.ticket_code}</span>
-                                {item.priority === 'PRIORITY' && (
-                                    <span className={styles.tvPriorityBadgeSmall}>PR</span>
-                                )}
-                                <span style={{ fontSize: '0.9rem' }}>{!!item.appointment_id ? '📅' : '🏃'}</span>
+                                <div className={styles.nextMeta}>
+                                    <span className={styles.nextName}>{item.patient_name}</span>
+                                    <span className={styles.nextDoctor}>
+                                        {item.doctor_name || 'Clínico'}
+                                    </span>
+                                </div>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <span className={styles.nextName}>{item.patient_name}</span>
-                                <ArrowRight size={20} color="rgba(255,255,255,0.2)" />
+                            <div className={styles.nextRight}>
+                                {item.priority === 'PRIORITY' && <span className={styles.tvPriorityBadgeSmall}>PR</span>}
                             </div>
                         </div>
                     ))}
                     {waiting.length === 0 && (
-                        <div style={{ padding: '4rem 2rem', textAlign: 'center', opacity: 0.3, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '16px' }}>
+                        <div className={styles.emptyState}>
                             Fila vazia
                         </div>
                     )}
@@ -107,12 +110,11 @@ export default function TVBoard({
             <footer className={styles.tvFooter}>
                 <div className={styles.clinicName}>
                     {logoUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img src={logoUrl} alt={clinicName} className={styles.tvClinicLogo} />
                     ) : (
                         <Building2 size={24} color="var(--accent)" />
                     )}
-                    {clinicName}
+                    <span>{clinicName}</span>
                 </div>
                 <div className={styles.clock}>
                     {mounted && new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}

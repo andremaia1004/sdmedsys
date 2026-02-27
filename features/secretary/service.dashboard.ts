@@ -14,6 +14,7 @@ export interface DashboardItem {
     queue_item_id: string | null;
     ticket_code: string | null;
     queue_status: 'WAITING' | 'CALLED' | 'IN_SERVICE' | 'DONE' | 'NO_SHOW' | 'CANCELED' | null;
+    doctor_specialty: string | null;
 }
 
 export class SecretaryDashboardService {
@@ -29,7 +30,7 @@ export class SecretaryDashboardService {
                 patient_id,
                 patient_name,
                 doctor_id,
-                doctors ( name ),
+                doctors ( name, specialty ),
                 start_time,
                 status,
                 queue_items (
@@ -38,7 +39,7 @@ export class SecretaryDashboardService {
                     status
                 )
             `)
-            .eq('clinic_id', clinicId) // Assumes clinic_id exists in appointments
+            .eq('clinic_id', clinicId)
             .gte('start_time', startOfDay)
             .lte('start_time', endOfDay)
             .order('start_time', { ascending: true });
@@ -59,6 +60,7 @@ export class SecretaryDashboardService {
             queue_item_id: row.queue_items?.[0]?.id || null,
             ticket_code: row.queue_items?.[0]?.ticket_code || null,
             queue_status: row.queue_items?.[0]?.status || null,
+            doctor_specialty: (row.doctors as any)?.specialty || null,
         }));
     }
 
@@ -77,17 +79,6 @@ export class SecretaryDashboardService {
 
         if (fetchError || !appointment) return false;
 
-        // 2. Generate Ticket Code (e.g., A-001)
-        const dateStr = new Date().toISOString().split('T')[0];
-        const { count } = await supabase
-            .from('queue_items')
-            .select('*', { count: 'exact', head: true })
-            .gte('created_at', `${dateStr}T00:00:00Z`);
-
-        const ticketSeq = (count || 0) + 1;
-        const ticketCode = `T-${ticketSeq.toString().padStart(3, '0')}`;
-
-        // 3. Update Appointment and Create Queue Item
         const { error: updateError } = await supabase
             .from('appointments')
             .update({ status: 'ARRIVED' })
@@ -95,24 +86,20 @@ export class SecretaryDashboardService {
 
         if (updateError) return false;
 
-        const { error: queueError } = await supabase
-            .from('queue_items')
-            .insert([{
-                clinic_id: user.clinicId,
-                appointment_id: appointmentId,
-                patient_id: appointment.patient_id,
-                doctor_id: appointment.doctor_id,
-                ticket_code: ticketCode,
-                status: 'WAITING',
-                priority: priority
-            }]);
+        // Use standard QueueService to generate ticket correctly
+        const prefix = priority === 'PRIORITY' ? 'P' : 'A';
+        const { QueueService } = await import('@/features/queue/service');
 
-        if (queueError) {
-            console.error('DashboardService: Queue error', queueError);
-            return false;
-        }
+        await QueueService.add({
+            clinic_id: user.clinicId,
+            appointment_id: appointmentId,
+            patient_id: appointment.patient_id,
+            doctor_id: appointment.doctor_id,
+            status: 'WAITING',
+            priority: priority
+        }, user.role, prefix);
 
-        await logAudit('CHECK_IN', 'APPOINTMENT', appointmentId, { ticketCode, patientId: appointment.patient_id });
+        await logAudit('CHECK_IN', 'APPOINTMENT', appointmentId, { kind: 'APPOINTMENT', patientId: appointment.patient_id });
 
         return true;
     }
@@ -161,16 +148,6 @@ export class SecretaryDashboardService {
 
         const supabase = await createClient();
 
-        // 1. Generate Ticket Code
-        const dateStr = new Date().toISOString().split('T')[0];
-        const { count } = await supabase
-            .from('queue_items')
-            .select('*', { count: 'exact', head: true })
-            .gte('created_at', `${dateStr}T00:00:00Z`);
-
-        const ticketSeq = (count || 0) + 1;
-        const ticketCode = `T-${ticketSeq.toString().padStart(3, '0')}`;
-
         // 1.5 Fetch Patient Name
         const { data: patientData } = await supabase
             .from('patients')
@@ -203,26 +180,20 @@ export class SecretaryDashboardService {
             throw new Error(`Erro ao criar agendamento: ${appError.message}`);
         }
 
-        // 3. Create Queue Item
-        const { error: queueError } = await supabase
-            .from('queue_items')
-            .insert([{
-                clinic_id: user.clinicId,
-                appointment_id: appointment.id,
-                patient_id: patientId,
-                doctor_id: doctorId,
-                ticket_code: ticketCode,
-                status: 'WAITING',
-                priority: priority
-            }]);
+        // Use standard QueueService to generate ticket correctly
+        const prefix = priority === 'PRIORITY' ? 'P' : 'A';
+        const { QueueService } = await import('@/features/queue/service');
 
-        if (queueError) {
-            console.error('DEBUG: DashboardService: Create QueueItem error', queueError);
-            throw new Error(`Erro ao entrar na fila: ${queueError.message}`);
-        }
+        await QueueService.add({
+            clinic_id: user.clinicId,
+            appointment_id: appointment.id,
+            patient_id: patientId,
+            doctor_id: doctorId,
+            status: 'WAITING',
+            priority: priority
+        }, user.role, prefix);
 
-        console.log('DEBUG: createWalkIn success - appointment:', appointment.id, 'queue_item:', ticketCode);
-        await logAudit('CHECK_IN', 'APPOINTMENT', appointment.id, { ticketCode, kind: 'WALK_IN' });
+        await logAudit('CHECK_IN', 'APPOINTMENT', appointment.id, { kind: 'WALK_IN' });
         return true;
     }
 }

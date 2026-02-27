@@ -15,5 +15,7 @@ export interface QueueItem {
 
 export interface QueueItemWithPatient extends QueueItem {
     patient_name: string;
+    doctor_name: string | null;
+    doctor_specialty: string | null;
     start_time: string | null; // For sorting and display in Ops view
 }

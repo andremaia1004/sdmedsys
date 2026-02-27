@@ -36,15 +36,28 @@ export class SupabaseQueueRepository implements IQueueRepository {
     async getTVList(doctorId?: string): Promise<QueueItemWithPatient[]> {
         let query = this.supabase
             .from('queue_items')
-            .select('id, ticket_code, status, doctor_id, patient_id, created_at, updated_at, patients(name)')
+            .select(`
+                id, 
+                ticket_code, 
+                status, 
+                doctor_id, 
+                patient_id, 
+                created_at, 
+                updated_at, 
+                priority,
+                appointment_id,
+                patients(name),
+                doctors(name, specialty)
+            `)
             .eq('clinic_id', this.clinicId)
-            .in('status', ['WAITING', 'CALLED', 'IN_SERVICE']);
+            .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
+            .gte('created_at', new Date().toISOString().split('T')[0]); // Today only
 
         if (doctorId) {
             query = query.or(`doctor_id.eq.${doctorId},doctor_id.is.null`);
         }
 
-        const { data, error } = await query.order('updated_at', { ascending: false });
+        const { data, error } = await query.order('priority', { ascending: false }).order('updated_at', { ascending: false });
 
         if (error) {
             console.error('Supabase Error (TV list):', error);
@@ -61,8 +74,10 @@ export class SupabaseQueueRepository implements IQueueRepository {
             patient_id: row.patient_id,
             appointment_id: row.appointment_id || null,
             patient_name: row.patients?.name || '---',
+            doctor_name: row.doctors?.name || null,
+            doctor_specialty: row.doctors?.specialty || null,
             priority: row.priority || 'NORMAL',
-            start_time: null, // Joined below or handled later
+            start_time: null,
             created_at: row.created_at,
             updated_at: row.updated_at
         }));

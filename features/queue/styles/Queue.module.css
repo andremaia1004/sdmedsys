@@ -147,6 +147,36 @@
     font-weight: 900;
 }
 
+.doctorHighlight {
+    margin-top: 2rem;
+    padding: 1.5rem 2.5rem;
+    background: rgba(148, 163, 184, 0.05);
+    /* Slate 400 with low alpha */
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.doctorLabel {
+    font-size: 0.875rem;
+    color: #64748b;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.doctorValue {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.specialtyTag {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #94a3b8;
+    vertical-align: middle;
+}
+
 .sideDisplay {
     background: #0f172a;
     /* Slate 900 */
@@ -200,22 +230,51 @@
     border-color: rgba(255, 255, 255, 0.1);
 }
 
+.nextLeft {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 .nextTicket {
     font-size: 2.25rem;
     font-weight: 700;
     color: #e2e8f0;
     letter-spacing: -0.02em;
+    min-width: 80px;
+}
+
+.nextMeta {
+    display: flex;
+    flex-direction: column;
 }
 
 .nextName {
     font-size: 1.125rem;
     font-weight: 500;
-    color: #94a3b8;
-    max-width: 180px;
+    color: #f8fafc;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: right;
+}
+
+.nextDoctor {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.nextRight {
+    display: flex;
+    align-items: center;
+}
+
+.emptyState {
+    padding: 4rem 2rem;
+    text-align: center;
+    opacity: 0.3;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
 }
 
 .tvFooter {

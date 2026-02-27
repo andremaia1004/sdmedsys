@@ -26,7 +26,9 @@ export class QueueService {
             enriched.push({
                 ...item,
                 patient_name: patient ? patient.name : 'Unknown',
-                start_time: null // will be enriched if necessary or accessed from appointments directly
+                doctor_name: null, // Basic list doesn't join doctors yet, but we satisfy the type
+                doctor_specialty: null,
+                start_time: null
             });
         }
         return enriched;
@@ -37,10 +39,10 @@ export class QueueService {
         return repo.getTVList(doctorId);
     }
 
-    static async add(item: Omit<QueueItem, 'id' | 'created_at' | 'updated_at' | 'ticket_code'>, actorRole: string): Promise<QueueItem> {
+    static async add(item: Omit<QueueItem, 'id' | 'created_at' | 'updated_at' | 'ticket_code'>, actorRole: string, prefixArg?: string): Promise<QueueItem> {
         const repo = await getRepository();
 
-        let prefix = 'A';
+        let prefix = prefixArg || 'A';
         try {
             const { SettingsService } = await import('../admin/settings/service');
             const settings = await SettingsService.get();
@@ -137,6 +139,8 @@ export class QueueService {
         const enriched: QueueItemWithPatient[] = filtered.map(item => ({
             ...item,
             patient_name: patientMap.get(item.patient_id) || 'Unknown',
+            doctor_name: null, // Add if needed later, but satisfies type for now
+            doctor_specialty: null,
             start_time: item.appointment_id ? (appMap.get(item.appointment_id) || null) : null
         }));
 
