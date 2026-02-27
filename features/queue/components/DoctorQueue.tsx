@@ -13,6 +13,7 @@ import styles from '../styles/Queue.module.css';
 import { PhoneOutgoing, Play, UserX, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
+import { finishConsultationAction } from '../../consultation/actions';
 
 interface Props {
     doctorId: string;
@@ -86,7 +87,7 @@ export default function DoctorQueue({ doctorId }: Props) {
                     <button onClick={loadData} className={styles.secondaryAction} title="Atualizar">
                         <RefreshCcw size={18} />
                     </button>
-                    {!calledPatient && (
+                    {!calledPatient && !items.some(i => i.status === 'IN_SERVICE') && (
                         <button onClick={handleCallNext} className={styles.mainAction}>
                             <PhoneOutgoing size={18} />
                             Chamar Próximo
@@ -110,7 +111,7 @@ export default function DoctorQueue({ doctorId }: Props) {
                     const isLate = !!item.appointment_id && item.start_time && new Date(item.start_time) < new Date();
 
                     return (
-                        <div key={item.id} className={`${styles.opsCard} ${isCalled ? styles.called : ''}`}>
+                        <div key={item.id} className={`${styles.opsCard} ${isCalled || item.status === 'IN_SERVICE' ? styles.called : ''}`}>
                             <div className={styles.ticketBadge}>{item.ticket_code}</div>
 
                             <div className={styles.patientInfo}>
@@ -187,6 +188,50 @@ export default function DoctorQueue({ doctorId }: Props) {
                                             }}
                                         >
                                             <RefreshCcw size={16} />
+                                        </button>
+                                    </div>
+                                )}
+                                {item.status === 'IN_SERVICE' && (
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        <button
+                                            onClick={() => router.push(`/doctor/consultations/${item.patient_id}`)}
+                                            className={`${styles.inlineBtn} ${styles.btnStart}`}
+                                            title="Retomar Consulta"
+                                            style={{
+                                                background: '#16a34a',
+                                                color: '#fff',
+                                                borderRadius: '8px',
+                                                padding: '0.5rem 1rem',
+                                                fontWeight: 700,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.4rem',
+                                                flex: 1
+                                            }}
+                                        >
+                                            <Play size={14} fill="currentColor" /> Retomar Consulta
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                if (confirm("Tem certeza que deseja remover este paciente da fila e arquivar a chamada sem conclusão?")) {
+                                                    handleAction(quickNoShowAction(item.id));
+                                                }
+                                            }}
+                                            className={styles.inlineBtn}
+                                            title="Remover da Fila"
+                                            style={{
+                                                background: '#fff',
+                                                color: '#ef4444',
+                                                border: '1px solid #fecaca',
+                                                borderRadius: '8px',
+                                                padding: '0.5rem',
+                                                cursor: 'pointer',
+                                                flex: '0 0 auto'
+                                            }}
+                                        >
+                                            <UserX size={16} />
                                         </button>
                                     </div>
                                 )}
