@@ -12,10 +12,10 @@ export default async function DoctorDashboard() {
     const user = await requireRole(['DOCTOR', 'ADMIN']);
 
     // Fetch Data
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })).toISOString().split('T')[0];
     const [queue, appointments] = await Promise.all([
         QueueService.getOperationalQueue(user.id),
-        AppointmentService.list(user.id, `${today}T00:00:00`, `${today}T23:59:59`)
+        AppointmentService.list(user.id, `${today}T00:00:00-03:00`, `${today}T23:59:59-03:00`)
     ]);
 
     // Metrics

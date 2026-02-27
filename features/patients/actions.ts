@@ -72,15 +72,8 @@ export async function searchPatientsAction(query: string): Promise<ActionRespons
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
 
-        let doctorId: string | undefined = undefined;
-        if (user.role === 'DOCTOR') {
-            const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
-            const doctor = await doctorsRepo.findByProfileId(user.id);
-            if (doctor) doctorId = doctor.id;
-        }
-
         const repo = new SupabasePatientsRepository(supabaseServer, clinicId);
-        const data = await repo.list(query, doctorId);
+        const data = await repo.list(query, undefined);
         return formatSuccess(data);
     } catch (err) {
         return formatError(err);
@@ -92,15 +85,8 @@ export async function fetchPatientsAction(): Promise<ActionResponse<Patient[]>> 
         const user = await requireRole(['ADMIN', 'SECRETARY', 'DOCTOR']);
         const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
 
-        let doctorId: string | undefined = undefined;
-        if (user.role === 'DOCTOR') {
-            const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
-            const doctor = await doctorsRepo.findByProfileId(user.id);
-            if (doctor) doctorId = doctor.id;
-        }
-
         const repo = new SupabasePatientsRepository(supabaseServer, clinicId);
-        const data = await repo.list(undefined, doctorId);
+        const data = await repo.list(undefined, undefined);
         return formatSuccess(data);
     } catch (err) {
         return formatError(err);

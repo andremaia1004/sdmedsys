@@ -109,8 +109,8 @@ export class QueueService {
         const repo = await getRepository();
         const items = await repo.list(doctorId);
 
-        // Filter only WAITING and CALLED for the operational view
-        const filtered = items.filter(i => i.status === 'WAITING' || i.status === 'CALLED');
+        // Filter only WAITING, CALLED, and IN_SERVICE for the operational view
+        const filtered = items.filter(i => i.status === 'WAITING' || i.status === 'CALLED' || i.status === 'IN_SERVICE');
 
         if (filtered.length === 0) return [];
 
