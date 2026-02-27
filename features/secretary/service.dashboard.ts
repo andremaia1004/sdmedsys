@@ -20,8 +20,9 @@ export interface DashboardItem {
 export class SecretaryDashboardService {
     static async getDailyDashboard(clinicId: string, date: string): Promise<DashboardItem[]> {
         const supabase = await createClient();
-        const startOfDay = `${date}T00:00:00Z`;
-        const endOfDay = `${date}T23:59:59Z`;
+        // Assume BRT timezone (-03:00) for local queries to match how apps are created.
+        const startOfDay = new Date(`${date}T00:00:00-03:00`).toISOString();
+        const endOfDay = new Date(`${date}T23:59:59-03:00`).toISOString();
 
         const { data, error } = await supabase
             .from('appointments')

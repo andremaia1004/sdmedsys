@@ -55,8 +55,10 @@ export async function createAppointmentAction(prevState: ActionResponse<Appointm
             startTime: appointment.start_time
         });
 
+        // Revalidate the agenda and operational dashboard
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
+        revalidatePath('/secretary/dashboard');
 
         // Auto-add to queue if appointment is today
         try {
@@ -99,6 +101,7 @@ export async function updateAppointmentStatusAction(id: string, status: Appointm
 
         revalidatePath('/doctor/agenda');
         revalidatePath('/secretary/agenda');
+        revalidatePath('/secretary/dashboard');
         return formatSuccess(appointment ?? undefined);
     } catch (err) {
         return formatError(err);
