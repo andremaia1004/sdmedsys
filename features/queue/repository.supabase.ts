@@ -51,9 +51,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
             .eq('clinic_id', this.clinicId)
             .in('status', ['WAITING', 'CALLED', 'IN_SERVICE'])
             .gte('created_at', new Date().toISOString().split('T')[0]); // Today only
-
         if (doctorId) {
-            query = query.or(`doctor_id.eq.${doctorId},doctor_id.is.null`);
+            query = query.eq('doctor_id', doctorId);
         }
 
         const { data, error } = await query.order('priority', { ascending: false }).order('updated_at', { ascending: false });
