@@ -1,13 +1,18 @@
 import PDFDocument from 'pdfkit';
 import path from 'path';
+import fs from 'fs';
 
 // Fix Next.js compilation issues with pdfkit (it often resolves to an object with a .default property)
 const PDFDocConstructor = typeof PDFDocument === 'function' ? PDFDocument : (PDFDocument as any).default || PDFDocument;
 
 // Standard fonts for PDFKit can have issues in Next.js environment (AFM files missing)
 // We use bundled TTF fonts to ensure stability across all environments.
-const FONT_REGULAR = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Regular.ttf');
-const FONT_BOLD = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Bold.ttf');
+// Reading them via fs.readFileSync explicitly forces the Next.js/Vercel static analyzer to include them.
+const fontRegularPath = path.resolve(process.cwd(), 'features', 'documents', 'fonts', 'Regular.ttf');
+const fontBoldPath = path.resolve(process.cwd(), 'features', 'documents', 'fonts', 'Bold.ttf');
+
+const FONT_REGULAR = fs.readFileSync(fontRegularPath);
+const FONT_BOLD = fs.readFileSync(fontBoldPath);
 
 export interface BaseDocumentData {
     patientName: string;
