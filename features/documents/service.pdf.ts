@@ -1,6 +1,9 @@
 import PDFDocument from 'pdfkit';
 import path from 'path';
 
+// Fix Next.js compilation issues with pdfkit (it often resolves to an object with a .default property)
+const PDFDocConstructor = typeof PDFDocument === 'function' ? PDFDocument : (PDFDocument as any).default || PDFDocument;
+
 // Standard fonts for PDFKit can have issues in Next.js environment (AFM files missing)
 // We use bundled TTF fonts to ensure stability across all environments.
 const FONT_REGULAR = path.join(process.cwd(), 'features', 'documents', 'fonts', 'Regular.ttf');
@@ -122,7 +125,7 @@ export class PdfService {
     static async generatePrescription(data: PrescriptionData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -161,7 +164,7 @@ export class PdfService {
     static async generateCertificate(data: CertificateData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -201,7 +204,7 @@ export class PdfService {
     static async generateReport(data: ReportData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -228,7 +231,7 @@ export class PdfService {
     static async generateExamRequest(data: ExamRequestData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -261,7 +264,7 @@ export class PdfService {
     static async generateReferral(data: ReferralData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new (require('pdfkit'))({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
