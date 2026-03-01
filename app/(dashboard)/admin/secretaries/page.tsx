@@ -150,25 +150,36 @@ export default function SecretariesAdminPage() {
             </div>
 
             {showForm && (
-                <Card style={{ marginBottom: '2.5rem', borderRadius: '20px', overflow: 'hidden' }}>
+                <Card
+                    style={{
+                        marginBottom: '2.5rem',
+                        border: 'none',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        borderRadius: '20px',
+                        overflow: 'hidden'
+                    }}
+                >
                     <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #001f41 100%)', padding: '1.5rem 2rem', color: '#fff' }}>
                         <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>
                             {isEditing ? 'Editar Funcionário' : 'Cadastrar Novo Funcionário'}
                         </h3>
+                        <p style={{ margin: '0.25rem 0 0 0', opacity: 0.8, fontSize: '0.875rem' }}>
+                            {isEditing ? 'Atualize os dados ou altere a senha de acesso' : 'Preencha os dados e configure as credenciais de acesso'}
+                        </p>
                     </div>
 
                     <form onSubmit={handleSubmit} style={{ padding: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                                <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--primary)', textTransform: 'uppercase' }}>Dados Pessoais</h4>
+                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
+                                <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dados Pessoais</h4>
                             </div>
                             <Input label="Nome Completo" value={name} onChange={e => setName(e.target.value)} required placeholder="Ex: Ana Maria Souza" />
                             <Input label="Celular / WhatsApp" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(00) 00000-0000" />
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                                <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--primary)', textTransform: 'uppercase' }}>Credenciais</h4>
+                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
+                                <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Credenciais de Acesso</h4>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border)' }}>
                                 <input
@@ -177,15 +188,15 @@ export default function SecretariesAdminPage() {
                                     onChange={e => setCreateAuth(e.target.checked)}
                                     id="createAuth"
                                     disabled={isEditing && !!email}
-                                    style={{ width: '18px', height: '18px' }}
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                                 />
-                                <label htmlFor="createAuth" style={{ fontWeight: 700, color: 'var(--primary)', cursor: 'pointer' }}>
-                                    {isEditing ? 'Manter conta ativa' : 'Criar conta de acesso'}
+                                <label htmlFor="createAuth" style={{ fontWeight: 700, color: 'var(--primary)', cursor: 'pointer', fontSize: '0.9375rem' }}>
+                                    {isEditing ? 'Manter conta ativa' : 'Criar conta de acesso para este funcionário'}
                                 </label>
                             </div>
 
                             {createAuth && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', animation: 'fadeIn 0.2s ease-out' }}>
                                     <Input
                                         label="E-mail de Login"
                                         value={email}
@@ -197,14 +208,15 @@ export default function SecretariesAdminPage() {
                                     />
                                     <div style={{ position: 'relative' }}>
                                         <Input
-                                            label={isEditing ? "Nova Senha (opcional)" : "Senha"}
+                                            label={isEditing ? "Nova Senha (deixe em branco para manter)" : "Senha de Acesso"}
                                             value={password}
                                             onChange={e => setPassword(e.target.value)}
                                             required={!isEditing}
                                             type={showPassword ? 'text' : 'password'}
+                                            placeholder={isEditing ? "Nova senha..." : "Mínimo 6 caracteres"}
                                         />
                                         <div style={{ position: 'absolute', right: '0.75rem', top: '2.3rem', display: 'flex', gap: '0.5rem' }}>
-                                            <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)' }}>
                                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                             </button>
                                             <button type="button" onClick={generatePassword} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--accent)', fontWeight: 700, fontSize: '0.75rem' }}>
@@ -212,13 +224,21 @@ export default function SecretariesAdminPage() {
                                             </button>
                                         </div>
                                     </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: '#fffbeb', padding: '0.75rem', borderRadius: '8px', border: '1px solid #fef3c7' }}>
+                                        <strong>Atenção:</strong> {isEditing ? 'Se preenchida, a nova senha valerá imediatamente.' : 'Ao clicar em cadastrar, as credenciais serão ativadas imediatamente.'}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
                         <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                            <Button variant="primary" type="submit" disabled={isSaving} style={{ padding: '0.85rem 3rem', borderRadius: '12px', fontWeight: 800 }}>
-                                {isSaving ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Finalizar Cadastro')}
+                            <Button
+                                variant="primary"
+                                type="submit"
+                                disabled={isSaving}
+                                style={{ padding: '0.85rem 3rem', borderRadius: '12px', fontSize: '1rem', fontWeight: 800, background: 'var(--accent)' }}
+                            >
+                                {isSaving ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Finalizar Cadastro Master')}
                             </Button>
                         </div>
                     </form>
