@@ -6,6 +6,9 @@ import { DashboardItem } from '@/features/secretary/service.dashboard';
 import KanbanBoard from '@/features/secretary/components/KanbanBoard';
 import NewWalkInModal from '@/features/secretary/components/NewWalkInModal';
 import styles from '@/features/secretary/styles/Dashboard.module.css';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { RefreshCw, Calendar, Users, Plus } from 'lucide-react';
 
 export default function SecretaryDashboard() {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -38,11 +41,11 @@ export default function SecretaryDashboard() {
     const scheduledItems = items.filter(item => item.appointment_status === 'SCHEDULED');
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <div className={styles.titleInfo}>
-                    <h1>Painel Operacional do Dia</h1>
-                    <p>Modo Híbrido: Agendados e Ordem de Chegada</p>
+        <div className="page-container" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="page-header" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                    <h1 className="page-title">Painel Operacional do Dia</h1>
+                    <p className="page-subtitle">Modo Híbrido: Agendados e Ordem de Chegada</p>
                 </div>
                 <div className={styles.filters}>
                     <input
@@ -58,14 +61,16 @@ export default function SecretaryDashboard() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className={styles.search}
                     />
-                    <button onClick={loadData} className={styles.refreshBtn}>🔄 Atualizar</button>
+                    <Button onClick={loadData} variant="outline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}>
+                        <RefreshCw size={16} /> Atualizar
+                    </Button>
                 </div>
             </div>
 
             <div className={styles.topGrid}>
-                <div className={styles.scheduledBlock}>
+                <Card padding="none" style={{ overflow: 'hidden' }}>
                     <div className={styles.blockHeader}>
-                        <h3>📅 Hora Marcada</h3>
+                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, fontSize: '0.9rem', color: 'var(--text-main)', letterSpacing: '0.05em', fontWeight: 700 }}><Calendar size={18} color="var(--primary)" /> HORA MARCADA</h3>
                         <span className={styles.badge}>{scheduledItems.length}</span>
                     </div>
                     <div className={styles.appList}>
@@ -89,17 +94,19 @@ export default function SecretaryDashboard() {
                             ))
                         }
                     </div>
-                </div>
+                </Card>
 
-                <div className={styles.arrivalBlock}>
+                <Card padding="none" style={{ overflow: 'hidden' }}>
                     <div className={styles.blockHeader}>
-                        <h3>🏃 Chegada (Eventual)</h3>
+                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, fontSize: '0.9rem', color: 'var(--text-main)', letterSpacing: '0.05em', fontWeight: 700 }}><Users size={18} color="var(--warning)" /> CHEGADA (EVENTUAL)</h3>
                     </div>
                     <div className={styles.arrivalContent}>
-                        <p>Paciente sem hora marcada? Adicione-o diretamente à fila.</p>
-                        <button onClick={() => setShowWalkInModal(true)} className={styles.newArrivalBtn}>➕ Novo Atendimento</button>
+                        <p style={{ opacity: 0.8, marginBottom: '1.5rem' }}>Paciente sem hora marcada? Adicione-o diretamente à fila.</p>
+                        <Button onClick={() => setShowWalkInModal(true)} variant="primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '0.8rem', fontWeight: 700 }}>
+                            <Plus size={18} /> Novo Atendimento
+                        </Button>
                     </div>
-                </div>
+                </Card>
             </div>
 
             {showWalkInModal && (
