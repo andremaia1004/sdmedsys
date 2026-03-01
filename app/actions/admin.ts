@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 import { requireRole } from '@/lib/session';
 import { revalidatePath } from 'next/cache';
 import { DoctorInput, Doctor } from '@/features/doctors/types';
+import { Secretary } from '@/features/secretaries/types';
 
 /**
  * Administrative action to link a Supabase Auth User with a Profile Role.
@@ -236,6 +237,145 @@ export async function updateDoctorAction(id: string, data: Partial<DoctorInput> 
         console.error('Error in updateDoctorAction:', err);
         const msg = err instanceof Error ? err.message : 'Unknown error';
         return { success: false, error: msg || 'Erro ao atualizar médico' };
+    }
+}
+
+// --- Secretaries Management ---
+
+export async function fetchSecretariesAction(activeOnly: boolean = false) {
+    const user = await requireRole(['ADMIN']);
+    const { SupabaseSecretariesRepository } = await import('@/features/secretaries/repository.supabase');
+
+    const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+    const repo = new SupabaseSecretariesRepository(supabaseServer, clinicId);
+
+    return repo.list(activeOnly);
+}
+
+export async function createSecretaryAction(formData: FormData) {
+    try {
+        const user = await requireRole(['ADMIN']);
+        const { SupabaseSecretariesRepository } = await import('@/features/secretaries/repository.supabase');
+        const { logAudit } = await import('@/lib/audit');
+
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!serviceKey) {
+            return {
+                success: false,
+                error: 'Erro de Configuração: Chave de Serviço ausente.'
+            };
+        }
+
+        const name = formData.get('name') as string;
+        const phone = formData.get('phone') as string || undefined;
+        const email = formData.get('email') as string || undefined;
+        const password = formData.get('password') as string || undefined;
+        const createAuth = formData.get('createAuth') === 'true';
+
+        let profileId: string | undefined = undefined;
+        const clinicIdToUse = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+
+        if (createAuth && email && password) {
+            const { data: authData, error: authError } = await supabaseServer.auth.admin.createUser({
+                email,
+                password,
+                email_confirm: true,
+                user_metadata: { name }
+            });
+
+            if (authError) {
+                return { success: false, error: `Erro ao criar conta de acesso: ${authError.message}` };
+            }
+
+            profileId = authData.user.id;
+
+            const { error: profileError } = await supabaseServer
+                .from('profiles')
+                .upsert({
+                    id: profileId,
+                    email: email,
+                    role: 'SECRETARY',
+                    clinic_id: clinicIdToUse,
+                    updated_at: new Date().toISOString()
+                });
+
+            if (profileError) {
+                await supabaseServer.auth.admin.deleteUser(profileId);
+                return { success: false, error: `Erro ao criar perfil de acesso: ${profileError.message}` };
+            }
+        }
+
+        try {
+            const repo = new SupabaseSecretariesRepository(supabaseServer, clinicIdToUse);
+            const secretary = await repo.create({
+                name,
+                phone,
+                email,
+                profileId
+            });
+
+            await logAudit('CREATE', 'SECRETARY', secretary.id, { name });
+
+            revalidatePath('/admin/secretaries');
+            return { success: true, secretary };
+        } catch (dbError: unknown) {
+            if (profileId) {
+                await supabaseServer.auth.admin.deleteUser(profileId);
+                await supabaseServer.from('profiles').delete().eq('id', profileId);
+            }
+            const msg = dbError instanceof Error ? dbError.message : 'Erro desconhecido';
+            return { success: false, error: `Erro ao salvar dados da secretária: ${msg}` };
+        }
+    } catch (err: unknown) {
+        console.error('Unexpected error in createSecretaryAction:', err);
+        const msg = err instanceof Error ? err.message : 'Erro desconhecido';
+        return { success: false, error: `Erro inesperado: ${msg}` };
+    }
+}
+
+export async function updateSecretaryAction(id: string, data: Partial<Secretary> & { password?: string }) {
+    try {
+        const user = await requireRole(['ADMIN']);
+        const { SupabaseSecretariesRepository } = await import('@/features/secretaries/repository.supabase');
+        const { logAudit } = await import('@/lib/audit');
+
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            return { success: false, error: 'Erro de Configuração: Chave de Serviço ausente.' };
+        }
+
+        if (data.password && data.password.length > 0) {
+            let profileId = data.profileId;
+            if (!profileId) {
+                const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+                const tempRepo = new SupabaseSecretariesRepository(supabaseServer, clinicId);
+                const sec = await tempRepo.findById(id);
+                profileId = sec?.profileId;
+            }
+
+            if (profileId) {
+                const { error: authError } = await supabaseServer.auth.admin.updateUserById(
+                    profileId,
+                    { password: data.password }
+                );
+                if (authError) return { success: false, error: `Erro ao atualizar senha: ${authError.message}` };
+            }
+        }
+
+        const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
+        const repo = new SupabaseSecretariesRepository(supabaseServer, clinicId);
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...secretaryData } = data;
+        const secretary = await repo.update(id, secretaryData);
+
+        await logAudit('UPDATE', 'SECRETARY', id, { active: data.active });
+
+        revalidatePath('/admin/secretaries');
+        return { success: true, secretary };
+    } catch (err: unknown) {
+        console.error('Error in updateSecretaryAction:', err);
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: msg || 'Erro ao atualizar secretária' };
     }
 }
 

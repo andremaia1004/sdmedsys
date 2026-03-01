@@ -56,6 +56,11 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
                     href: '/admin/doctors',
                     rolesAllowed: ['ADMIN'],
                 },
+                {
+                    label: 'Funcionários',
+                    href: '/admin/secretaries',
+                    rolesAllowed: ['ADMIN'],
+                },
             ]
         },
         {

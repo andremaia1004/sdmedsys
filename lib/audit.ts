@@ -26,7 +26,7 @@ export type AuditAction =
     | 'DOWNLOAD_REPORT'
     | 'DOWNLOAD_DOCUMENT'
     | 'OTHER';
-export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'QUEUE_ITEM' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SETTINGS' | 'CLINICAL_ENTRY' | 'DOCUMENT';
+export type AuditEntity = 'PATIENT' | 'APPOINTMENT' | 'QUEUE' | 'QUEUE_ITEM' | 'CONSULTATION' | 'AUTH' | 'DOCTOR' | 'SECRETARY' | 'SETTINGS' | 'CLINICAL_ENTRY' | 'DOCUMENT';
 
 /**
  * Records a critical action to the audit logs.
