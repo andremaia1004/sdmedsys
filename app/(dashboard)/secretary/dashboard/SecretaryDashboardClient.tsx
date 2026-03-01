@@ -8,7 +8,8 @@ import NewWalkInModal from '@/features/secretary/components/NewWalkInModal';
 import styles from '@/features/secretary/styles/Dashboard.module.css';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { RefreshCw, Calendar, Users, Plus } from 'lucide-react';
+import { Input } from '@/components/ui/Input';
+import { RefreshCw, Calendar, Users, Plus, Search } from 'lucide-react';
 
 export default function SecretaryDashboard() {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -47,21 +48,25 @@ export default function SecretaryDashboard() {
                     <h1 className="page-title">Painel Operacional do Dia</h1>
                     <p className="page-subtitle">Modo Híbrido: Agendados e Ordem de Chegada</p>
                 </div>
-                <div className={styles.filters}>
-                    <input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className={styles.datePicker}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Buscar paciente ou ticket..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className={styles.search}
-                    />
-                    <Button onClick={loadData} variant="outline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}>
+                <div className={styles.filters} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '160px' }}>
+                        <Input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                        />
+                    </div>
+                    <div style={{ width: '280px', position: 'relative' }}>
+                        <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', zIndex: 10 }} />
+                        <Input
+                            type="text"
+                            placeholder="Buscar paciente ou ticket..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{ paddingLeft: '2.5rem' }}
+                        />
+                    </div>
+                    <Button onClick={loadData} variant="outline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, height: '42px' }}>
                         <RefreshCw size={16} /> Atualizar
                     </Button>
                 </div>
