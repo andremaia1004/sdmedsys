@@ -108,7 +108,7 @@ export async function resumeConsultationAction(queueItemId: string, patientId: s
         // Search for open consultation for this patient by this doctor
         const activeConsultations = await ConsultationService.listByPatient(patientId);
         const currentConsulta = activeConsultations.find(c =>
-            c.doctor_id === doctor.id &&
+            c.doctor_id === doctorId &&
             c.finished_at === null &&
             c.queue_item_id === queueItemId
         );

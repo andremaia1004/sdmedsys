@@ -45,10 +45,10 @@ export default async function DoctorDashboard() {
 
     // Find active consultation if there is an in-service patient
     let activeConsultationId: string | null = null;
-    if (inServicePatient && doctorIdContext) {
-        // Quick lookup: find active consultation for this doctor
+    if (inServicePatient) {
+        // Quick lookup: find active consultation for this doctor (using user.id which matches the consultation doctor_id)
         const activeConsults = await ConsultationService.listByPatient(inServicePatient.patient_id);
-        const current = activeConsults.find(c => c.doctor_id === doctorIdContext && c.finished_at === null);
+        const current = activeConsults.find(c => c.doctor_id === user.id && c.finished_at === null);
         if (current) {
             activeConsultationId = current.id;
         }
