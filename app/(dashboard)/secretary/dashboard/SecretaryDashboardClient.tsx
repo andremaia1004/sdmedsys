@@ -48,22 +48,23 @@ export default function SecretaryDashboard() {
                     <h1 className="page-title">Painel Operacional do Dia</h1>
                     <p className="page-subtitle">Modo Híbrido: Agendados e Ordem de Chegada</p>
                 </div>
-                <div className={styles.filters} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '160px' }}>
+                <div className={styles.filters} style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem' }}>
+                    <div style={{ width: '150px' }}>
                         <Input
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
+                            style={{ height: '42px' }}
                         />
                     </div>
-                    <div style={{ width: '280px', position: 'relative' }}>
-                        <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', zIndex: 10 }} />
+                    <div style={{ width: '320px', position: 'relative' }}>
+                        <Search size={16} style={{ position: 'absolute', left: '12px', bottom: '13px', color: 'var(--text-muted)', zIndex: 10 }} />
                         <Input
                             type="text"
                             placeholder="Buscar paciente ou ticket..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{ paddingLeft: '2.5rem' }}
+                            style={{ paddingLeft: '2.5rem', height: '42px' }}
                         />
                     </div>
                     <Button onClick={loadData} variant="outline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, height: '42px' }}>
