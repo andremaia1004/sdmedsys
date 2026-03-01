@@ -139,7 +139,7 @@ export class SecretaryDashboardService {
         return !error;
     }
 
-    static async createWalkIn(patientId: string, doctorId: string, priority: 'NORMAL' | 'PRIORITY' = 'NORMAL', notes?: string): Promise<boolean> {
+    static async createWalkIn(patientId: string, doctorId: string, priority: 'NORMAL' | 'PRIORITY' = 'NORMAL', startDate?: string, startTime?: string, notes?: string): Promise<boolean> {
         const user = await getCurrentUser();
         console.log('DEBUG: createWalkIn - user:', user?.id, 'role:', user?.role, 'clinicId:', user?.clinicId);
         if (!user || !user.clinicId) {
@@ -158,7 +158,16 @@ export class SecretaryDashboardService {
         const patientName = patientData?.name || 'Desconhecido';
 
         // 2. Create WALK_IN Appointment
-        const now = new Date();
+        let now = new Date();
+        if (startDate && startTime) {
+            now = new Date(`${startDate}T${startTime}:00-03:00`);
+        } else if (startDate) {
+            now = new Date(`${startDate}T${now.toLocaleTimeString('pt-BR', { hour12: false })}-03:00`);
+        } else if (startTime) {
+            const todayStr = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+            now = new Date(`${todayStr}T${startTime}:00-03:00`);
+        }
+
         const endTime = new Date(now.getTime() + 30 * 60000); // 30 minutes later
 
         const { data: appointment, error: appError } = await supabase

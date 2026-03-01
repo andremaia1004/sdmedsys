@@ -23,6 +23,8 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const [priority, setPriority] = useState<'NORMAL' | 'PRIORITY'>('NORMAL');
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
+    const [startDate, setStartDate] = useState<string>('');
+    const [startTime, setStartTime] = useState<string>('');
 
     useEffect(() => {
         const loadDoctors = async () => {
@@ -51,7 +53,7 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const handleCreate = async () => {
         if (!selectedPatient || !selectedDoctorId) return;
         setLoading(true);
-        const result = await createWalkInAction(selectedPatient.id, selectedDoctorId, priority);
+        const result = await createWalkInAction(selectedPatient.id, selectedDoctorId, priority, startDate ? startDate : undefined, startTime ? startTime : undefined);
         if (result.success) {
             onSuccess();
             onClose();
@@ -111,6 +113,29 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
                             ))
                         )}
                     </select>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', marginTop: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <label>Data (opcional):</label>
+                        <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className={styles.search}
+                            style={{ width: '100%', marginTop: '0.5rem' }}
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label>Hora (opcional):</label>
+                        <input
+                            type="time"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className={styles.search}
+                            style={{ width: '100%', marginTop: '0.5rem' }}
+                        />
+                    </div>
                 </div>
 
                 <div style={{ marginBottom: '1.5rem', marginTop: '1rem' }}>
