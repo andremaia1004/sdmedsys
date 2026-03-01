@@ -125,7 +125,7 @@ export class PdfService {
     static async generatePrescription(data: PrescriptionData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50, font: FONT_REGULAR });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -164,7 +164,7 @@ export class PdfService {
     static async generateCertificate(data: CertificateData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50, font: FONT_REGULAR });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -204,7 +204,7 @@ export class PdfService {
     static async generateReport(data: ReportData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50, font: FONT_REGULAR });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -231,7 +231,7 @@ export class PdfService {
     static async generateExamRequest(data: ExamRequestData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50, font: FONT_REGULAR });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -264,7 +264,7 @@ export class PdfService {
     static async generateReferral(data: ReferralData): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const doc = new PDFDocConstructor({ size: 'A4', margin: 50 });
+                const doc = new PDFDocConstructor({ size: 'A4', margin: 50, font: FONT_REGULAR });
                 const chunks: Buffer[] = [];
                 doc.on('data', (chunk: Buffer) => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
