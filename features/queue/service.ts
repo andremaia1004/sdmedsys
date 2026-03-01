@@ -65,7 +65,7 @@ export class QueueService {
         const transitions: Record<QueueStatus, QueueStatus[]> = {
             'WAITING': ['CALLED', 'CANCELED', 'NO_SHOW'],
             'CALLED': ['IN_SERVICE', 'NO_SHOW', 'WAITING'],
-            'IN_SERVICE': ['DONE'],
+            'IN_SERVICE': ['DONE', 'NO_SHOW', 'CANCELED'],
             'DONE': [],
             'NO_SHOW': ['WAITING'],
             'CANCELED': ['WAITING']
