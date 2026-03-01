@@ -41,7 +41,8 @@ export const AttachmentUploadModal: React.FC<Props> = ({ patientId, role, onSucc
         setError(null);
 
         try {
-            const { supabase } = await import('@/lib/supabase');
+            const { createBrowserSupabaseClient } = await import('@/lib/supabase-browser');
+            const supabase = createBrowserSupabaseClient();
 
             const fileExt = file.name.split('.').pop();
             const filePath = `${patientId}/${Date.now()}.${fileExt}`;
