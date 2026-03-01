@@ -16,9 +16,8 @@ export class SupabaseQueueRepository implements IQueueRepository {
             .not('status', 'eq', 'DONE')
             .not('status', 'eq', 'CANCELED')
             .order('created_at', { ascending: true });
-
         if (doctorId) {
-            query = query.or(`doctor_id.eq.${doctorId},doctor_id.is.null`);
+            query = query.eq('doctor_id', doctorId);
         }
 
         const { data, error } = await query;
