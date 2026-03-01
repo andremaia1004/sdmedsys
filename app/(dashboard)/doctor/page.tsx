@@ -6,6 +6,9 @@ import { Users, Calendar, Clock, Play, Search, Settings, History, ClipboardList,
 import Link from 'next/link';
 import { Appointment } from '@/features/agenda/types';
 
+// Add import at the top
+import { ConsultationService } from '@/features/consultation/service';
+
 export const dynamic = 'force-dynamic';
 
 export default async function DoctorDashboard() {
@@ -39,6 +42,17 @@ export default async function DoctorDashboard() {
     const inServicePatient = queue.find(q => q.status === 'IN_SERVICE');
     const calledPatient = queue.find(q => q.status === 'CALLED');
     const completedToday = appointments.filter(a => a.status === 'COMPLETED');
+
+    // Find active consultation if there is an in-service patient
+    let activeConsultationId: string | null = null;
+    if (inServicePatient && doctorIdContext) {
+        // Quick lookup: find active consultation for this doctor
+        const activeConsults = await ConsultationService.listByPatient(inServicePatient.patient_id);
+        const current = activeConsults.find(c => c.doctor_id === doctorIdContext && c.finished_at === null);
+        if (current) {
+            activeConsultationId = current.id;
+        }
+    }
 
     // Find next appointment
     const now = new Date().getTime();
@@ -122,7 +136,7 @@ export default async function DoctorDashboard() {
                                 <p style={{ opacity: 0.8, marginTop: '0.25rem' }}>Senha: {inServicePatient.ticket_code} • Iniciado há {Math.floor((new Date().getTime() - new Date(inServicePatient.updated_at || '').getTime()) / 60000)} min</p>
                             </div>
                             <Link
-                                href="/doctor/queue"
+                                href={activeConsultationId ? `/doctor/consultations/${activeConsultationId}` : `/doctor/queue`}
                                 style={{
                                     background: '#fff',
                                     color: '#1e40af',

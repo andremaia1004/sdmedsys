@@ -90,6 +90,39 @@ export async function startConsultationFromQueueAction(queueItemId: string, pati
     }
 }
 
+export async function resumeConsultationAction(queueItemId: string, patientId: string): Promise<ActionResponse<string>> {
+    try {
+        const sessionUser = await requireRole(['DOCTOR']);
+        const doctorId = sessionUser.id;
+
+        // Ensure doctor is linked properly via repository
+        const { SupabaseDoctorsRepository } = await import('@/features/doctors/repository.supabase');
+        const { supabaseServer } = await import('@/lib/supabase-server');
+        const doctorsRepo = new SupabaseDoctorsRepository(supabaseServer, sessionUser.clinicId || '550e8400-e29b-41d4-a716-446655440000');
+        const doctor = await doctorsRepo.findByProfileId(doctorId);
+
+        if (!doctor) {
+            return { success: false, error: 'Perfil de médico não encontrado.' };
+        }
+
+        // Search for open consultation for this patient by this doctor
+        const activeConsultations = await ConsultationService.listByPatient(patientId);
+        const currentConsulta = activeConsultations.find(c =>
+            c.doctor_id === doctor.id &&
+            c.finished_at === null &&
+            c.queue_item_id === queueItemId
+        );
+
+        if (!currentConsulta) {
+            return { success: false, error: 'Nenhum atendimento ativo encontrado para este paciente.' };
+        }
+
+        return formatSuccess(currentConsulta.id);
+    } catch (err) {
+        return formatError(err);
+    }
+}
+
 export async function saveConsultationFieldsAction(
     consultationId: string,
     fields: Partial<Pick<Consultation, 'chief_complaint' | 'diagnosis' | 'conduct'>>

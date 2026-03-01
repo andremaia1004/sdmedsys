@@ -8,7 +8,7 @@ import {
     quickStartAction,
     quickNoShowAction
 } from '../actions';
-import { startConsultationFromQueueAction } from '../../consultation/actions';
+import { startConsultationFromQueueAction, resumeConsultationAction } from '../../consultation/actions';
 import styles from '../styles/Queue.module.css';
 import { PhoneOutgoing, Play, UserX, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -70,6 +70,18 @@ export default function DoctorQueue({ doctorId }: Props) {
             router.push(`/doctor/consultations/${res.data}`);
         } else {
             showToast('error', res.error || 'Erro ao iniciar consulta');
+            setLoading(false);
+            loadData();
+        }
+    };
+
+    const handleResumeConsultation = async (queueItemId: string, patientId: string) => {
+        setLoading(true);
+        const res = await resumeConsultationAction(queueItemId, patientId);
+        if (res.success && res.data) {
+            router.push(`/doctor/consultations/${res.data}`);
+        } else {
+            showToast('error', res.error || 'Acesso Negado ou Consulta não encontrada');
             setLoading(false);
             loadData();
         }
@@ -194,7 +206,7 @@ export default function DoctorQueue({ doctorId }: Props) {
                                 {item.status === 'IN_SERVICE' && (
                                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <button
-                                            onClick={() => router.push(`/doctor/consultations/${item.patient_id}`)}
+                                            onClick={() => handleResumeConsultation(item.id, item.patient_id)}
                                             className={`${styles.inlineBtn} ${styles.btnStart}`}
                                             title="Retomar Consulta"
                                             style={{
