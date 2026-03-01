@@ -68,7 +68,7 @@ export default function PatientHub({
                             )}
                         </button>
                     )}
-                    {isClinicalAllowed && (
+                    {(isClinicalAllowed || role === 'SECRETARY') && (
                         <button
                             className={`${styles.tabButton} ${activeTab === 'documents' ? styles.active : ''}`}
                             onClick={() => setActiveTab('documents')}
@@ -80,18 +80,16 @@ export default function PatientHub({
                         </button>
                     )}
 
-                    {/* Attachments - Hidden for SECRETARY as per UX decision to prevent "blocked menu" feeling */}
-                    {role !== 'SECRETARY' && (
-                        <button
-                            className={`${styles.tabButton} ${activeTab === 'attachments' ? styles.active : ''}`}
-                            onClick={() => setActiveTab('attachments')}
-                        >
-                            📎 Anexos
-                            {attachmentsCount !== undefined && attachmentsCount !== null && (
-                                <span className={styles.badge}>{attachmentsCount}</span>
-                            )}
-                        </button>
-                    )}
+                    {/* Attachments - Enabled for all roles including SECRETARY */}
+                    <button
+                        className={`${styles.tabButton} ${activeTab === 'attachments' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('attachments')}
+                    >
+                        📎 Anexos
+                        {attachmentsCount !== undefined && attachmentsCount !== null && (
+                            <span className={styles.badge}>{attachmentsCount}</span>
+                        )}
+                    </button>
                 </div>
 
                 <div className={styles.tabPanel}>
@@ -106,14 +104,14 @@ export default function PatientHub({
                     {activeTab === 'history' && isClinicalAllowed && (
                         <PatientTimeline patientId={patient.id} />
                     )}
-                    {activeTab === 'documents' && isClinicalAllowed && (
+                    {activeTab === 'documents' && (isClinicalAllowed || role === 'SECRETARY') && (
                         <PatientDocuments
                             patientId={patient.id}
                             patientName={patient.name}
                             activeConsultationId={activeConsultationId}
                         />
                     )}
-                    {activeTab === 'attachments' && role !== 'SECRETARY' && (
+                    {activeTab === 'attachments' && (
                         <PatientAttachments patientId={patient.id} role={role} />
                     )}
                 </div>

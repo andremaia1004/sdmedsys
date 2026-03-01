@@ -3,9 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Patient, PatientInput } from '../types';
 import { updatePatientAction } from '../actions';
-import { X, Save, Loader2 } from 'lucide-react';
-import styles from '@/components/ui/Modal.module.css';
-import { useToastSuccess, useToastError } from '@/components/ui/Toast';
+import { X, Save, Loader2, User, Phone, Info } from 'lucide-react';
+import modalStyles from '@/components/ui/Modal.module.css';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
 
 export type EditSection = 'identification' | 'contact' | 'additional';
 
@@ -20,12 +23,10 @@ interface Props {
 export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<Partial<PatientInput>>({});
-    const toastSuccess = useToastSuccess();
-    const toastError = useToastError();
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (isOpen && patient) {
-            // Initialize form data based on patient data
             setFormData({
                 name: patient.name,
                 document: patient.document,
@@ -50,13 +51,11 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            // Basic Validation
             if (section === 'identification') {
-                if (!formData.name?.trim()) { toastError('Nome é obrigatório'); setIsLoading(false); return; }
-                if (!formData.document?.trim()) { toastError('CPF é obrigatório'); setIsLoading(false); return; }
+                if (!formData.name?.trim()) { showToast('error', 'Nome é obrigatório'); setIsLoading(false); return; }
+                if (!formData.document?.trim()) { showToast('error', 'CPF é obrigatório'); setIsLoading(false); return; }
             }
 
-            // Prepare input
             const input: PatientInput = {
                 name: formData.name || patient.name,
                 document: formData.document || patient.document,
@@ -74,17 +73,35 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
             const res = await updatePatientAction(patient.id, input);
 
             if (res.success && res.data) {
-                toastSuccess('Dados atualizados com sucesso!');
+                showToast('success', 'Dados atualizados com sucesso!');
                 onSuccess(res.data);
                 onClose();
             } else {
-                toastError(res.error || 'Erro ao atualizar paciente.');
+                showToast('error', res.error || 'Erro ao atualizar paciente.');
             }
         } catch (error) {
             console.error(error);
-            toastError('Erro desconhecido ao salvar.');
+            showToast('error', 'Erro desconhecido ao salvar.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const getTitle = () => {
+        switch (section) {
+            case 'identification': return 'Identificação do Paciente';
+            case 'contact': return 'Contato e Localização';
+            case 'additional': return 'Informações Complementares';
+            default: return 'Editar Dados';
+        }
+    };
+
+    const getIcon = () => {
+        switch (section) {
+            case 'identification': return <User size={20} />;
+            case 'contact': return <Phone size={20} />;
+            case 'additional': return <Info size={20} />;
+            default: return null;
         }
     };
 
@@ -92,108 +109,91 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
         switch (section) {
             case 'identification':
                 return (
-                    <>
-                        <div className={styles.formGroup}>
-                            <label>Nome Completo *</label>
-                            <input
-                                type="text"
-                                value={formData.name || ''}
-                                onChange={e => handleChange('name', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>CPF *</label>
-                            <input
-                                type="text"
-                                value={formData.document || ''}
-                                onChange={e => handleChange('document', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>Data de Nascimento</label>
-                            <input
-                                type="date"
-                                value={formData.birth_date || ''}
-                                onChange={e => handleChange('birth_date', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                    </>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        <Input
+                            label="Nome Completo *"
+                            value={formData.name || ''}
+                            onChange={e => handleChange('name', e.target.value)}
+                            fullWidth
+                            placeholder="Nome Completo"
+                        />
+                        <Input
+                            label="Documento (CPF / RG) *"
+                            value={formData.document || ''}
+                            onChange={e => handleChange('document', e.target.value)}
+                            fullWidth
+                            placeholder="000.000.000-00"
+                        />
+                        <Input
+                            label="Data de Nascimento"
+                            type="date"
+                            value={formData.birth_date || ''}
+                            onChange={e => handleChange('birth_date', e.target.value)}
+                            fullWidth
+                        />
+                    </div>
                 );
             case 'contact':
                 return (
-                    <>
-                        <div className={styles.formGroup}>
-                            <label>Telefone</label>
-                            <input
-                                type="text"
-                                value={formData.phone || ''}
-                                onChange={e => handleChange('phone', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>E-mail</label>
-                            <input
-                                type="email"
-                                value={formData.email || ''}
-                                onChange={e => handleChange('email', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>Endereço</label>
-                            <textarea
-                                value={formData.address || ''}
-                                onChange={e => handleChange('address', e.target.value)}
-                                className={styles.textarea}
-                                rows={3}
-                            />
-                        </div>
-                    </>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        <Input
+                            label="Telefone / Celular"
+                            value={formData.phone || ''}
+                            onChange={e => handleChange('phone', e.target.value)}
+                            fullWidth
+                            placeholder="(00) 00000-0000"
+                        />
+                        <Input
+                            label="E-mail"
+                            type="email"
+                            value={formData.email || ''}
+                            onChange={e => handleChange('email', e.target.value)}
+                            fullWidth
+                            placeholder="exemplo@email.com"
+                        />
+                        <Textarea
+                            label="Endereço Completo"
+                            value={formData.address || ''}
+                            onChange={e => handleChange('address', e.target.value)}
+                            fullWidth
+                            placeholder="Rua, número, bairro, cidade..."
+                            rows={3}
+                        />
+                    </div>
                 );
             case 'additional':
                 return (
-                    <>
-                        <div className={styles.formGroup}>
-                            <label>Convênio / Plano</label>
-                            <input
-                                type="text"
-                                value={formData.insurance || ''}
-                                onChange={e => handleChange('insurance', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>Responsável</label>
-                            <input
-                                type="text"
-                                value={formData.guardian_name || ''}
-                                onChange={e => handleChange('guardian_name', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>Contato de Emergência</label>
-                            <input
-                                type="text"
-                                value={formData.emergency_contact || ''}
-                                onChange={e => handleChange('emergency_contact', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>Queixa Principal (Cadastro)</label>
-                            <textarea
-                                value={formData.main_complaint || ''}
-                                onChange={e => handleChange('main_complaint', e.target.value)}
-                                className={styles.textarea}
-                                rows={3}
-                            />
-                        </div>
-                    </>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        <Input
+                            label="Convênio / Plano"
+                            value={formData.insurance || ''}
+                            onChange={e => handleChange('insurance', e.target.value)}
+                            fullWidth
+                            placeholder="Ex: Unimed, Bradesco, Particular"
+                        />
+                        <Input
+                            label="Responsável Legal"
+                            value={formData.guardian_name || ''}
+                            onChange={e => handleChange('guardian_name', e.target.value)}
+                            fullWidth
+                            placeholder="Nome do pai, mãe ou responsável"
+                        />
+                        <Input
+                            label="Contato de Emergência"
+                            value={formData.emergency_contact || ''}
+                            onChange={e => handleChange('emergency_contact', e.target.value)}
+                            fullWidth
+                            placeholder="Nome e Telefone"
+                        />
+                        <Textarea
+                            label="Queixa Principal / Observação de Cadastro"
+                            value={formData.main_complaint || ''}
+                            onChange={e => handleChange('main_complaint', e.target.value)}
+                            fullWidth
+                            placeholder="Digite aqui as observações iniciais..."
+                            rows={3}
+                        />
+                    </div>
                 );
             default:
                 return null;
@@ -201,23 +201,42 @@ export function PatientEditModal({ isOpen, onClose, patient, section, onSuccess 
     };
 
     return (
-        <div className={styles.overlay}>
-            <div className={styles.modal}>
-                <div className={styles.header}>
-                    <h3>Editar {section === 'identification' ? 'Identificação' : section === 'contact' ? 'Contato' : 'Informações Adicionais'}</h3>
-                    <button onClick={onClose} className={styles.closeBtn}><X size={20} /></button>
+        <div className={modalStyles.overlay}>
+            <div className={modalStyles.modal} style={{ maxWidth: '550px', borderRadius: '16px' }}>
+                <div className={modalStyles.header} style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary)' }}>
+                        {getIcon()}
+                        <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>{getTitle()}</h3>
+                    </div>
+                    <button onClick={onClose} className={modalStyles.closeBtn}><X size={20} /></button>
                 </div>
-                <div className={styles.body}>
+                <div className={modalStyles.body} style={{ padding: '2rem' }}>
                     {renderFields()}
                 </div>
-                <div className={styles.footer}>
-                    <button onClick={onClose} className={styles.secondaryBtn} disabled={isLoading}>Cancelar</button>
-                    <button onClick={handleSave} className={styles.primaryBtn} disabled={isLoading} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {isLoading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                        Salvar
-                    </button>
+                <div className={modalStyles.footer} style={{ background: '#f8fafc', padding: '1.25rem 2rem', gap: '1rem' }}>
+                    <Button variant="secondary" onClick={onClose} disabled={isLoading} style={{ borderRadius: '10px' }}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={handleSave}
+                        disabled={isLoading}
+                        style={{
+                            borderRadius: '10px',
+                            display: 'flex',
+                            gap: '8px',
+                            alignItems: 'center',
+                            background: 'var(--primary)',
+                            padding: '0.75rem 2rem',
+                            fontWeight: 700
+                        }}
+                    >
+                        {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                        Salvar Alterações
+                    </Button>
                 </div>
             </div>
         </div>
     );
 }
+

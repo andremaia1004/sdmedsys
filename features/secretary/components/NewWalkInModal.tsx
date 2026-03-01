@@ -8,6 +8,8 @@ import { Patient } from '@/features/patients/types';
 import { Doctor } from '@/features/doctors/types';
 import styles from '@/features/secretary/styles/Dashboard.module.css';
 import { useToast } from '@/components/ui/Toast';
+import PatientForm from '@/features/patients/components/PatientForm';
+import { UserPlus, ArrowLeft } from 'lucide-react';
 
 interface NewWalkInModalProps {
     onClose: () => void;
@@ -25,6 +27,7 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
     const { showToast } = useToast();
     const [startDate, setStartDate] = useState<string>('');
     const [startTime, setStartTime] = useState<string>('');
+    const [showPatientForm, setShowPatientForm] = useState(false);
 
     useEffect(() => {
         const loadDoctors = async () => {
@@ -50,6 +53,12 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
         }
     };
 
+    const handlePatientCreated = (newPatient: Patient) => {
+        setSelectedPatient(newPatient);
+        setShowPatientForm(false);
+        setPatientQuery(newPatient.name);
+    };
+
     const handleCreate = async () => {
         if (!selectedPatient || !selectedDoctorId) return;
         setLoading(true);
@@ -69,23 +78,65 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
                 <h3>Registrar Novo Atendimento (Chegada)</h3>
 
                 <div style={{ marginBottom: '1rem' }}>
-                    <label>Buscar Paciente:</label>
-                    <input
-                        type="text"
-                        value={patientQuery}
-                        onChange={handleSearch}
-                        placeholder="Nome ou CPF..."
-                        className={styles.search}
-                        style={{ width: '100%', marginTop: '0.5rem' }}
-                    />
-                    {patients.length > 0 && !selectedPatient && (
-                        <div className={styles.searchResultList}>
-                            {patients.map(p => (
-                                <div key={p.id} onClick={() => setSelectedPatient(p)} className={styles.searchResultItem}>
-                                    {p.name} ({p.document})
-                                </div>
-                            ))}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <label style={{ margin: 0 }}>{showPatientForm ? 'Novo Cadastro de Paciente' : 'Buscar Paciente:'}</label>
+                        {!selectedPatient && (
+                            <button
+                                type="button"
+                                onClick={() => setShowPatientForm(!showPatientForm)}
+                                style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    color: 'var(--primary)',
+                                    fontSize: '0.875rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem'
+                                }}
+                            >
+                                {showPatientForm ? (
+                                    <><ArrowLeft size={16} /> Voltar para busca</>
+                                ) : (
+                                    <><UserPlus size={16} /> Novo Paciente</>
+                                )}
+                            </button>
+                        )}
+                    </div>
+
+                    {showPatientForm ? (
+                        <div style={{
+                            background: '#f8fafc',
+                            padding: '1.5rem',
+                            borderRadius: '12px',
+                            border: '1px solid var(--border)',
+                            maxHeight: '400px',
+                            overflowY: 'auto',
+                            animation: 'fadeIn 0.2s ease-out'
+                        }}>
+                            <PatientForm onSuccess={handlePatientCreated} />
                         </div>
+                    ) : (
+                        <>
+                            <input
+                                type="text"
+                                value={patientQuery}
+                                onChange={handleSearch}
+                                placeholder="Nome ou CPF..."
+                                className={styles.search}
+                                style={{ width: '100%' }}
+                            />
+                            {patients.length > 0 && !selectedPatient && (
+                                <div className={styles.searchResultList}>
+                                    {patients.map(p => (
+                                        <div key={p.id} onClick={() => setSelectedPatient(p)} className={styles.searchResultItem}>
+                                            {p.name} ({p.document})
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
