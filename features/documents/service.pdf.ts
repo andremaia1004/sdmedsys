@@ -232,12 +232,12 @@ export class PdfService {
 
         // Signature Line
         doc.moveTo(200, height - 120).lineTo(400, height - 120).lineWidth(1).strokeColor(this.colors.textMain).stroke();
-        doc.fillColor(this.colors.primary).font(FONT_BOLD).fontSize(11).text(`Dr(a). ${data.doctorName}`, 150, height - 110, { width: 300, align: 'center' });
+        doc.fillColor(this.colors.primary).font(FONT_BOLD).fontSize(11).text(`Dr(a). ${data.doctorName}`, 150, height - 110, { width: 300, align: 'center', lineBreak: false });
 
         // Footer Contact
         doc.fillColor(this.colors.textMuted).font(FONT_REGULAR).fontSize(9);
-        doc.text(data.clinic?.phone ? `Tel: ${data.clinic.phone}` : '', 50, height - 55);
-        doc.text(data.clinic?.address || 'Documento Eletrônico • SDMED System', 50, height - 43);
+        doc.text(data.clinic?.phone ? `Tel: ${data.clinic.phone}` : '', 50, height - 55, { lineBreak: false });
+        doc.text(data.clinic?.address || 'Documento Eletrônico • SDMED System', 50, height - 43, { lineBreak: false });
     }
 
     static async generatePrescription(data: PrescriptionData): Promise<Buffer> {

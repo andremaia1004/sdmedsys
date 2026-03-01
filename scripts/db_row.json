@@ -1,0 +1,38 @@
+{
+  "id": "9930c141-d6ca-4288-ae18-ab1c736d7488",
+  "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+  "clinic_name": "Clinica SDMED",
+  "working_hours": {
+    "friday": {
+      "end": "18:00",
+      "start": "08:00"
+    },
+    "monday": {
+      "end": "18:00",
+      "start": "08:00"
+    },
+    "sunday": null,
+    "tuesday": {
+      "end": "18:00",
+      "start": "08:00"
+    },
+    "saturday": {
+      "end": "12:00",
+      "start": "08:00"
+    },
+    "thursday": {
+      "end": "18:00",
+      "start": "08:00"
+    },
+    "wednesday": {
+      "end": "18:00",
+      "start": "08:00"
+    }
+  },
+  "appointment_duration_minutes": 30,
+  "queue_prefix": "A",
+  "tv_refresh_seconds": 30,
+  "created_at": "2026-01-29T22:22:35.937905+00:00",
+  "updated_at": "2026-02-27T14:46:56.243028+00:00",
+  "logo_url": null
+}
