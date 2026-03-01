@@ -19,12 +19,12 @@ export default async function DoctorQueuePage() {
     }
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '1.8rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>
-                    Gestão de Fila
-                </h1>
-                <p style={{ color: 'var(--text-muted)' }}>Controle de chamadas e atendimentos.</p>
+        <div className="page-container">
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title"> Gestão de Fila </h1>
+                    <p className="page-subtitle">Controle de chamadas e atendimentos.</p>
+                </div>
             </div>
 
             <DoctorQueue doctorId={doctorId} />

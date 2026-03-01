@@ -19,9 +19,9 @@ export default async function SharedPatientsPageResource() {
     const canManagePatients = user.role === 'ADMIN' || user.role === 'SECRETARY';
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ margin: 0 }}>Cadastro de Pacientes</h1>
+        <div className="page-container">
+            <div className="page-header">
+                <h1 className="page-title">Cadastro de Pacientes</h1>
                 <PatientModalWrapper canCreate={canManagePatients} />
             </div>
 

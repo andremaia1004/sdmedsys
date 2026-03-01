@@ -45,6 +45,52 @@ h6 {
   box-shadow: var(--shadow-md);
 }
 
+/* Global Page Structure Utilities */
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: slideUpFade 0.4s ease-out;
+  /* Leaves padding mapping to layout.module.css */
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;

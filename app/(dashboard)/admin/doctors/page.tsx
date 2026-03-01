@@ -139,19 +139,11 @@ export default function DoctorsAdminPage() {
     };
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', animation: 'fadeIn 0.4s ease-out' }}>
-            <style jsx global>{`
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-            `}</style>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
+        <div className="page-container">
+            <div className="page-header">
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 850, color: 'var(--primary)', letterSpacing: '-0.02em' }}>
-                        Gestão de Profissionais
-                    </h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '0.4rem', fontWeight: 500 }}>
-                        Controle central de acesso e dados dos médicos da clínica
-                    </p>
+                    <h1 className="page-title"> Gestão de Profissionais </h1>
+                    <p className="page-subtitle"> Controle central de acesso e dados dos médicos da clínica </p>
                 </div>
                 <Button
                     variant={showForm ? 'secondary' : 'primary'}

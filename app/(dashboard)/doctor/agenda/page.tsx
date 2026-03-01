@@ -51,13 +51,11 @@ export default async function DoctorAgendaPage({
     const appointments = await AppointmentService.list(doctorIdContext, `${startStr}T00:00:00`, `${endStr}T23:59:59`);
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
+        <div className="page-container">
+            <div className="page-header">
                 <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>
-                        Minha Agenda
-                    </h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>Gerencie seus horários e atendimentos clínicos.</p>
+                    <h1 className="page-title"> Minha Agenda </h1>
+                    <p className="page-subtitle">Gerencie seus horários e atendimentos clínicos.</p>
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem', background: '#f1f5f9', padding: '0.4rem', borderRadius: '12px' }}>
