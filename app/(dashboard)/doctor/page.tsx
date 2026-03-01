@@ -95,7 +95,7 @@ export default async function DoctorDashboard() {
                     { label: 'Atendidos', value: completedToday.length, icon: ClipboardList, color: '#8b5cf6', bg: '#f5f3ff' },
                     { label: 'Próximo', value: nextAppointment ? new Date(nextAppointment.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--', icon: Clock, color: '#f59e0b', bg: '#fffbeb' },
                 ].map((stat, i) => (
-                    <Card key={i} style={{ border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}>
+                    <Card key={i} className="interactive-element hover-lift">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem' }}>
                             <div style={{ padding: '0.8rem', background: stat.bg, borderRadius: '14px', color: stat.color }}>
                                 <stat.icon size={26} />
@@ -275,14 +275,6 @@ export default async function DoctorDashboard() {
 
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                .hover-lift:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1) !important;
-                }
-            `}} />
         </div>
     );
 }
