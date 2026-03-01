@@ -8,7 +8,7 @@ const nextConfig = {
     experimental: {
         serverComponentsExternalPackages: ['pdfkit'],
         outputFileTracingIncludes: {
-            '/*': ['./features/documents/fonts/**/*']
+            '/*': ['./features/documents/fonts/*', './logo-clinica/*']
         }
     }
 };
