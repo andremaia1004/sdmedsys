@@ -104,6 +104,7 @@ export async function createDoctorAction(formData: FormData) {
         const createAuth = formData.get('createAuth') === 'true';
 
         let profileId: string | undefined = undefined;
+        const clinicIdToUse = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
 
         // 1. Create Auth User if requested
         if (createAuth && email && password) {
@@ -129,7 +130,7 @@ export async function createDoctorAction(formData: FormData) {
                     id: profileId,
                     email: email,
                     role: 'DOCTOR',
-                    clinic_id: user.clinicId,
+                    clinic_id: clinicIdToUse,
                     updated_at: new Date().toISOString()
                 });
 
@@ -142,8 +143,7 @@ export async function createDoctorAction(formData: FormData) {
 
         // 3. Create Doctor Record
         try {
-            const clinicId = user.clinicId || '550e8400-e29b-41d4-a716-446655440000';
-            const repo = new SupabaseDoctorsRepository(supabaseServer, clinicId);
+            const repo = new SupabaseDoctorsRepository(supabaseServer, clinicIdToUse);
             const doctor = await repo.create({
                 name,
                 specialty,
