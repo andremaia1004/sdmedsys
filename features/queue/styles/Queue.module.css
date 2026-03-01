@@ -31,8 +31,9 @@
     gap: 0;
     background-color: #020617;
     /* Slate 950 */
+    /* Slate 950 */
     color: white;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* font-family inherited globally */
     overflow: hidden;
     position: relative;
 }

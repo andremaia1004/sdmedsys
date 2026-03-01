@@ -17,10 +17,32 @@ body {
 body {
   background-color: var(--bg-main);
   color: var(--text-main);
-  /* Fallback to system fonts, Inter is preferred if user adds it */
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Enforce Inter globally */
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Base Interactions & Polish */
+.interactive-element {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 a {
