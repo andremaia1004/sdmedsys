@@ -5,7 +5,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 async function testUpdate() {
     // Import updateSettingsAction
-    const { updateSettingsAction } = await import('./app/actions/admin');
+    const { updateSettingsAction } = await import('../app/actions/admin');
 
     console.log('Testing updateSettingsAction...');
     try {

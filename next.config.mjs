@@ -5,11 +5,9 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: false,
     },
-    experimental: {
-        serverComponentsExternalPackages: ['pdfkit'],
-        outputFileTracingIncludes: {
-            '/*': ['./features/documents/fonts/*', './logo-clinica/*']
-        }
+    serverExternalPackages: ['pdfkit'],
+    outputFileTracingIncludes: {
+        '/*': ['./features/documents/fonts/*', './logo-clinica/*']
     }
 };
 
