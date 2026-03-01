@@ -74,7 +74,7 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
 
     return (
         <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
+            <div className={styles.modalContent} style={{ maxWidth: showPatientForm ? '850px' : '450px' }}>
                 <h3>Registrar Novo Atendimento (Chegada)</h3>
 
                 <div style={{ marginBottom: '1rem' }}>
@@ -111,8 +111,6 @@ export default function NewWalkInModal({ onClose, onSuccess }: NewWalkInModalPro
                             padding: '1.5rem',
                             borderRadius: '12px',
                             border: '1px solid var(--border)',
-                            maxHeight: '400px',
-                            overflowY: 'auto',
                             animation: 'fadeIn 0.2s ease-out'
                         }}>
                             <PatientForm onSuccess={handlePatientCreated} />
