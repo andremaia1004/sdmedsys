@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { fetchPatientAttachmentsAction, deleteAttachmentRecordAction } from '@/features/documents/attachment_actions';
+import { fetchPatientAttachmentsAction, deleteAttachmentRecordAction, getAttachmentSignedUrlAction } from '@/features/documents/attachment_actions';
 import { PatientAttachment } from '@/features/documents/service.attachments';
 import { AttachmentUploadModal } from './AttachmentUploadModal';
 import { LoadingState, EmptyState } from '@/features/patients/components/TabStates';
@@ -37,6 +37,15 @@ export const PatientAttachments: React.FC<Props> = ({ patientId, role }) => {
     useEffect(() => {
         load();
     }, [load]);
+
+    const handleView = async (filePath: string) => {
+        const result = await getAttachmentSignedUrlAction(filePath);
+        if (result.success && result.data) {
+            window.open(result.data, '_blank', 'noopener,noreferrer');
+        } else {
+            showToast('error', 'Erro ao abrir arquivo.');
+        }
+    };
 
     const handleDelete = async (id: string) => {
         if (!confirm('Deseja realmente excluir este anexo?')) return;
@@ -115,8 +124,7 @@ export const PatientAttachments: React.FC<Props> = ({ patientId, role }) => {
                             <td>{att.fileType.split('/')[1]?.toUpperCase() || att.fileType}</td>
                             <td>{new Date(att.createdAt).toLocaleDateString('pt-BR')}</td>
                             <td className={styles.actions}>
-                                {/* Link for testing - in production this would point to Supabase Storage URL */}
-                                <a href={att.filePath} target="_blank" rel="noopener noreferrer" className={styles.viewBtn}>👁️ Ver</a>
+                                <button onClick={() => handleView(att.filePath)} className={styles.viewBtn}>👁️ Ver</button>
                                 {isFullAccess && (
                                     <button
                                         onClick={() => handleDelete(att.id)}

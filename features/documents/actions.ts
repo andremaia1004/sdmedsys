@@ -32,8 +32,9 @@ export async function generatePrescriptionAction(
         const patient = await PatientService.findById(patientId);
         if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
-        const doctor = await DoctorService.findById(user.id);
-        const doctorName = doctor?.name || 'Médico';
+        // FIX: Use findByProfileId (user.id is the profile id, not doctors.id)
+        const doctor = await DoctorService.findByProfileId(user.id);
+        if (!doctor) return { success: false, error: 'Perfil médico não encontrado. Contate o administrador.' };
 
         const settings = await SettingsService.get();
         const clinicInfo = {
@@ -46,8 +47,8 @@ export async function generatePrescriptionAction(
 
         const pdfBuffer = await PdfService.generatePrescription({
             patientName: patient.name,
-            doctorName,
-            crm: doctor?.crm,
+            doctorName: doctor.name,
+            crm: doctor.crm,
             clinic: clinicInfo,
             medications,
             instructions,
@@ -58,7 +59,7 @@ export async function generatePrescriptionAction(
             clinicId: user.clinicId,
             patientId,
             consultationId: consultationId || null,
-            doctorId: user.id,
+            doctorId: doctor.id, // FIX: use doctors.id (PK), not profile id
             type: 'prescription',
             issuedAt: new Date().toISOString(),
             meta: { medications },
@@ -85,8 +86,9 @@ export async function generateCertificateAction(
         const patient = await PatientService.findById(patientId);
         if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
-        const doctor = await DoctorService.findById(user.id);
-        const doctorName = doctor?.name || 'Médico';
+        // FIX: Use findByProfileId (user.id is the profile id, not doctors.id)
+        const doctor = await DoctorService.findByProfileId(user.id);
+        if (!doctor) return { success: false, error: 'Perfil médico não encontrado. Contate o administrador.' };
 
         const settings = await SettingsService.get();
         const clinicInfo = {
@@ -99,8 +101,8 @@ export async function generateCertificateAction(
 
         const pdfBuffer = await PdfService.generateCertificate({
             patientName: patient.name,
-            doctorName,
-            crm: doctor?.crm,
+            doctorName: doctor.name,
+            crm: doctor.crm,
             clinic: clinicInfo,
             date: new Date().toLocaleDateString('pt-BR'),
             days: days || 0,
@@ -112,7 +114,7 @@ export async function generateCertificateAction(
             clinicId: user.clinicId,
             patientId,
             consultationId: consultationId || null,
-            doctorId: user.id,
+            doctorId: doctor.id, // FIX: use doctors.id (PK), not profile id
             type: 'certificate',
             issuedAt: new Date().toISOString(),
             meta: { days, cid, observation },
@@ -137,8 +139,9 @@ export async function generateReportAction(
         const patient = await PatientService.findById(patientId);
         if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
-        const doctor = await DoctorService.findById(user.id);
-        const doctorName = doctor?.name || 'Médico';
+        // FIX: Use findByProfileId (user.id is the profile id, not doctors.id)
+        const doctor = await DoctorService.findByProfileId(user.id);
+        if (!doctor) return { success: false, error: 'Perfil médico não encontrado. Contate o administrador.' };
 
         const settings = await SettingsService.get();
         const clinicInfo = {
@@ -151,8 +154,8 @@ export async function generateReportAction(
 
         const pdfBuffer = await PdfService.generateReport({
             patientName: patient.name,
-            doctorName,
-            crm: doctor?.crm,
+            doctorName: doctor.name,
+            crm: doctor.crm,
             clinic: clinicInfo,
             date: new Date().toLocaleDateString('pt-BR'),
             content
@@ -162,7 +165,7 @@ export async function generateReportAction(
             clinicId: user.clinicId,
             patientId,
             consultationId: consultationId || null,
-            doctorId: user.id,
+            doctorId: doctor.id, // FIX: use doctors.id (PK), not profile id
             type: 'report',
             issuedAt: new Date().toISOString(),
             meta: { contentSample: content.substring(0, 100) },
@@ -188,8 +191,9 @@ export async function generateExamRequestAction(
         const patient = await PatientService.findById(patientId);
         if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
-        const doctor = await DoctorService.findById(user.id);
-        const doctorName = doctor?.name || 'Médico';
+        // FIX: Use findByProfileId (user.id is the profile id, not doctors.id)
+        const doctor = await DoctorService.findByProfileId(user.id);
+        if (!doctor) return { success: false, error: 'Perfil médico não encontrado. Contate o administrador.' };
 
         const settings = await SettingsService.get();
         const clinicInfo = {
@@ -202,8 +206,8 @@ export async function generateExamRequestAction(
 
         const pdfBuffer = await PdfService.generateExamRequest({
             patientName: patient.name,
-            doctorName,
-            crm: doctor?.crm,
+            doctorName: doctor.name,
+            crm: doctor.crm,
             clinic: clinicInfo,
             date: new Date().toLocaleDateString('pt-BR'),
             examList,
@@ -214,7 +218,7 @@ export async function generateExamRequestAction(
             clinicId: user.clinicId,
             patientId,
             consultationId: consultationId || null,
-            doctorId: user.id,
+            doctorId: doctor.id, // FIX: use doctors.id (PK), not profile id
             type: 'exam_request',
             issuedAt: new Date().toISOString(),
             meta: { examCount: examList.split('\n').filter(l => l.trim()).length },
@@ -242,8 +246,9 @@ export async function generateReferralAction(
         const patient = await PatientService.findById(patientId);
         if (!patient) return { success: false, error: 'Paciente não encontrado.' };
 
-        const doctor = await DoctorService.findById(user.id);
-        const doctorName = doctor?.name || 'Médico';
+        // FIX: Use findByProfileId (user.id is the profile id, not doctors.id)
+        const doctor = await DoctorService.findByProfileId(user.id);
+        if (!doctor) return { success: false, error: 'Perfil médico não encontrado. Contate o administrador.' };
 
         const settings = await SettingsService.get();
         const clinicInfo = {
@@ -256,8 +261,8 @@ export async function generateReferralAction(
 
         const pdfBuffer = await PdfService.generateReferral({
             patientName: patient.name,
-            doctorName,
-            crm: doctor?.crm,
+            doctorName: doctor.name,
+            crm: doctor.crm,
             clinic: clinicInfo,
             date: new Date().toLocaleDateString('pt-BR'),
             specialty,
@@ -270,7 +275,7 @@ export async function generateReferralAction(
             clinicId: user.clinicId,
             patientId,
             consultationId: consultationId || null,
-            doctorId: user.id,
+            doctorId: doctor.id, // FIX: use doctors.id (PK), not profile id
             type: 'referral',
             issuedAt: new Date().toISOString(),
             meta: { specialty, reasonSample: reason.substring(0, 100) },

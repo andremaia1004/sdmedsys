@@ -118,7 +118,17 @@ export class PatientAttachmentService {
             patientId
         });
 
-        return data;
+        return {
+            id: data.id,
+            clinicId: data.clinic_id,
+            patientId: data.patient_id,
+            category: data.category,
+            fileName: data.file_name,
+            filePath: data.file_path,
+            fileType: data.file_type,
+            uploadedBy: data.uploaded_by,
+            createdAt: data.created_at
+        };
     }
 
     static async deleteRecord(id: string): Promise<boolean> {
