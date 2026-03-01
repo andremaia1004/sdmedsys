@@ -162,15 +162,26 @@ export class PdfService {
         let rightEdgeX = width - 50;
 
         // Draw Right-Aligned Logo
-        if (DEFAULT_LOGO) {
-            doc.image(DEFAULT_LOGO, rightEdgeX - 120, 15, { fit: [120, 40], align: 'right' });
+        let localLogo = DEFAULT_LOGO;
+        if (!localLogo) {
+            try {
+                const logoPath = path.resolve(process.cwd(), 'logo-clinica', 'logo-clinica.png');
+                if (fs.existsSync(logoPath)) {
+                    localLogo = fs.readFileSync(logoPath);
+                    DEFAULT_LOGO = localLogo; // cache for next time
+                }
+            } catch (e) { }
+        }
+
+        if (localLogo) {
+            doc.image(localLogo, rightEdgeX - 140, 15, { fit: [140, 55], align: 'right' });
         } else if (data.clinic?.logoUrl) {
             try {
                 const response = await fetch(data.clinic.logoUrl);
                 if (response.ok) {
                     const arrayBuffer = await response.arrayBuffer();
                     const logoBuffer = Buffer.from(arrayBuffer);
-                    doc.image(logoBuffer, rightEdgeX - 120, 15, { fit: [120, 40], align: 'right' });
+                    doc.image(logoBuffer, rightEdgeX - 140, 15, { fit: [140, 55], align: 'right' });
                 }
             } catch (err) { }
         } else {
@@ -209,6 +220,10 @@ export class PdfService {
         // Add Watermark Dots
         this.drawDotsDecoration(doc, 40, nextY + 30, 8, 4);
         this.drawDotsDecoration(doc, width - 70, nextY + 30, 8, 4);
+
+        // RESET X COORDINATE FOR BODY CONTENT
+        // (Prevents text from wrapping on the right side)
+        doc.x = 50;
     }
 
     private static drawFooter(doc: PDFKit.PDFDocument, data: BaseDocumentData) {
