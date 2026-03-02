@@ -28,16 +28,19 @@
         position: fixed;
         transform: translateX(-100%);
         left: 0;
+        z-index: 1000;
     }
 
     .sidebarVisible {
         transform: translateX(0) !important;
         position: fixed !important;
+        z-index: 1000;
     }
 
     .sidebarHidden {
         transform: translateX(-100%) !important;
         position: fixed !important;
+        z-index: 1000;
     }
 }
 
@@ -198,7 +201,7 @@
     padding: 0 2.5rem;
     position: sticky;
     top: 0;
-    z-index: 90;
+    z-index: 50;
 }
 
 @media (max-width: 768px) {

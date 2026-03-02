@@ -22,8 +22,8 @@ export default async function DashboardLayout({
         'DOCTOR': 'Médico'
     };
 
-    const sidebar = (
-        <aside className={styles.sidebar}>
+    const sidebarContent = (
+        <>
             <div className={styles.logoContainer}>
                 {settings.logoUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -43,7 +43,7 @@ export default async function DashboardLayout({
                     </button>
                 </form>
             </div>
-        </aside>
+        </>
     );
 
     const topbarContent = (
@@ -59,7 +59,7 @@ export default async function DashboardLayout({
     );
 
     return (
-        <LayoutShell sidebar={sidebar} topbarContent={topbarContent}>
+        <LayoutShell sidebar={sidebarContent} topbarContent={topbarContent}>
             {children}
         </LayoutShell>
     );

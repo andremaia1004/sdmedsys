@@ -41,9 +41,9 @@ export default function LayoutShell({ sidebar, topbarContent, children }: Layout
     return (
         <div className={`${styles.layout} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
             {/* Sidebar with visibility control handled via CSS class on parent + portal/absolute logic */}
-            <div className={`${styles.sidebar} ${isSidebarVisible ? styles.sidebarVisible : styles.sidebarHidden}`}>
+            <aside className={`${styles.sidebar} ${isSidebarVisible ? styles.sidebarVisible : styles.sidebarHidden}`}>
                 {sidebar}
-            </div>
+            </aside>
 
             {/* Backdrop for mobile */}
             <div
