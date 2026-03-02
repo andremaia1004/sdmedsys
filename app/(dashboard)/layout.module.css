@@ -14,11 +14,12 @@
     flex-direction: column;
     padding: 2rem 1.25rem;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
-    position: sticky;
+    position: fixed;
     top: 0;
-    height: 100vh;
+    left: 0;
+    bottom: 0;
     z-index: 100;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Mobile Sidebar State (Applied only via JS + Media Query) */
@@ -188,6 +189,14 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    margin-left: 280px;
+    /* Same as sidebar width */
+}
+
+@media (max-width: 1024px) {
+    .mainArea {
+        margin-left: 0;
+    }
 }
 
 .topbar {
