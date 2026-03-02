@@ -59,12 +59,13 @@
     border-radius: 16px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: 80px repeat(7, 1fr);
+    grid-template-columns: 70px repeat(7, minmax(140px, 1fr));
     background-color: var(--border);
     gap: 1px;
 }
@@ -199,7 +200,21 @@
     width: 100%;
     max-width: 480px;
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #fff;
+    border-radius: 16px;
     overflow: hidden;
+}
+
+@media (max-width: 480px) {
+    .modalOverlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .modalCard {
+        max-width: 100%;
+        border-radius: 24px 24px 0 0;
+    }
 }
 
 @keyframes slideUp {

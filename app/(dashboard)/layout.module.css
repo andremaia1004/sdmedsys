@@ -2,6 +2,8 @@
     display: flex;
     min-height: 100vh;
     background-color: var(--bg-main);
+    position: relative;
+    overflow-x: hidden;
 }
 
 .sidebar {
@@ -16,6 +18,30 @@
     top: 0;
     height: 100vh;
     z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+}
+
+/* Mobile Sidebar State */
+.sidebarHidden {
+    transform: translateX(-100%);
+    position: fixed;
+}
+
+.sidebarVisible {
+    transform: translateX(0);
+    position: fixed;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 260px;
+        position: fixed;
+        transform: translateX(-100%);
+    }
+
+    .layout:has(.sidebarVisible) .sidebar {
+        transform: translateX(0);
+    }
 }
 
 .logoContainer {
@@ -41,10 +67,10 @@
 
 .logoAccent {
     color: #ff5252;
-    /* Lighter red for better contrast on dark blue */
 }
 
 .navContent {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 2.25rem;
@@ -155,6 +181,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .topbar {
@@ -164,11 +191,33 @@
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0 2.5rem;
     position: sticky;
     top: 0;
     z-index: 90;
+}
+
+@media (max-width: 768px) {
+    .topbar {
+        padding: 0 1.25rem;
+    }
+}
+
+.menuToggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-left: -0.5rem;
+}
+
+@media (max-width: 1024px) {
+    .menuToggle {
+        display: block;
+    }
 }
 
 .userInfo {
@@ -179,6 +228,12 @@
 
 .userData {
     text-align: right;
+}
+
+@media (max-width: 480px) {
+    .userData {
+        display: none;
+    }
 }
 
 .userName {
@@ -220,4 +275,46 @@
     max-width: 1600px;
     margin: 0 auto;
     width: 100%;
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 1rem;
+    }
+}
+
+/* Sidebar Overlay for Mobile */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 45, 94, 0.3);
+    backdrop-filter: blur(4px);
+    z-index: 95;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 1024px) {
+    .layout:has(.sidebarVisible) .overlay {
+        display: block;
+    }
 }

@@ -2,6 +2,7 @@
     width: 100%;
     overflow-x: auto;
     border-radius: var(--radius-sm);
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {

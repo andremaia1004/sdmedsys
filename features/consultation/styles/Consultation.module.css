@@ -41,9 +41,13 @@
     gap: 1.5rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     .workspaceGrid {
         grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        order: -1;
     }
 }
 

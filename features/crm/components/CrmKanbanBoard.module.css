@@ -6,6 +6,14 @@
     height: calc(100vh - 180px);
     /* Adjust based on your header */
     align-items: flex-start;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .board {
+        height: calc(100vh - 140px);
+        padding: 0.5rem;
+    }
 }
 
 .column {

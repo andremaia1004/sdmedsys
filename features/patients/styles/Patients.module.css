@@ -23,6 +23,12 @@
     align-items: start;
 }
 
+@media (max-width: 1200px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Table Styles */
 .tableContainer {
     overflow-x: auto;

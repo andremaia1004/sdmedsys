@@ -31,6 +31,12 @@
     margin-bottom: 2rem;
 }
 
+@media (max-width: 1200px) {
+    .topGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .scheduledBlock,
 .arrivalBlock {
     border: 1px solid #e9ecef;
@@ -148,10 +154,11 @@
 .kanban {
     display: flex;
     gap: 1rem;
-    padding: 1rem 2rem;
+    padding: 1rem 0;
     overflow-x: auto;
     height: 100%;
     align-items: flex-start;
+    -webkit-overflow-scrolling: touch;
 }
 
 .column {
@@ -314,7 +321,21 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    transition: max-width 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 480px) {
+    .modalOverlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .modalContent {
+        max-width: 100%;
+        border-radius: 24px 24px 0 0;
+        padding-bottom: 3rem;
+        max-height: 95vh;
+    }
 }
 
 .modalContent h3 {

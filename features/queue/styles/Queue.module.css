@@ -38,6 +38,14 @@
     position: relative;
 }
 
+@media (max-width: 1024px) {
+    .tvContainer {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60% 40%;
+        overflow-y: auto;
+    }
+}
+
 .mainDisplay {
     display: flex;
     flex-direction: column;
@@ -391,7 +399,7 @@
 
 .opsList {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
 }
 

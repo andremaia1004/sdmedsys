@@ -1,6 +1,6 @@
 .dashboardGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -10,6 +10,12 @@
     grid-template-columns: 1fr 2fr;
     gap: 1.5rem;
     margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .sectionsLayout {
+        grid-template-columns: 1fr;
+    }
 }
 
 .statCard {
@@ -129,7 +135,7 @@
 /* Active doctors list */
 .doctorList {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
 }
 
