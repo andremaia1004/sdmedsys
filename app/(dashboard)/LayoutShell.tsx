@@ -16,9 +16,13 @@ export default function LayoutShell({ sidebar, topbarContent, children }: Layout
     const pathname = usePathname();
 
     // Close sidebar on navigation (mobile)
-    useEffect(() => {
-        setIsSidebarVisible(false);
-    }, [pathname]);
+    const [prevPath, setPrevPath] = useState(pathname);
+    if (pathname !== prevPath) {
+        setPrevPath(pathname);
+        if (isSidebarVisible) {
+            setIsSidebarVisible(false);
+        }
+    }
 
     // Prevent scrolling when mobile menu is open
     useEffect(() => {
