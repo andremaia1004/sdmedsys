@@ -1,51 +1,87 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import Image from 'next/image';
+import { ShieldCheck, Clock, Users, FileText, MonitorSmartphone } from 'lucide-react';
+import styles from './page.module.css';
+
+const benefits = [
+  {
+    icon: <Clock size={32} />,
+    title: 'Atendimento Rápido e Eficiente',
+    description: 'Gestão de agendamentos integrada e fila inteligente que reduz o tempo de espera.'
+  },
+  {
+    icon: <ShieldCheck size={32} />,
+    title: 'Prontuário Seguro',
+    description: 'Registros médicos organizados com validade jurídica, imutáveis após finalização.'
+  },
+  {
+    icon: <Users size={32} />,
+    title: 'Gestão Isolada e Segura',
+    description: 'Acessos específicos para médicos, secretárias e gestão com proteção total dos dados (RLS).'
+  },
+  {
+    icon: <FileText size={32} />,
+    title: 'Emissão de Documentos',
+    description: 'Geração automática de receitas, atestados e laudos em PDF, prontos para impressão.'
+  },
+  {
+    icon: <MonitorSmartphone size={32} />,
+    title: 'Display TV em Tempo Real',
+    description: 'Painel para a sala de espera integrado com a fila, garantindo um fluxo organizado.'
+  }
+];
 
 export default function Home() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      backgroundColor: 'var(--primary)',
-      backgroundImage: 'linear-gradient(135deg, var(--primary) 0%, #001f41 100%)',
-      color: 'white',
-      textAlign: 'center',
-      padding: '2rem'
-    }}>
-      <div style={{
-        width: '120px',
-        height: '120px',
-        backgroundColor: 'var(--accent)',
-        borderRadius: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '3rem',
-        fontWeight: 900,
-        marginBottom: '2rem',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
-      }}>
-        SD
-      </div>
-      <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '1rem', letterSpacing: '-0.05em' }}>
-        SDMED<span style={{ color: 'var(--accent)' }}>SYS</span>
-      </h1>
-      <p style={{ fontSize: '1.25rem', marginBottom: '3rem', opacity: 0.8, maxWidth: '500px' }}>
-        A próxima geração em gestão médica. Eficiente, seguro e moderno.
-      </p>
+    <div className={styles.page}>
+      <main className={styles.hero}>
+        <div className={styles.logoContainer}>
+          <Image
+            src="/logo-clinica.png"
+            alt="Logo da Clínica"
+            width={120}
+            height={120}
+            className={styles.logo}
+            priority
+          />
+        </div>
 
-      <Link href="/login">
-        <Button size="lg" variant="accent" style={{ padding: '1.5rem 3rem', fontSize: '1.25rem', borderRadius: '50px' }}>
-          Acessar Sistema
-        </Button>
-      </Link>
+        <h1 className={styles.title}>
+          SDMED<span className={styles.titleAccent}>SYS</span>
+        </h1>
 
-      <div style={{ marginTop: 'auto', opacity: 0.5, fontSize: '0.875rem' }}>
-        © 2026 SDMED SYS. Todos os direitos reservados.
-      </div>
+        <p className={styles.subtitle}>
+          A próxima geração em gestão médica. Eficiente, seguro e moderno. Desenvolvido para clínicas que buscam excelência no atendimento.
+        </p>
+
+        <div className={styles.ctaWrapper}>
+          <Link href="/login" className={styles.ctaButton}>
+            Acessar Sistema
+          </Link>
+        </div>
+      </main>
+
+      <section className={styles.benefitsSection}>
+        <div className={styles.benefitsGrid}>
+          {benefits.map((benefit, index) => (
+            <div
+              key={index}
+              className={styles.benefitCard}
+              style={{ animationDelay: `${0.8 + index * 0.1}s` }}
+            >
+              <div className={styles.iconWrapper}>
+                {benefit.icon}
+              </div>
+              <h3 className={styles.benefitTitle}>{benefit.title}</h3>
+              <p className={styles.benefitDesc}>{benefit.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <footer className={styles.footer}>
+        © {new Date().getFullYear()} SDMED SYS. Todos os direitos reservados.
+      </footer>
     </div>
   );
 }
