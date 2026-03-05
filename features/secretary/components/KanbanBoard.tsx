@@ -12,13 +12,9 @@ interface KanbanBoardProps {
 }
 
 const COLUMNS = [
-    { id: 'PENDING', label: 'Pendentes' },
-    { id: 'ARRIVED', label: 'Chegaram' },
     { id: 'WAITING', label: 'Aguardando' },
-    { id: 'CALLED', label: 'Chamados' },
     { id: 'IN_SERVICE', label: 'Em Atendimento' },
-    { id: 'DONE', label: 'Finalizados' },
-    { id: 'NO_SHOW', label: 'Faltas' }
+    { id: 'DONE', label: 'Finalizados' }
 ];
 
 export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
@@ -26,13 +22,9 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
 
     const getItemsByColumn = (colId: string) => {
         switch (colId) {
-            case 'PENDING': return items.filter(i => i.appointment_status === 'SCHEDULED');
-            case 'ARRIVED': return items.filter(i => i.appointment_status === 'ARRIVED' && !i.queue_item_id);
-            case 'WAITING': return items.filter(i => i.queue_status === 'WAITING');
-            case 'CALLED': return items.filter(i => i.queue_status === 'CALLED');
+            case 'WAITING': return items.filter(i => i.queue_status === 'WAITING' || i.queue_status === 'CALLED');
             case 'IN_SERVICE': return items.filter(i => i.queue_status === 'IN_SERVICE');
             case 'DONE': return items.filter(i => i.queue_status === 'DONE' || i.appointment_status === 'COMPLETED');
-            case 'NO_SHOW': return items.filter(i => i.appointment_status === 'NO_SHOW' || i.queue_status === 'NO_SHOW');
             default: return [];
         }
     };
@@ -74,17 +66,17 @@ export default function KanbanBoard({ items, onUpdate }: KanbanBoardProps) {
                                 <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>🩺 {item.doctor_name}</div>
 
                                 <div className={styles.actions}>
-                                    {item.appointment_status === 'SCHEDULED' && (
+                                    {(item.queue_status === 'WAITING' || item.queue_status === 'CALLED') && (
                                         <>
-                                            <button onClick={() => handleAction(() => checkInAction(item.id))} className={styles.actionBtn}>Chegou</button>
-                                            <button onClick={() => handleAction(() => markNoShowAction(item.id))} className={styles.noShowBtn}>Faltou</button>
+                                            {item.queue_status === 'WAITING' && (
+                                                <button onClick={() => handleAction(() => updateQueueStatusAction(item.id, item.queue_item_id!, 'CALLED'))} className={styles.actionBtn}>
+                                                    Chamar TV
+                                                </button>
+                                            )}
+                                            <button onClick={() => handleAction(() => updateQueueStatusAction(item.id, item.queue_item_id!, 'IN_SERVICE'))} className={styles.actionBtn}>
+                                                Iniciar
+                                            </button>
                                         </>
-                                    )}
-                                    {item.queue_status === 'WAITING' && (
-                                        <button onClick={() => handleAction(() => updateQueueStatusAction(item.id, item.queue_item_id!, 'CALLED'))} className={styles.actionBtn}>Chamar</button>
-                                    )}
-                                    {item.queue_status === 'CALLED' && (
-                                        <button onClick={() => handleAction(() => updateQueueStatusAction(item.id, item.queue_item_id!, 'IN_SERVICE'))} className={styles.actionBtn}>Iniciar</button>
                                     )}
                                     {item.queue_status === 'IN_SERVICE' && (
                                         <button onClick={() => handleAction(() => updateQueueStatusAction(item.id, item.queue_item_id!, 'DONE'))} className={styles.doneBtn}>Finalizar</button>
