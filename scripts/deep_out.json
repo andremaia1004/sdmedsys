@@ -1,0 +1,543 @@
+{
+  "allRecentApps": [
+    {
+      "id": "705e9945-c811-441e-9214-d066755c021f",
+      "patient_id": "833cc5c9-28b0-4297-9126-5e6b2e078f9a",
+      "patient_name": "Fernando ",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-03-05T15:56:53+00:00",
+      "end_time": "2026-03-05T16:26:53+00:00",
+      "status": "ARRIVED",
+      "notes": null,
+      "created_at": "2026-03-05T12:56:53.627446+00:00",
+      "updated_at": "2026-03-05T12:56:53.627446+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "e0da66ca-a852-4731-8d45-a850ef6c5c3a",
+          "status": "NO_SHOW",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-03-05T12:56:53.977483+00:00",
+          "patient_id": "833cc5c9-28b0-4297-9126-5e6b2e078f9a",
+          "updated_at": "2026-03-05T13:17:06.186719+00:00",
+          "ticket_code": "A001",
+          "appointment_id": "705e9945-c811-441e-9214-d066755c021f"
+        }
+      ]
+    },
+    {
+      "id": "e1ae9e86-4d53-4406-9914-7270b11eea94",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "patient_name": "Andre Maia",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-03-04T12:08:35.272+00:00",
+      "end_time": "2026-03-04T12:38:35.272+00:00",
+      "status": "ARRIVED",
+      "notes": null,
+      "created_at": "2026-03-04T12:08:35.305725+00:00",
+      "updated_at": "2026-03-04T12:08:35.305725+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "1bc5046e-b1f3-4118-89b9-1db9f3930720",
+          "status": "WAITING",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-03-04T12:08:35.563161+00:00",
+          "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+          "updated_at": "2026-03-04T12:08:35.563161+00:00",
+          "ticket_code": "A001",
+          "appointment_id": "e1ae9e86-4d53-4406-9914-7270b11eea94"
+        }
+      ]
+    },
+    {
+      "id": "bdd37f47-ccec-4cf6-84de-50eb1d4bcc8c",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "patient_name": "Andre Maia",
+      "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+      "start_time": "2026-03-02T17:39:23.034+00:00",
+      "end_time": "2026-03-02T18:09:23.034+00:00",
+      "status": "COMPLETED",
+      "notes": null,
+      "created_at": "2026-03-02T17:39:23.089068+00:00",
+      "updated_at": "2026-03-02T17:42:57.20227+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "2f47ada7-ef4f-468c-acaf-9c547a7c01ad",
+          "status": "DONE",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+          "created_at": "2026-03-02T17:39:23.436745+00:00",
+          "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+          "updated_at": "2026-03-02T17:42:57.447761+00:00",
+          "ticket_code": "A001",
+          "appointment_id": "bdd37f47-ccec-4cf6-84de-50eb1d4bcc8c"
+        }
+      ]
+    },
+    {
+      "id": "f079ebd2-ab28-4968-aea7-dfa7813ce9f0",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "patient_name": "Zayne ",
+      "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+      "start_time": "2026-03-01T18:00:00+00:00",
+      "end_time": "2026-03-01T18:30:00+00:00",
+      "status": "ARRIVED",
+      "notes": null,
+      "created_at": "2026-03-01T17:59:22.788155+00:00",
+      "updated_at": "2026-03-01T17:59:22.788155+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "3719af81-fc35-4abb-8ddf-13919d19d1b5",
+          "status": "NO_SHOW",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+          "created_at": "2026-03-01T17:59:23.009945+00:00",
+          "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+          "updated_at": "2026-03-01T22:05:08.448973+00:00",
+          "ticket_code": "A006",
+          "appointment_id": "f079ebd2-ab28-4968-aea7-dfa7813ce9f0"
+        }
+      ]
+    },
+    {
+      "id": "d8990c08-fab3-4cb1-a69c-4c51ab0d894c",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "patient_name": "Zayne ",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-03-01T18:00:00+00:00",
+      "end_time": "2026-03-01T18:30:00+00:00",
+      "status": "COMPLETED",
+      "notes": null,
+      "created_at": "2026-03-01T17:58:57.321476+00:00",
+      "updated_at": "2026-03-01T22:59:53.340785+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "41e43b31-4c2f-49d1-82c9-5d142a09553a",
+          "status": "NO_SHOW",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-03-01T17:58:57.605589+00:00",
+          "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+          "updated_at": "2026-03-01T22:05:05.003619+00:00",
+          "ticket_code": "A005",
+          "appointment_id": "d8990c08-fab3-4cb1-a69c-4c51ab0d894c"
+        }
+      ]
+    },
+    {
+      "id": "a9008d60-e10e-4476-8206-2baa9a693584",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "patient_name": "Zayne ",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-03-01T16:42:00+00:00",
+      "end_time": "2026-03-01T17:12:00+00:00",
+      "status": "COMPLETED",
+      "notes": null,
+      "created_at": "2026-03-01T13:42:00.916557+00:00",
+      "updated_at": "2026-03-01T13:43:12.340159+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "b8b28a86-219c-400d-b5c3-a5ce0025fef8",
+          "status": "DONE",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-03-01T13:42:01.116309+00:00",
+          "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+          "updated_at": "2026-03-01T13:43:12.528951+00:00",
+          "ticket_code": "A004",
+          "appointment_id": "a9008d60-e10e-4476-8206-2baa9a693584"
+        }
+      ]
+    },
+    {
+      "id": "84647ebc-8fdb-417b-96e3-ef028dc72081",
+      "patient_id": "83b344c9-43db-4398-a437-0335fa0dd36c",
+      "patient_name": "Marcio Antonio",
+      "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+      "start_time": "2026-03-01T02:51:08.912+00:00",
+      "end_time": "2026-03-01T03:21:08.912+00:00",
+      "status": "ARRIVED",
+      "notes": null,
+      "created_at": "2026-03-01T02:51:08.96424+00:00",
+      "updated_at": "2026-03-01T02:51:08.96424+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "f1cddde3-88f8-4ad4-a8a3-71cd5f77646e",
+          "status": "NO_SHOW",
+          "priority": "PRIORITY",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+          "created_at": "2026-03-01T02:51:09.461386+00:00",
+          "patient_id": "83b344c9-43db-4398-a437-0335fa0dd36c",
+          "updated_at": "2026-03-01T02:55:23.321011+00:00",
+          "ticket_code": "A003",
+          "appointment_id": "84647ebc-8fdb-417b-96e3-ef028dc72081"
+        }
+      ]
+    },
+    {
+      "id": "d9582470-44bb-45c3-8762-0e7a943f34fe",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "patient_name": "Zayne ",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-03-01T02:36:37.903+00:00",
+      "end_time": "2026-03-01T03:06:37.903+00:00",
+      "status": "ARRIVED",
+      "notes": null,
+      "created_at": "2026-03-01T02:36:37.953005+00:00",
+      "updated_at": "2026-03-01T02:36:37.953005+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "49e6cb91-383c-4a20-9014-50605766ff4e",
+          "status": "NO_SHOW",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-03-01T02:36:38.156563+00:00",
+          "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+          "updated_at": "2026-03-01T02:53:47.353113+00:00",
+          "ticket_code": "A002",
+          "appointment_id": "d9582470-44bb-45c3-8762-0e7a943f34fe"
+        }
+      ]
+    },
+    {
+      "id": "5a010528-b4a8-407e-a9b4-c6b7de30ccc3",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "patient_name": "Andre Maia",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-03-01T02:36:29.232+00:00",
+      "end_time": "2026-03-01T03:06:29.232+00:00",
+      "status": "ARRIVED",
+      "notes": null,
+      "created_at": "2026-03-01T02:36:29.277362+00:00",
+      "updated_at": "2026-03-01T02:36:29.277362+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "a6911077-2a37-41e5-9b3d-6b61b5ad1618",
+          "status": "NO_SHOW",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-03-01T02:36:29.485502+00:00",
+          "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+          "updated_at": "2026-03-01T02:53:50.056715+00:00",
+          "ticket_code": "A001",
+          "appointment_id": "5a010528-b4a8-407e-a9b4-c6b7de30ccc3"
+        }
+      ]
+    },
+    {
+      "id": "78effad5-8440-4bb2-a51e-9f58dd8fd4ba",
+      "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+      "patient_name": "Maria da Silva ",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "start_time": "2026-02-27T16:39:40.113+00:00",
+      "end_time": "2026-02-27T17:09:40.113+00:00",
+      "status": "COMPLETED",
+      "notes": null,
+      "created_at": "2026-02-27T16:39:40.157807+00:00",
+      "updated_at": "2026-03-01T13:40:41.52774+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "queue_items": [
+        {
+          "id": "d4d4d67c-ef44-4627-adb5-52976bf9cf14",
+          "status": "DONE",
+          "priority": "NORMAL",
+          "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+          "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+          "created_at": "2026-02-27T16:39:40.430497+00:00",
+          "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+          "updated_at": "2026-03-01T13:28:40.986313+00:00",
+          "ticket_code": "A005",
+          "appointment_id": "78effad5-8440-4bb2-a51e-9f58dd8fd4ba"
+        }
+      ]
+    }
+  ],
+  "allRecentQueue": [
+    {
+      "id": "e0da66ca-a852-4731-8d45-a850ef6c5c3a",
+      "ticket_code": "A001",
+      "appointment_id": "705e9945-c811-441e-9214-d066755c021f",
+      "patient_id": "833cc5c9-28b0-4297-9126-5e6b2e078f9a",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "NO_SHOW",
+      "created_at": "2026-03-05T12:56:53.977483+00:00",
+      "updated_at": "2026-03-05T13:17:06.186719+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "705e9945-c811-441e-9214-d066755c021f",
+        "notes": null,
+        "status": "ARRIVED",
+        "end_time": "2026-03-05T16:26:53+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-03-05T12:56:53.627446+00:00",
+        "patient_id": "833cc5c9-28b0-4297-9126-5e6b2e078f9a",
+        "start_time": "2026-03-05T15:56:53+00:00",
+        "updated_at": "2026-03-05T12:56:53.627446+00:00",
+        "patient_name": "Fernando "
+      }
+    },
+    {
+      "id": "1bc5046e-b1f3-4118-89b9-1db9f3930720",
+      "ticket_code": "A001",
+      "appointment_id": "e1ae9e86-4d53-4406-9914-7270b11eea94",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "WAITING",
+      "created_at": "2026-03-04T12:08:35.563161+00:00",
+      "updated_at": "2026-03-04T12:08:35.563161+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "e1ae9e86-4d53-4406-9914-7270b11eea94",
+        "notes": null,
+        "status": "ARRIVED",
+        "end_time": "2026-03-04T12:38:35.272+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-03-04T12:08:35.305725+00:00",
+        "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+        "start_time": "2026-03-04T12:08:35.272+00:00",
+        "updated_at": "2026-03-04T12:08:35.305725+00:00",
+        "patient_name": "Andre Maia"
+      }
+    },
+    {
+      "id": "2f47ada7-ef4f-468c-acaf-9c547a7c01ad",
+      "ticket_code": "A001",
+      "appointment_id": "bdd37f47-ccec-4cf6-84de-50eb1d4bcc8c",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+      "status": "DONE",
+      "created_at": "2026-03-02T17:39:23.436745+00:00",
+      "updated_at": "2026-03-02T17:42:57.447761+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "bdd37f47-ccec-4cf6-84de-50eb1d4bcc8c",
+        "notes": null,
+        "status": "COMPLETED",
+        "end_time": "2026-03-02T18:09:23.034+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+        "created_at": "2026-03-02T17:39:23.089068+00:00",
+        "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+        "start_time": "2026-03-02T17:39:23.034+00:00",
+        "updated_at": "2026-03-02T17:42:57.20227+00:00",
+        "patient_name": "Andre Maia"
+      }
+    },
+    {
+      "id": "3719af81-fc35-4abb-8ddf-13919d19d1b5",
+      "ticket_code": "A006",
+      "appointment_id": "f079ebd2-ab28-4968-aea7-dfa7813ce9f0",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+      "status": "NO_SHOW",
+      "created_at": "2026-03-01T17:59:23.009945+00:00",
+      "updated_at": "2026-03-01T22:05:08.448973+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "f079ebd2-ab28-4968-aea7-dfa7813ce9f0",
+        "notes": null,
+        "status": "ARRIVED",
+        "end_time": "2026-03-01T18:30:00+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+        "created_at": "2026-03-01T17:59:22.788155+00:00",
+        "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+        "start_time": "2026-03-01T18:00:00+00:00",
+        "updated_at": "2026-03-01T17:59:22.788155+00:00",
+        "patient_name": "Zayne "
+      }
+    },
+    {
+      "id": "41e43b31-4c2f-49d1-82c9-5d142a09553a",
+      "ticket_code": "A005",
+      "appointment_id": "d8990c08-fab3-4cb1-a69c-4c51ab0d894c",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "NO_SHOW",
+      "created_at": "2026-03-01T17:58:57.605589+00:00",
+      "updated_at": "2026-03-01T22:05:05.003619+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "d8990c08-fab3-4cb1-a69c-4c51ab0d894c",
+        "notes": null,
+        "status": "COMPLETED",
+        "end_time": "2026-03-01T18:30:00+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-03-01T17:58:57.321476+00:00",
+        "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+        "start_time": "2026-03-01T18:00:00+00:00",
+        "updated_at": "2026-03-01T22:59:53.340785+00:00",
+        "patient_name": "Zayne "
+      }
+    },
+    {
+      "id": "b8b28a86-219c-400d-b5c3-a5ce0025fef8",
+      "ticket_code": "A004",
+      "appointment_id": "a9008d60-e10e-4476-8206-2baa9a693584",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "DONE",
+      "created_at": "2026-03-01T13:42:01.116309+00:00",
+      "updated_at": "2026-03-01T13:43:12.528951+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "a9008d60-e10e-4476-8206-2baa9a693584",
+        "notes": null,
+        "status": "COMPLETED",
+        "end_time": "2026-03-01T17:12:00+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-03-01T13:42:00.916557+00:00",
+        "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+        "start_time": "2026-03-01T16:42:00+00:00",
+        "updated_at": "2026-03-01T13:43:12.340159+00:00",
+        "patient_name": "Zayne "
+      }
+    },
+    {
+      "id": "f1cddde3-88f8-4ad4-a8a3-71cd5f77646e",
+      "ticket_code": "A003",
+      "appointment_id": "84647ebc-8fdb-417b-96e3-ef028dc72081",
+      "patient_id": "83b344c9-43db-4398-a437-0335fa0dd36c",
+      "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+      "status": "NO_SHOW",
+      "created_at": "2026-03-01T02:51:09.461386+00:00",
+      "updated_at": "2026-03-01T02:55:23.321011+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "PRIORITY",
+      "appointments": {
+        "id": "84647ebc-8fdb-417b-96e3-ef028dc72081",
+        "notes": null,
+        "status": "ARRIVED",
+        "end_time": "2026-03-01T03:21:08.912+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "e0fd2776-f74e-4870-b92f-353000b5ede4",
+        "created_at": "2026-03-01T02:51:08.96424+00:00",
+        "patient_id": "83b344c9-43db-4398-a437-0335fa0dd36c",
+        "start_time": "2026-03-01T02:51:08.912+00:00",
+        "updated_at": "2026-03-01T02:51:08.96424+00:00",
+        "patient_name": "Marcio Antonio"
+      }
+    },
+    {
+      "id": "49e6cb91-383c-4a20-9014-50605766ff4e",
+      "ticket_code": "A002",
+      "appointment_id": "d9582470-44bb-45c3-8762-0e7a943f34fe",
+      "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "NO_SHOW",
+      "created_at": "2026-03-01T02:36:38.156563+00:00",
+      "updated_at": "2026-03-01T02:53:47.353113+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "d9582470-44bb-45c3-8762-0e7a943f34fe",
+        "notes": null,
+        "status": "ARRIVED",
+        "end_time": "2026-03-01T03:06:37.903+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-03-01T02:36:37.953005+00:00",
+        "patient_id": "d566b9da-d8f6-4080-b20e-d3dc32f01c26",
+        "start_time": "2026-03-01T02:36:37.903+00:00",
+        "updated_at": "2026-03-01T02:36:37.953005+00:00",
+        "patient_name": "Zayne "
+      }
+    },
+    {
+      "id": "a6911077-2a37-41e5-9b3d-6b61b5ad1618",
+      "ticket_code": "A001",
+      "appointment_id": "5a010528-b4a8-407e-a9b4-c6b7de30ccc3",
+      "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "NO_SHOW",
+      "created_at": "2026-03-01T02:36:29.485502+00:00",
+      "updated_at": "2026-03-01T02:53:50.056715+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "5a010528-b4a8-407e-a9b4-c6b7de30ccc3",
+        "notes": null,
+        "status": "ARRIVED",
+        "end_time": "2026-03-01T03:06:29.232+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-03-01T02:36:29.277362+00:00",
+        "patient_id": "e9b32cb7-d04e-4fde-ba0d-77ccdb9fe8dd",
+        "start_time": "2026-03-01T02:36:29.232+00:00",
+        "updated_at": "2026-03-01T02:36:29.277362+00:00",
+        "patient_name": "Andre Maia"
+      }
+    },
+    {
+      "id": "d4d4d67c-ef44-4627-adb5-52976bf9cf14",
+      "ticket_code": "A005",
+      "appointment_id": "78effad5-8440-4bb2-a51e-9f58dd8fd4ba",
+      "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+      "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+      "status": "DONE",
+      "created_at": "2026-02-27T16:39:40.430497+00:00",
+      "updated_at": "2026-03-01T13:28:40.986313+00:00",
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+      "priority": "NORMAL",
+      "appointments": {
+        "id": "78effad5-8440-4bb2-a51e-9f58dd8fd4ba",
+        "notes": null,
+        "status": "COMPLETED",
+        "end_time": "2026-02-27T17:09:40.113+00:00",
+        "clinic_id": "550e8400-e29b-41d4-a716-446655440000",
+        "doctor_id": "d5e044f1-ef68-4731-aebe-5a8afc8c15a9",
+        "created_at": "2026-02-27T16:39:40.157807+00:00",
+        "patient_id": "5d249b4e-8da9-479b-8bd1-a7cffbd0e934",
+        "start_time": "2026-02-27T16:39:40.113+00:00",
+        "updated_at": "2026-03-01T13:40:41.52774+00:00",
+        "patient_name": "Maria da Silva "
+      }
+    }
+  ],
+  "clinics": [
+    {
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    {
+      "clinic_id": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  ]
+}

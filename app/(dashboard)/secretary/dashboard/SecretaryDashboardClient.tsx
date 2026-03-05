@@ -36,7 +36,7 @@ export default function SecretaryDashboard() {
 
     const filteredItems = items.filter(item =>
         item.patient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.ticket_code?.toLowerCase().includes(searchTerm.toLowerCase())
+        (item.ticket_code || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const scheduledItems = items.filter(item => item.appointment_status === 'SCHEDULED');

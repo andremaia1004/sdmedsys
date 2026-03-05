@@ -123,7 +123,12 @@ export class QueueService {
         const items = await repo.list(doctorId);
 
         // Filter only WAITING, CALLED, and IN_SERVICE for the operational view
-        const filtered = items.filter(i => i.status === 'WAITING' || i.status === 'CALLED' || i.status === 'IN_SERVICE');
+        // AND ensure it's from today (to match dashboard)
+        const todayStr = new Date().toISOString().split('T')[0];
+        const filtered = items.filter(i =>
+            (i.status === 'WAITING' || i.status === 'CALLED' || i.status === 'IN_SERVICE') &&
+            (i.created_at || '').startsWith(todayStr)
+        );
 
         if (filtered.length === 0) return [];
 
