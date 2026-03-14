@@ -38,11 +38,11 @@ export class PatientTimelineService {
         if (doctorIds.length > 0) {
             const { data: doctorsData, error: doctorsError } = await supabaseServer
                 .from('doctors')
-                .select('id, name')
-                .in('id', doctorIds);
+                .select('id, profile_id, name')
+                .in('profile_id', doctorIds);
 
             if (!doctorsError && doctorsData) {
-                const doctorMap = new Map(doctorsData.map(doc => [doc.id, doc.name]));
+                const doctorMap = new Map(doctorsData.map(doc => [doc.profile_id, doc.name]));
                 allEvents = allEvents.map(event => ({
                     ...event,
                     doctorName: event.doctorUserId ? doctorMap.get(event.doctorUserId) : undefined

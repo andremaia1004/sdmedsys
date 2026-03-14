@@ -85,26 +85,48 @@ export const PatientTimeline: React.FC<PatientTimelineProps> = ({ patientId }) =
                 )}
 
                 {events.map((event) => (
-                    <div key={event.id} className="mb-8 ml-6 relative">
+                    <div key={event.id} style={{ marginBottom: '2rem', marginLeft: '1.5rem', position: 'relative' }}>
                         {/* Icon/Dot */}
-                        <div className="absolute -left-9 mt-1.5 w-6 h-6 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center">
+                        <div style={{
+                            position: 'absolute',
+                            left: '-2.25rem',
+                            marginTop: '0.375rem',
+                            width: '1.5rem',
+                            height: '1.5rem',
+                            borderRadius: '9999px',
+                            backgroundColor: event.eventType === 'CONSULTATION' ? '#3b82f6' : '#8b5cf6',
+                            border: '2px solid white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                        }}>
                             {/* Simple Icon placeholder */}
-                            <span className="text-white text-xs">
+                            <span style={{ color: 'white', fontSize: '0.75rem', fontWeight: 700 }}>
                                 {event.eventType === 'CONSULTATION' ? 'C' : 'E'}
                             </span>
                         </div>
 
                         {/* Content */}
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start">
-                                <h4 className="text-lg font-semibold text-gray-800">{event.title}</h4>
-                                <span className="text-xs text-gray-400">
+                        <div style={{
+                            backgroundColor: 'white',
+                            padding: '1rem',
+                            borderRadius: '0.5rem',
+                            border: '1px solid #f1f5f9',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                            transition: 'box-shadow 0.2s'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                <h4 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1e293b', margin: 0 }}>{event.title}</h4>
+                                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
                                     {new Date(event.occurredAt).toLocaleDateString()} {new Date(event.occurredAt).toLocaleTimeString()}
                                 </span>
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">{event.summary}</p>
+                            <p style={{ fontSize: '0.875rem', color: '#475569', marginTop: '0.25rem' }}>{event.summary}</p>
                             {event.doctorUserId && (
-                                <p className="text-xs text-gray-400 mt-2">Dr. {event.doctorName || 'Médico'}</p>
+                                <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.5rem', fontWeight: 500 }}>
+                                    Dr. {event.doctorName || 'Médico'}
+                                </p>
                             )}
                         </div>
                     </div>
