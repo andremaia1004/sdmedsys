@@ -25,6 +25,7 @@ export class SecretaryDashboardService {
         const startOfDay = new Date(`${date}T00:00:00-03:00`).toISOString();
         const endOfDay = new Date(`${date}T23:59:59-03:00`).toISOString();
 
+        // 1. Fetch appointments and their queue items
         const { data, error } = await supabase
             .from('appointments')
             .select(`
@@ -32,7 +33,6 @@ export class SecretaryDashboardService {
                 patient_id,
                 patient_name,
                 doctor_id,
-                doctors ( name, specialty ),
                 start_time,
                 status,
                 queue_items (
@@ -51,19 +51,42 @@ export class SecretaryDashboardService {
             return [];
         }
 
-        return (data || []).map(row => ({
-            id: row.id,
-            patient_id: row.patient_id,
-            patient_name: row.patient_name || 'Desconhecido',
-            doctor_id: row.doctor_id,
-            doctor_name: (row.doctors as any)?.name || 'Médico',
-            start_time: row.start_time,
-            appointment_status: row.status as AppointmentStatus,
-            queue_item_id: row.queue_items?.[0]?.id || null,
-            ticket_code: row.queue_items?.[0]?.ticket_code || null,
-            queue_status: row.queue_items?.[0]?.status || null,
-            doctor_specialty: (row.doctors as any)?.specialty || null,
-        }));
+        if (!data || data.length === 0) return [];
+
+        // 2. Map doctor_ids and fetch doctors manually to avoid missing foreign key errors
+        const doctorIds = Array.from(new Set(data.map(app => app.doctor_id).filter(Boolean)));
+        let doctorMap = new Map<string, { name: string, specialty: string | null }>();
+
+        if (doctorIds.length > 0) {
+            const { data: doctorsData, error: doctorsError } = await supabase
+                .from('doctors')
+                .select('id, name, specialty')
+                .in('id', doctorIds);
+
+            if (!doctorsError && doctorsData) {
+                doctorMap = new Map(doctorsData.map(doc => [doc.id, { name: doc.name, specialty: doc.specialty }]));
+            } else {
+                console.error('DashboardService: Error fetching doctors', doctorsError);
+            }
+        }
+
+        // 3. Map the final DashboardItems
+        return data.map(row => {
+            const doctorInfo = row.doctor_id ? doctorMap.get(row.doctor_id) : null;
+            return {
+                id: row.id,
+                patient_id: row.patient_id,
+                patient_name: row.patient_name || 'Desconhecido',
+                doctor_id: row.doctor_id,
+                doctor_name: doctorInfo?.name || 'Médico',
+                start_time: row.start_time,
+                appointment_status: row.status as AppointmentStatus,
+                queue_item_id: row.queue_items?.[0]?.id || null,
+                ticket_code: row.queue_items?.[0]?.ticket_code || null,
+                queue_status: row.queue_items?.[0]?.status || null,
+                doctor_specialty: doctorInfo?.specialty || null,
+            };
+        });
     }
 
     static async markArrived(appointmentId: string, priority: 'NORMAL' | 'PRIORITY' = 'NORMAL'): Promise<boolean> {
