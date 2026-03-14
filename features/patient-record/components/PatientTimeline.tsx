@@ -104,7 +104,7 @@ export const PatientTimeline: React.FC<PatientTimelineProps> = ({ patientId }) =
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{event.summary}</p>
                             {event.doctorUserId && (
-                                <p className="text-xs text-gray-400 mt-2">Dr. {event.doctorUserId}</p>
+                                <p className="text-xs text-gray-400 mt-2">Dr. {event.doctorName || 'Médico'}</p>
                             )}
                         </div>
                     </div>

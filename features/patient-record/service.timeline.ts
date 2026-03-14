@@ -29,9 +29,26 @@ export class PatientTimelineService {
         const [consultations, entries] = await Promise.all([consultationsPromise, entriesPromise]);
 
         // Merge and Sort
-        const allEvents = [...consultations, ...entries].sort((a, b) =>
+        let allEvents = [...consultations, ...entries].sort((a, b) =>
             new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()
         );
+
+        // Fetch Doctor Names to replace raw UUIDs in the timeline
+        const doctorIds = Array.from(new Set(allEvents.map(e => e.doctorUserId).filter(Boolean))) as string[];
+        if (doctorIds.length > 0) {
+            const { data: doctorsData, error: doctorsError } = await supabaseServer
+                .from('doctors')
+                .select('id, name')
+                .in('id', doctorIds);
+
+            if (!doctorsError && doctorsData) {
+                const doctorMap = new Map(doctorsData.map(doc => [doc.id, doc.name]));
+                allEvents = allEvents.map(event => ({
+                    ...event,
+                    doctorName: event.doctorUserId ? doctorMap.get(event.doctorUserId) : undefined
+                }));
+            }
+        }
 
         // Pagination Logic (Slice)
         // Note: Simple slice for now. Real pagination with mixed sources needs cursor or larger buffer.

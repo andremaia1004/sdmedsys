@@ -5,6 +5,7 @@ export interface TimelineEvent {
     eventType: TimelineEventType;
     occurredAt: string; // ISO Timestamp
     doctorUserId?: string; // Optional, for filtering
+    doctorName?: string; // Optional, to display actual doctor name
     title: string;
     summary?: string; // Short description
     link?: string; // e.g. /consultations/[id]
