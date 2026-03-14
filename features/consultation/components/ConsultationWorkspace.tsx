@@ -165,15 +165,6 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                                 </Button>
 
                                 <Button
-                                    variant="secondary"
-                                    onClick={() => setIsUploadOpen(true)}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}
-                                >
-                                    <Paperclip size={18} />
-                                    Anexar Arquivo
-                                </Button>
-
-                                <Button
                                     variant="primary"
                                     onClick={handleFinish}
                                     disabled={status === 'saving'}
@@ -212,18 +203,6 @@ export default function ConsultationWorkspace({ consultation, patient }: Props) 
                     onClose={() => setIsUploadOpen(false)}
                     onSuccess={() => {
                         setIsUploadOpen(false);
-                    }}
-                />
-            )}
-
-            {isUploadOpen && (
-                <AttachmentUploadModal
-                    patientId={patient.id}
-                    role="DOCTOR"
-                    onClose={() => setIsUploadOpen(false)}
-                    onSuccess={() => {
-                        setIsUploadOpen(false);
-                        // Optional: trigger a refresh of history panel if it shows attachments
                     }}
                 />
             )}
