@@ -7,6 +7,7 @@ import { Role } from '@/lib/session';
 import { navItemsByRole } from '@/lib/nav';
 import {
     Calendar,
+    CalendarDays,
     Users,
     FileText,
     Contact,
@@ -15,29 +16,32 @@ import {
     ShieldCheck,
     Tv,
     LayoutDashboard,
-    ClipboardList
+    ClipboardList,
+    DollarSign,
+    Wallet,
+    Tag,
+    KanbanSquare
 } from 'lucide-react';
 
 // Icon Mapping
 const ICON_MAP: Record<string, React.ElementType> = {
-    'Agenda (Sec)': Calendar,
-    'Controle de fila (Sec)': Users,
-    'Agenda (Doc)': Calendar,
-    'Minha fila (Doc)': Users,
     'Minha Fila': Users,
     'Consultas': FileText,
     'Pacientes': Contact,
     'Médicos': Stethoscope,
+    'Funcionários': Users,
     'Painel TV': Tv,
     'Configurações': Settings,
     'Auditoria': ShieldCheck,
-    'Agenda': Calendar,
-    'Painel do dia': LayoutDashboard,
-    'Painel': LayoutDashboard,
+    'Agenda': CalendarDays,
+    'Painel do Dia': LayoutDashboard,
     'Painel Administrativo': LayoutDashboard,
+    'Meu Painel': LayoutDashboard,
     'Operação de Fila': Users,
-    'Gestão Kanban': LayoutDashboard,
-    'Controle de fila': Users,
+    'CRM Comercial': KanbanSquare,
+    'Dashboard Financeiro': DollarSign,
+    'Caixa do Dia': Wallet,
+    'Catálogo de Serviços': Tag,
 };
 
 export default function SidebarNav({ role }: { role: Role }) {

@@ -17,27 +17,42 @@ export type NavGroup = {
 export const navItemsByRole: Record<Role, NavGroup[]> = {
     ADMIN: [
         {
-            title: 'Operação (Atalhos)',
+            title: 'Painel',
             items: [
                 {
                     label: 'Painel Administrativo',
                     href: '/admin',
                     rolesAllowed: ['ADMIN'],
                 },
+            ]
+        },
+        {
+            title: 'Operação',
+            items: [
                 {
-                    label: 'Painel do dia',
+                    label: 'Painel do Dia',
                     href: '/secretary/dashboard',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
                 },
                 {
-                    label: 'Agenda (Doc)',
+                    label: 'Operação de Fila',
+                    href: '/secretary/queue/ops',
+                    rolesAllowed: ['ADMIN', 'SECRETARY'],
+                },
+                {
+                    label: 'Agenda',
                     href: '/doctor/agenda',
                     rolesAllowed: ['ADMIN', 'DOCTOR'],
                 },
                 {
-                    label: 'Minha fila (Doc)',
-                    href: '/doctor/queue',
-                    rolesAllowed: ['ADMIN', 'DOCTOR'],
+                    label: 'CRM Comercial',
+                    href: '/secretary/crm',
+                    rolesAllowed: ['ADMIN', 'SECRETARY'],
+                },
+                {
+                    label: 'Painel TV',
+                    href: '/tv',
+                    rolesAllowed: ['ADMIN', 'SECRETARY'],
                 },
             ]
         },
@@ -72,13 +87,13 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
                     rolesAllowed: ['ADMIN'],
                 },
                 {
-                    label: 'Catálogo de Serviços',
-                    href: '/admin/financial/services',
+                    label: 'Caixa do Dia',
+                    href: '/secretary/financial',
                     rolesAllowed: ['ADMIN'],
                 },
                 {
-                    label: 'Caixa do Dia',
-                    href: '/secretary/financial',
+                    label: 'Catálogo de Serviços',
+                    href: '/admin/financial/services',
                     rolesAllowed: ['ADMIN'],
                 },
             ]
@@ -86,11 +101,6 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
         {
             title: 'Sistema',
             items: [
-                {
-                    label: 'Painel TV',
-                    href: '/tv',
-                    rolesAllowed: ['ADMIN', 'SECRETARY'], // Usually PIN protected, but listed for navigation
-                },
                 {
                     label: 'Configurações',
                     href: '/admin/settings',
@@ -110,9 +120,14 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             title: 'Operação',
             items: [
                 {
-                    label: 'Painel do dia',
+                    label: 'Painel do Dia',
                     href: '/secretary/dashboard',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
+                },
+                {
+                    label: 'Agenda',
+                    href: '/secretary/agenda',
+                    rolesAllowed: ['SECRETARY'],
                 },
                 {
                     label: 'Operação de Fila',
@@ -160,7 +175,7 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             title: 'Atendimento',
             items: [
                 {
-                    label: 'Painel',
+                    label: 'Meu Painel',
                     href: '/doctor',
                     rolesAllowed: ['ADMIN', 'DOCTOR'],
                 },
@@ -169,15 +184,6 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
                     href: '/doctor/queue',
                     rolesAllowed: ['ADMIN', 'DOCTOR'],
                 },
-                // Note: 'Consultation' is usually dynamic (/doctor/consultation/[id]), 
-                // so it might not be a direct Sidebar link unless it points to a "Worklist" or "Active Consultation".
-                // Assuming it links to the queue or a specific landing for consultations if changed.
-                // For now, mapping as requested, but logic implies this is started from Queue.
-            ]
-        },
-        {
-            title: 'Agenda',
-            items: [
                 {
                     label: 'Agenda',
                     href: '/doctor/agenda',
