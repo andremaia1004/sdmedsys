@@ -104,6 +104,26 @@ export default function SidebarNav({ role }: { role: Role }) {
                 const GroupIcon = GROUP_ICON_MAP[group.title] || ClipboardList;
                 const hasActiveItem = group.items.some(item => isRouteActive(item.href));
 
+                // Single-item group: render as direct link, no accordion
+                if (group.items.length === 1) {
+                    const item = group.items[0];
+                    if (!item.rolesAllowed.includes(role)) return null;
+                    const IconComponent = ICON_MAP[item.label] || ClipboardList;
+                    const isActive = isRouteActive(item.href);
+                    return (
+                        <nav key={group.title} className={styles.navSection}>
+                            <Link
+                                href={item.href}
+                                target={item.label === 'Painel TV' ? '_blank' : undefined}
+                                className={`${styles.navLink} ${isActive ? styles.activeLink : ''}`}
+                            >
+                                <IconComponent size={18} className={styles.navIcon} />
+                                <span>{item.label}</span>
+                            </Link>
+                        </nav>
+                    );
+                }
+
                 return (
                     <nav key={group.title} className={styles.navSection}>
                         <button
