@@ -72,35 +72,23 @@ export default function SidebarNav({ role }: { role: Role }) {
         return false;
     };
 
-    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
-        const expanded = new Set<string>();
-        navGroups.forEach(group => {
-            if (group.items.some(item => isRouteActive(item.href))) {
-                expanded.add(group.title);
-            }
-        });
-        if (expanded.size === 0 && navGroups.length > 0) {
-            expanded.add(navGroups[0].title);
-        }
-        return expanded;
-    });
+    const getInitialOpen = () => {
+        const active = navGroups.find(group =>
+            group.items.some(item => isRouteActive(item.href))
+        );
+        return active?.title ?? (navGroups.find(g => g.items.length > 1)?.title ?? '');
+    };
+
+    const [openGroup, setOpenGroup] = useState<string>(getInitialOpen);
 
     const toggleGroup = (title: string) => {
-        setExpandedGroups(prev => {
-            const next = new Set(prev);
-            if (next.has(title)) {
-                next.delete(title);
-            } else {
-                next.add(title);
-            }
-            return next;
-        });
+        setOpenGroup(prev => prev === title ? '' : title);
     };
 
     return (
         <div className={styles.navContent}>
             {navGroups.map((group) => {
-                const isExpanded = expandedGroups.has(group.title);
+                const isExpanded = openGroup === group.title;
                 const GroupIcon = GROUP_ICON_MAP[group.title] || ClipboardList;
                 const hasActiveItem = group.items.some(item => isRouteActive(item.href));
 
