@@ -1,6 +1,8 @@
+import Link from 'next/link';
 import { DashboardStats } from '../dashboard/service';
 import styles from './AdminDashboard.module.css';
 import { Users, CalendarDays, ClipboardList, Activity, Stethoscope } from 'lucide-react';
+import PatientModalWrapper from '@/features/patients/components/PatientModalWrapper';
 
 interface AdminDashboardProps {
     stats: DashboardStats | null;
@@ -20,6 +22,19 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
             <div className={styles.pageHeader}>
                 <h1>Painel Administrativo</h1>
                 <p>{today}</p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className={styles.quickActions}>
+                <PatientModalWrapper canCreate={true} />
+                <Link href="/secretary/queue/ops" className={styles.quickActionBtn}>
+                    <ClipboardList size={16} />
+                    Ver Fila
+                </Link>
+                <Link href="/doctor/agenda" className={styles.quickActionBtn}>
+                    <CalendarDays size={16} />
+                    Agendar
+                </Link>
             </div>
 
             {/* KPI Cards */}

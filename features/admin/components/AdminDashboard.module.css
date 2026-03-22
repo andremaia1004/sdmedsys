@@ -185,6 +185,36 @@
     font-size: 0.9rem;
 }
 
+/* Quick Actions bar */
+.quickActions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.quickActionBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--border, #e2e8f0);
+    background: var(--card-bg, #fff);
+    color: var(--text-primary, #0f172a);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+}
+
+.quickActionBtn:hover {
+    background: var(--bg-subtle, #f8fafc);
+    border-color: var(--primary, #2563eb);
+    color: var(--primary, #2563eb);
+}
+
 /* Page header */
 .pageHeader {
     margin-bottom: 2rem;
