@@ -7,7 +7,6 @@ import styles from './layout.module.css';
 import { Role } from '@/lib/session';
 import { navItemsByRole } from '@/lib/nav';
 import {
-    Calendar,
     CalendarDays,
     Users,
     FileText,
@@ -23,10 +22,15 @@ import {
     Tag,
     KanbanSquare,
     ChevronDown,
-    ChevronRight
+    Activity,
+    FolderOpen,
+    Banknote,
+    Wrench,
+    HeartPulse,
+    Monitor
 } from 'lucide-react';
 
-// Icon Mapping
+// Item icon mapping
 const ICON_MAP: Record<string, React.ElementType> = {
     'Minha Fila': Users,
     'Consultas': FileText,
@@ -47,6 +51,17 @@ const ICON_MAP: Record<string, React.ElementType> = {
     'Catálogo de Serviços': Tag,
 };
 
+// Group header icon mapping
+const GROUP_ICON_MAP: Record<string, React.ElementType> = {
+    'Painel': Monitor,
+    'Operação': Activity,
+    'Cadastros': FolderOpen,
+    'Financeiro': Banknote,
+    'Sistema': Wrench,
+    'Atendimento': HeartPulse,
+    'Agenda': CalendarDays,
+};
+
 export default function SidebarNav({ role }: { role: Role }) {
     const pathname = usePathname();
     const navGroups = navItemsByRole[role] || [];
@@ -64,7 +79,6 @@ export default function SidebarNav({ role }: { role: Role }) {
                 expanded.add(group.title);
             }
         });
-        // Default: expand first group if nothing is active
         if (expanded.size === 0 && navGroups.length > 0) {
             expanded.add(navGroups[0].title);
         }
@@ -87,18 +101,21 @@ export default function SidebarNav({ role }: { role: Role }) {
         <div className={styles.navContent}>
             {navGroups.map((group) => {
                 const isExpanded = expandedGroups.has(group.title);
+                const GroupIcon = GROUP_ICON_MAP[group.title] || ClipboardList;
+                const hasActiveItem = group.items.some(item => isRouteActive(item.href));
 
                 return (
                     <nav key={group.title} className={styles.navSection}>
                         <button
-                            className={styles.navTitleButton}
+                            className={`${styles.groupHeader} ${hasActiveItem ? styles.groupHeaderActive : ''}`}
                             onClick={() => toggleGroup(group.title)}
                         >
-                            <span className={styles.navTitle}>{group.title}</span>
-                            {isExpanded
-                                ? <ChevronDown size={12} className={styles.chevronIcon} />
-                                : <ChevronRight size={12} className={styles.chevronIcon} />
-                            }
+                            <GroupIcon size={18} className={styles.groupHeaderIcon} />
+                            <span className={styles.groupHeaderLabel}>{group.title}</span>
+                            <ChevronDown
+                                size={14}
+                                className={`${styles.groupChevron} ${isExpanded ? styles.groupChevronOpen : ''}`}
+                            />
                         </button>
                         {isExpanded && (
                             <div className={styles.navGroup}>
@@ -115,7 +132,7 @@ export default function SidebarNav({ role }: { role: Role }) {
                                             target={item.label === 'Painel TV' ? '_blank' : undefined}
                                             className={`${styles.navLink} ${isActive ? styles.activeLink : ''}`}
                                         >
-                                            <IconComponent size={18} className={styles.navIcon} />
+                                            <IconComponent size={16} className={styles.navIcon} />
                                             <span>{item.label}</span>
                                         </Link>
                                     );
