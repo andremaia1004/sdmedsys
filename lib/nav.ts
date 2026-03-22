@@ -64,6 +64,26 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
             ]
         },
         {
+            title: 'Financeiro',
+            items: [
+                {
+                    label: 'Dashboard Financeiro',
+                    href: '/admin/financial',
+                    rolesAllowed: ['ADMIN'],
+                },
+                {
+                    label: 'Catálogo de Serviços',
+                    href: '/admin/financial/services',
+                    rolesAllowed: ['ADMIN'],
+                },
+                {
+                    label: 'Caixa do Dia',
+                    href: '/secretary/financial',
+                    rolesAllowed: ['ADMIN'],
+                },
+            ]
+        },
+        {
             title: 'Sistema',
             items: [
                 {
@@ -107,6 +127,16 @@ export const navItemsByRole: Record<Role, NavGroup[]> = {
                 {
                     label: 'Painel TV',
                     href: '/tv',
+                    rolesAllowed: ['ADMIN', 'SECRETARY'],
+                },
+            ]
+        },
+        {
+            title: 'Financeiro',
+            items: [
+                {
+                    label: 'Caixa do Dia',
+                    href: '/secretary/financial',
                     rolesAllowed: ['ADMIN', 'SECRETARY'],
                 },
             ]
